@@ -32,7 +32,7 @@
 
     .topbar {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.8fr) auto auto;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(76px, 1.15fr) auto auto;
       align-items: center;
       gap: 8px;
       padding: 8px;
@@ -57,24 +57,25 @@
       font-size: 18px;
     }
     .icon-button:hover { background: #eef2ff; }
-    .topbar #pause { grid-row: 1; grid-column: 5; }
-    .topbar #settings { grid-row: 1; grid-column: 6; }
+    .topbar #pause { grid-row: 1; grid-column: 4; }
+    .topbar #settings { grid-row: 1; grid-column: 5; }
     .timer-row {
-      grid-column: 4;
+      grid-column: 3;
       grid-row: 1;
       display: flex;
-      min-height: 40px;
+      min-width: 0;
+      min-height: 36px;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 3px;
       border: 1px solid #dfe6fa;
       border-radius: 12px;
       color: #3455ce;
       background: #f2f5ff;
-      font-size: 28px;
+      font-size: 16px;
       font-weight: 900;
       font-variant-numeric: tabular-nums;
-      letter-spacing: .04em;
+      letter-spacing: 0;
     }
 
     .board-wrap { position: relative; width: 100%; }
@@ -237,10 +238,13 @@
 
     .number-pad { display: grid; grid-template-columns: repeat(9, 1fr); gap: 5px; }
     .number-button {
-      display: grid;
+      display: flex;
+      flex-direction: column;
       min-height: 52px;
-      place-items: center;
+      align-items: center;
+      justify-content: center;
       padding: 0;
+      gap: 1px;
       border: 1px solid #e5eaf4;
       border-radius: 10px;
       color: #4569e8;
@@ -249,8 +253,10 @@
       font-weight: 700;
       transition: transform .12s ease, background .12s ease;
     }
+    .number-button .remaining-count { color: var(--muted); font-size: 9px; font-weight: 750; line-height: 1; }
     .number-button:hover { background: #eef2ff; }
     .number-button.selected { border-color: var(--blue); color: #fff; background: var(--blue); box-shadow: 0 3px 10px #4569e84d; }
+    .number-button.selected .remaining-count { color: #fff; }
     .number-button:active, .tool:active { transform: scale(.96); }
     .number-button:disabled { opacity: .3; cursor: default; }
 
@@ -299,7 +305,7 @@
     @media (max-width: 380px) {
       .topbar { gap: 5px; padding: 6px; }
       .icon-button { width: 34px; height: 34px; }
-      .number-button { min-height: 46px; font-size: 21px; }
+      .number-button { min-height: 46px; font-size: 20px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
@@ -309,7 +315,6 @@
 <body>
   <main class="app">
     <header class="topbar">
-      <div class="stat"><span class="stat-label">Độ khó</span><span class="stat-value" id="difficulty-label">Vừa</span></div>
       <div class="stat"><span class="stat-label">Điểm</span><span class="stat-value" id="score">0</span></div>
       <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
       <div class="timer-row"><span aria-hidden="true">⏱</span><span id="timer">00:00</span></div>
@@ -332,15 +337,15 @@
     </div>
 
     <div class="number-pad" id="number-pad" aria-label="Bàn phím số">
-      <button class="number-button" type="button" data-value="1" aria-label="Điền số 1">1</button>
-      <button class="number-button" type="button" data-value="2" aria-label="Điền số 2">2</button>
-      <button class="number-button" type="button" data-value="3" aria-label="Điền số 3">3</button>
-      <button class="number-button" type="button" data-value="4" aria-label="Điền số 4">4</button>
-      <button class="number-button" type="button" data-value="5" aria-label="Điền số 5">5</button>
-      <button class="number-button" type="button" data-value="6" aria-label="Điền số 6">6</button>
-      <button class="number-button" type="button" data-value="7" aria-label="Điền số 7">7</button>
-      <button class="number-button" type="button" data-value="8" aria-label="Điền số 8">8</button>
-      <button class="number-button" type="button" data-value="9" aria-label="Điền số 9">9</button>
+      <button class="number-button" type="button" data-value="1" aria-label="Điền số 1"><span>1</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="2" aria-label="Điền số 2"><span>2</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="3" aria-label="Điền số 3"><span>3</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="4" aria-label="Điền số 4"><span>4</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="5" aria-label="Điền số 5"><span>5</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="6" aria-label="Điền số 6"><span>6</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="7" aria-label="Điền số 7"><span>7</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="8" aria-label="Điền số 8"><span>8</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="9" aria-label="Điền số 9"><span>9</span><span class="remaining-count">9</span></button>
     </div>
   </main>
 
@@ -401,13 +406,11 @@
 
       const MAX_ERRORS = 3;
       const MAX_HINTS = 3;
-      const levelNames = { easy: "Dễ", medium: "Vừa", hard: "Khó" };
       const boardElement = document.getElementById("board");
       const timerElement = document.getElementById("timer");
       const toastElement = document.getElementById("toast");
       const hintPopover = document.getElementById("hint-popover");
       const difficultyElement = document.getElementById("difficulty");
-      const difficultyLabel = document.getElementById("difficulty-label");
       const scoreElement = document.getElementById("score");
       const errorsElement = document.getElementById("errors");
       const hintCountElement = document.getElementById("hint-count");
@@ -618,8 +621,14 @@
         });
 
         boardElement.replaceChildren(fragment);
+        const digitCounts = Array(10).fill(0);
+        values.forEach((value) => { if (value) digitCounts[value] += 1; });
         document.querySelectorAll(".number-button").forEach((button) => {
-          button.classList.toggle("selected", Number(button.dataset.value) === selectedDigit);
+          const digit = Number(button.dataset.value);
+          const remaining = 9 - digitCounts[digit];
+          button.classList.toggle("selected", digit === selectedDigit);
+          button.querySelector(".remaining-count").textContent = String(remaining);
+          button.setAttribute("aria-label", `Điền số ${digit}, còn ${remaining} ô`);
         });
       }
 
@@ -636,7 +645,6 @@
         hintCountElement.textContent = String(hintsLeft);
         document.getElementById("hint").disabled = hintsLeft === 0;
         document.getElementById("undo").disabled = history.length === 0;
-        difficultyLabel.textContent = levelNames[difficultyElement.value];
       }
 
       function isComplete() {
