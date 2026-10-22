@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4f6f8">
-  <title>Sudoku</title>
+  <title>Sudoku truyền thống</title>
   <style>
     :root {
       color-scheme: light;
@@ -130,27 +130,27 @@
   <main>
     <header>
       <h1>SUDOKU</h1>
-      <p>Fill every row, column, and 3 × 3 box with 1–9.</p>
+      <p>Điền các số từ 1 đến 9 vào mỗi hàng, cột và ô vuông 3 × 3.</p>
     </header>
-    <div id="board" role="group" aria-label="Sudoku board"></div>
-    <p id="status" role="status" aria-live="polite">Select a cell, then enter a number.</p>
-    <div class="number-pad" aria-label="Number pad">
-      <button class="key" data-number="1" aria-label="Enter 1">1</button>
-      <button class="key" data-number="2" aria-label="Enter 2">2</button>
-      <button class="key" data-number="3" aria-label="Enter 3">3</button>
-      <button class="key" data-number="4" aria-label="Enter 4">4</button>
-      <button class="key" data-number="5" aria-label="Enter 5">5</button>
-      <button class="key" data-number="6" aria-label="Enter 6">6</button>
-      <button class="key" data-number="7" aria-label="Enter 7">7</button>
-      <button class="key" data-number="8" aria-label="Enter 8">8</button>
-      <button class="key" data-number="9" aria-label="Enter 9">9</button>
+    <div id="board" role="group" aria-label="Bàn cờ Sudoku"></div>
+    <p id="status" role="status" aria-live="polite">Chọn một ô trống, sau đó nhập số.</p>
+    <div class="number-pad" aria-label="Bàn phím số">
+      <button class="key" data-number="1" aria-label="Nhập số 1">1</button>
+      <button class="key" data-number="2" aria-label="Nhập số 2">2</button>
+      <button class="key" data-number="3" aria-label="Nhập số 3">3</button>
+      <button class="key" data-number="4" aria-label="Nhập số 4">4</button>
+      <button class="key" data-number="5" aria-label="Nhập số 5">5</button>
+      <button class="key" data-number="6" aria-label="Nhập số 6">6</button>
+      <button class="key" data-number="7" aria-label="Nhập số 7">7</button>
+      <button class="key" data-number="8" aria-label="Nhập số 8">8</button>
+      <button class="key" data-number="9" aria-label="Nhập số 9">9</button>
     </div>
     <div class="actions">
-      <button class="action" id="reset">Reset</button>
-      <button class="action primary" id="check">Check</button>
-      <button class="action" id="new-game">New game</button>
+      <button class="action" id="reset">Làm lại</button>
+      <button class="action primary" id="check">Kiểm tra</button>
+      <button class="action" id="new-game">Ván mới</button>
     </div>
-    <p class="help">Keyboard: 1–9 to enter · Backspace or Delete to clear.</p>
+    <p class="help">Phím tắt: 1–9 để nhập · Backspace hoặc Delete để xóa.</p>
   </main>
 
   <script>
@@ -234,7 +234,7 @@
           cell.type = "button";
           cell.className = "cell";
           cell.textContent = value || "";
-          cell.setAttribute("aria-label", `Row ${row + 1}, column ${column + 1}${value ? `, ${value}` : ", empty"}${puzzle[row][column] ? ", given" : ""}`);
+          cell.setAttribute("aria-label", `Hàng ${row + 1}, cột ${column + 1}${value ? `, ${value}` : ", trống"}${puzzle[row][column] ? ", ô cho sẵn" : ""}`);
           cell.setAttribute("aria-pressed", String(selected === index));
           if (puzzle[row][column]) cell.classList.add("given");
           if (selected >= 0 &&
@@ -257,7 +257,7 @@
       function enterNumber(number) {
         if (selected < 0 || puzzle[Math.floor(selected / 9)][selected % 9]) return;
         values[selected] = number;
-        setStatus(number ? "Number entered." : "Cell cleared.");
+        setStatus(number ? "Đã nhập số." : "Đã xóa số.");
         render();
       }
 
@@ -265,7 +265,7 @@
         puzzle = createPuzzle();
         values = puzzle.flat();
         selected = -1;
-        setStatus("Select a cell, then enter a number.");
+        setStatus("Chọn một ô trống, sau đó nhập số.");
         render();
       }
 
@@ -274,21 +274,26 @@
       });
       document.querySelector("#reset").addEventListener("click", () => {
         values = puzzle.flat();
-        setStatus("Board reset.");
+        setStatus("Đã khôi phục bàn cờ.");
         render();
       });
       document.querySelector("#new-game").addEventListener("click", startGame);
       document.querySelector("#check").addEventListener("click", () => {
         const conflicts = findConflicts();
         const empty = values.includes(0);
-        if (conflicts.size) setStatus("There are repeated numbers in a row, column, or box.", "error");
-        else if (empty) setStatus("No conflicts so far. Keep going!", "");
-        else setStatus("Congratulations — the puzzle is solved!", "success");
+        if (conflicts.size) setStatus("Có số bị lặp trong hàng, cột hoặc ô vuông 3 × 3.", "error");
+        else if (empty) setStatus("Chưa có lỗi. Tiếp tục nhé!", "");
+        else setStatus("Chúc mừng — bạn đã giải xong Sudoku!", "success");
         render();
       });
       document.addEventListener("keydown", event => {
-        if (/^[1-9]$/.test(event.key)) enterNumber(Number(event.key));
-        else if (event.key === "Backspace" || event.key === "Delete" || event.key === "0") enterNumber(0);
+        if (/^[1-9]$/.test(event.key)) {
+          event.preventDefault();
+          enterNumber(Number(event.key));
+        } else if (event.key === "Backspace" || event.key === "Delete" || event.key === "0") {
+          event.preventDefault();
+          enterNumber(0);
+        }
       });
 
       startGame();

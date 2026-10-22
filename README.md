@@ -1,5 +1,5 @@
-# Traditional Sudoku
+# Sudoku truyền thống
 
-A classic 9 × 9 Sudoku game. Open `index.html` in a browser to play; no installation or server is required.
+Trò chơi Sudoku cổ điển 9 × 9. Mở `index.html` bằng trình duyệt để chơi; không cần cài đặt hoặc máy chủ.
 
-Select an empty cell and enter a number using the on-screen number pad or your keyboard. Use **Check** to highlight rule conflicts or confirm a completed board, **Reset** to restore the current puzzle, and **New game** to start a freshly shuffled puzzle.
+Chọn một ô trống rồi nhập số bằng bàn phím số trên màn hình hoặc bàn phím máy tính. Chọn **Kiểm tra** để tìm số bị lặp hoặc xác nhận bàn cờ đã hoàn thành, **Làm lại** để khôi phục câu đố hiện tại, hoặc **Ván mới** để bắt đầu câu đố được xáo trộn.
