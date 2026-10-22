@@ -276,14 +276,10 @@
           <h1 id="game-title">Sudoku</h1>
           <p class="subtitle">Điền các số từ 1 đến 9 vào bảng.</p>
         </div>
-        <div class="stats" aria-label="Thống kê ván chơi">
+        <div class="stats" aria-label="Thời gian chơi">
           <div class="stat">
             <span class="stat-label">Thời gian</span>
             <span class="stat-value" id="timer">00:00</span>
-          </div>
-          <div class="stat">
-            <span class="stat-label">Lỗi</span>
-            <span class="stat-value" id="mistakes">0 / 3</span>
           </div>
         </div>
       </div>
@@ -343,7 +339,6 @@
 
       const boardElement = document.getElementById("board");
       const timerElement = document.getElementById("timer");
-      const mistakesElement = document.getElementById("mistakes");
       const messageElement = document.getElementById("message");
       const difficultyElement = document.getElementById("difficulty");
       const clueTargets = { easy: 42, medium: 37, hard: 32 };
@@ -353,7 +348,6 @@
       let values = [];
       let selectedCell = -1;
       let invalidCell = -1;
-      let mistakes = 0;
       let startedAt = Date.now();
       let finished = false;
 
@@ -516,7 +510,6 @@
       function updateStats() {
         const seconds = Math.floor((Date.now() - startedAt) / 1000);
         timerElement.textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
-        mistakesElement.textContent = String(mistakes);
       }
 
       function isComplete() {
@@ -534,14 +527,12 @@
 
         if (value && value !== solution[row][column]) {
           invalidCell = selectedCell;
-          mistakes += 1;
-          setMessage("Số này sẽ trùng với đáp án chuẩn trong cùng hàng, cột và ô 3 × 3 nên chưa được điền.", "error");
-          updateStats();
+          setMessage("Số không chính xác nên chưa được điền. Hãy thử lại.", "error");
           renderBoard();
           return;
         }
 
-        invalidCell = -1;
+        if (invalidCell === selectedCell) invalidCell = -1;
         values[selectedCell] = value;
         if (value) {
           setMessage("Chính xác! Tiếp tục thôi.");
@@ -563,7 +554,6 @@
         values = puzzle.flat();
         selectedCell = -1;
         invalidCell = -1;
-        mistakes = 0;
         startedAt = Date.now();
         finished = false;
         setMessage("Chọn một ô trống rồi nhập số bạn muốn.");
@@ -575,7 +565,6 @@
         values = puzzle.flat();
         selectedCell = -1;
         invalidCell = -1;
-        mistakes = 0;
         startedAt = Date.now();
         finished = false;
         setMessage("Ván chơi đã được đặt lại. Chúc bạn may mắn!");
@@ -587,7 +576,6 @@
         const cell = event.target.closest(".cell");
         if (!cell || cell.disabled) return;
         selectedCell = Number(cell.dataset.index);
-        invalidCell = -1;
         setMessage("Ô đã chọn. Nhập số từ 1 đến 9.");
         renderBoard();
       });
