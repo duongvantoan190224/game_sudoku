@@ -118,7 +118,6 @@
     .cell.same { color: #3455ce; background: #e7edff; }
     .cell.user-entry { color: #087f6a; font-weight: 800; }
     .cell.selected { z-index: 1; outline: 2px solid var(--blue); outline-offset: -2px; background: #dce5ff; }
-    .cell.wrong { color: #d64c55; background: #fff0f0; }
     .cell.conflict { color: #d64c55; }
     .cell.invalid, .cell.invalid.selected { color: #b4232e; background: #ffe1e2; box-shadow: inset 0 0 0 2px #d64c55; }
     .cell:focus-visible { z-index: 2; outline: 3px solid #7891f5; outline-offset: -3px; }
@@ -609,7 +608,6 @@
           if (value && value === selectedValue) cell.classList.add("same");
           if (!given && value) cell.classList.add("user-entry");
           if (conflicts.has(index)) cell.classList.add("conflict");
-          if (!given && value && value !== solution[row][column]) cell.classList.add("wrong");
           if (invalidCell === index) cell.classList.add("invalid");
           if (value) {
             cell.textContent = String(value);
@@ -655,6 +653,21 @@
 
       function isComplete() {
         return values.every((value, index) => value === solution[Math.floor(index / 9)][index % 9]);
+      }
+
+      function violatesRules(index, value) {
+        const row = Math.floor(index / 9);
+        const column = index % 9;
+        for (let i = 0; i < 9; i += 1) {
+          const boxIndex = (Math.floor(row / 3) * 3 + Math.floor(i / 3)) * 9 +
+            Math.floor(column / 3) * 3 + i % 3;
+          if ((i !== column && values[row * 9 + i] === value) ||
+              (i !== row && values[i * 9 + column] === value) ||
+              (boxIndex !== index && values[boxIndex] === value)) {
+            return true;
+          }
+        }
+        return false;
       }
 
       function pushHistory() {
@@ -703,7 +716,7 @@
           return;
         }
 
-        if (value && value !== solution[row][column]) {
+        if (value && violatesRules(selectedCell, value)) {
           invalidCell = selectedCell;
           errors += 1;
           score = Math.max(0, score - 50);
@@ -712,11 +725,11 @@
             finished = true;
             setMessage("Bạn đã mắc quá nhiều lỗi. Hãy bắt đầu bàn mới!", "error");
           } else if (errors === 1) {
-            setMessage("Số không chính xác nên chưa được điền. Hãy thử lại.", "error");
+            setMessage("Số này vi phạm quy tắc hàng, cột hoặc khối 3x3 nên chưa được điền.", "error");
           } else if (errors === 2) {
             showHintPopover("Bạn đã mắc lỗi lần thứ hai. Hãy thử dùng Gợi ý để được trợ giúp nhé!");
           } else {
-            setMessage("Số không chính xác nên chưa được điền. Hãy thử lại.", "error");
+            setMessage("Số này vi phạm quy tắc hàng, cột hoặc khối 3x3 nên chưa được điền.", "error");
           }
           updateStats();
           renderBoard();
