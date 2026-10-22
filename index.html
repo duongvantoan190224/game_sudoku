@@ -57,8 +57,48 @@
       font-size: 18px;
     }
     .icon-button:hover { background: #eef2ff; }
-    .topbar #pause { grid-row: 1; grid-column: 4; }
+    .topbar #menu-control { grid-row: 1; grid-column: 4; }
     .topbar #settings { grid-row: 1; grid-column: 5; }
+    .menu-control { position: relative; }
+    .menu-button {
+      min-width: 52px;
+      height: 36px;
+      padding: 0 8px;
+      border: 1px solid #e1e6ef;
+      border-radius: 10px;
+      color: #536078;
+      background: #f8faff;
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .menu-button:hover, .menu-button[aria-expanded="true"] { background: #eef2ff; }
+    .menu-dropdown {
+      position: absolute;
+      z-index: 15;
+      top: calc(100% + 8px);
+      left: 0;
+      display: grid;
+      width: 156px;
+      gap: 3px;
+      padding: 5px;
+      border: 1px solid #e1e6ef;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 8px 24px #26395826;
+    }
+    .menu-dropdown[hidden] { display: none; }
+    .menu-dropdown button {
+      padding: 8px 9px;
+      border: 0;
+      border-radius: 8px;
+      color: #536078;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 650;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .menu-dropdown button:hover { color: var(--blue-dark); background: #f2f5ff; }
     .timer-row {
       grid-column: 3;
       grid-row: 1;
@@ -76,6 +116,7 @@
       font-weight: 900;
       font-variant-numeric: tabular-nums;
       letter-spacing: 0;
+      transform: translateX(-4px);
     }
 
     .board-wrap { position: relative; width: 100%; }
@@ -339,15 +380,6 @@
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
       .score-float { animation-duration: .01ms; }
     }
-    .pause-menu { position: fixed; z-index: 25; inset: 0; display: flex; align-items: center; justify-content: center; padding: 18px; background: #1b263b66; backdrop-filter: blur(3px); opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s; }
-    .pause-menu.show { opacity: 1; visibility: visible; }
-    .pause-card { width: min(100%, 320px); padding: 22px; border-radius: 20px; background: #fff; box-shadow: 0 24px 60px #1b263b50; text-align: center; transform: translateY(16px) scale(.92); transition: transform .28s cubic-bezier(.2,.9,.3,1.2); }
-    .pause-menu.show .pause-card { transform: none; }
-    .pause-card h2 { margin: 0 0 16px; font-size: 20px; }
-    .pause-card button { display: block; width: 100%; margin-top: 10px; padding: 13px; border: 0; border-radius: 12px; color: #fff; background: var(--blue); font-size: 15px; font-weight: 750; cursor: pointer; transition: transform .15s, filter .15s; }
-    .pause-card button:hover { filter: brightness(1.08); transform: translateY(-1px); }
-    .pause-card button.secondary { color: #1b263b; background: #e8edf5; }
-    @media (prefers-reduced-motion: reduce) { .pause-menu, .pause-card { transition: none; } }
   </style>
 </head>
 <body>
@@ -356,7 +388,15 @@
       <div class="stat"><span class="stat-label">Điểm</span><span class="stat-value" id="score">0</span></div>
       <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
       <div class="timer-row"><span aria-hidden="true">⏱</span><span id="timer">00:00</span></div>
-      <button class="icon-button" id="pause" type="button" aria-label="Tạm dừng">⏸</button>
+      <div class="menu-control" id="menu-control">
+        <button class="menu-button" id="menu-toggle" type="button" aria-expanded="false" aria-controls="game-menu">Menu</button>
+        <div class="menu-dropdown" id="game-menu" aria-label="Menu trò chơi" hidden>
+          <button type="button" id="menu-pause">Tạm dừng</button>
+          <button type="button" id="menu-resume">Tiếp tục</button>
+          <button type="button" id="menu-restart">Chơi lại</button>
+          <button type="button" id="menu-new">Đổi bàn mới</button>
+        </div>
+      </div>
       <button class="icon-button" id="settings" type="button" aria-label="Cài đặt">⚙</button>
     </header>
 
@@ -401,15 +441,6 @@
     </div>
   </main>
 
-  <div class="pause-menu" id="pause-menu" role="dialog" aria-modal="true" aria-labelledby="pause-menu-title">
-    <div class="pause-card">
-      <h2 id="pause-menu-title">Menu trò chơi</h2>
-      <button type="button" id="pm-pause" class="secondary">⏸ Tạm dừng</button>
-      <button type="button" id="pm-resume">▶ Tiếp tục chơi</button>
-      <button type="button" id="pm-restart" class="secondary">↺ Chơi lại từ đầu</button>
-      <button type="button" id="pm-new" class="secondary">✦ Đổi bàn mới</button>
-    </div>
-  </div>
   <div class="modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
     <div class="modal-card">
       <h2 id="settings-title">Cài đặt</h2>
@@ -478,7 +509,6 @@
       const hintCountElement = document.getElementById("hint-count");
       const notesToggle = document.getElementById("notes-toggle");
       const notesState = document.getElementById("notes-state");
-      const pauseButton = document.getElementById("pause");
       const pauseOverlay = document.getElementById("pause-overlay");
       const settingsModal = document.getElementById("settings-modal");
       const clueTargets = { easy: 42, medium: 37, hard: 32 };
@@ -881,8 +911,6 @@
         paused = on;
         pauseOverlay.classList.toggle("show", on);
         boardElement.classList.toggle("hidden", on);
-        pauseButton.textContent = on ? "▶" : "⏸";
-        pauseButton.setAttribute("aria-label", on ? "Tiếp tục" : "Tạm dừng");
         updateStats();
       }
 
@@ -940,15 +968,24 @@
         setNotesMode(!notesMode);
         setMessage(notesMode ? "Chế độ ghi chú đang bật. Chọn ô trống rồi nhập số cần ghi chú." : "Chế độ ghi chú đã tắt.");
       });
-      const pauseMenu = document.getElementById("pause-menu");
-      function openPauseMenu() { if (finished) return; setPaused(true); pauseOverlay.classList.remove("show"); pauseMenu.classList.add("show"); }
-      function closePauseMenu() { pauseMenu.classList.remove("show"); }
-      pauseButton.addEventListener("click", openPauseMenu);
-      document.getElementById("pm-pause").addEventListener("click", () => { closePauseMenu(); pauseOverlay.classList.add("show"); });
-      document.getElementById("pm-resume").addEventListener("click", () => { closePauseMenu(); setPaused(false); });
-      document.getElementById("pm-restart").addEventListener("click", () => { closePauseMenu(); restartGame(); });
-      document.getElementById("pm-new").addEventListener("click", () => { closePauseMenu(); startNewGame(); });
-      pauseMenu.addEventListener("click", (event) => { if (event.target === pauseMenu) { closePauseMenu(); setPaused(false); } });
+      const menuControl = document.getElementById("menu-control");
+      const menuToggle = document.getElementById("menu-toggle");
+      const gameMenu = document.getElementById("game-menu");
+      function closeGameMenu() {
+        gameMenu.hidden = true;
+        menuToggle.setAttribute("aria-expanded", "false");
+      }
+      menuToggle.addEventListener("click", () => {
+        gameMenu.hidden = !gameMenu.hidden;
+        menuToggle.setAttribute("aria-expanded", String(!gameMenu.hidden));
+      });
+      document.getElementById("menu-pause").addEventListener("click", () => { closeGameMenu(); setPaused(true); });
+      document.getElementById("menu-resume").addEventListener("click", () => { closeGameMenu(); setPaused(false); });
+      document.getElementById("menu-restart").addEventListener("click", () => { closeGameMenu(); restartGame(); });
+      document.getElementById("menu-new").addEventListener("click", () => { closeGameMenu(); startNewGame(); });
+      document.addEventListener("click", (event) => {
+        if (!menuControl.contains(event.target)) closeGameMenu();
+      });
       document.getElementById("resume").addEventListener("click", () => setPaused(false));
 
       function openSettings() { setPaused(true); settingsModal.classList.add("show"); }
@@ -971,6 +1008,7 @@
 
       document.addEventListener("keydown", (event) => {
         if (event.target.matches("select, input, textarea, [contenteditable='true']")) return;
+        if (event.key === "Escape" && !gameMenu.hidden) { closeGameMenu(); return; }
         if (event.key === "Escape" && settingsModal.classList.contains("show")) { closeSettings(); return; }
         if (paused) return;
         if (/^[1-9]$/.test(event.key)) {
