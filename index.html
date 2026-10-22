@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f8">
+  <title>Sudoku</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #202a35;
+      background: #f4f6f8;
+      font-synthesis: none;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      padding: 32px 16px;
+      display: grid;
+      place-items: center;
+    }
+
+    main {
+      width: min(100%, 560px);
+      padding: 28px;
+      border: 1px solid #e1e6eb;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 12px 36px #25344712;
+    }
+
+    header { margin-bottom: 22px; text-align: center; }
+    h1 { margin: 0; font-size: 2rem; letter-spacing: .08em; }
+    header p { margin: 6px 0 0; color: #667384; }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      border: 2px solid #344254;
+      aspect-ratio: 1;
+      overflow: hidden;
+    }
+
+    .cell {
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      border-right: 1px solid #cbd3dc;
+      border-bottom: 1px solid #cbd3dc;
+      background: #fff;
+      color: #2d6ca2;
+      font: inherit;
+      font-size: clamp(1rem, 5vw, 1.55rem);
+      cursor: pointer;
+    }
+
+    .cell:nth-child(3n) { border-right: 2px solid #344254; }
+    .cell:nth-child(9n) { border-right: 0; }
+    .cell:nth-child(n + 19):nth-child(-n + 27),
+    .cell:nth-child(n + 46):nth-child(-n + 54) { border-bottom: 2px solid #344254; }
+    .cell:nth-child(n + 73) { border-bottom: 0; }
+    .cell.given { color: #26313d; font-weight: 700; }
+    .cell.related { background: #f1f6fa; }
+    .cell.same-number { background: #e4eef7; }
+    .cell.selected { position: relative; background: #d6e9fa; outline: 2px solid #3486c4; outline-offset: -2px; }
+    .cell.conflict { background: #fde8e6; color: #bd3d36; }
+    .cell:focus-visible, .key:focus-visible, .action:focus-visible {
+      position: relative;
+      z-index: 1;
+      outline: 3px solid #3486c4;
+      outline-offset: 1px;
+    }
+
+    #status {
+      min-height: 24px;
+      margin: 14px 0 12px;
+      color: #566474;
+      text-align: center;
+      font-size: .95rem;
+    }
+    #status.error { color: #b8322b; }
+    #status.success { color: #237445; font-weight: 600; }
+
+    .number-pad {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 7px;
+    }
+    .key, .action {
+      min-height: 42px;
+      border: 1px solid #d5dce4;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #273545;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .key { color: #286b9f; font-size: 1.1rem; }
+    .key:hover, .action:hover { background: #eaf2f8; }
+    .key.clear { color: #697686; font-size: .9rem; }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .action { padding: 0 16px; }
+    .action.primary { border-color: #286b9f; background: #286b9f; color: white; }
+    .action.primary:hover { background: #205982; }
+    .help { margin: 16px 0 0; color: #718092; text-align: center; font-size: .8rem; }
+
+    @media (max-width: 430px) {
+      body { padding: 16px 10px; }
+      main { padding: 18px 12px; }
+      .number-pad { gap: 4px; }
+      .key { min-height: 40px; }
+      .actions { gap: 7px; }
+      .action { padding: 0 11px; font-size: .9rem; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>SUDOKU</h1>
+      <p>Fill every row, column, and 3 × 3 box with 1–9.</p>
+    </header>
+    <div id="board" role="group" aria-label="Sudoku board"></div>
+    <p id="status" role="status" aria-live="polite">Select a cell, then enter a number.</p>
+    <div class="number-pad" aria-label="Number pad">
+      <button class="key" data-number="1" aria-label="Enter 1">1</button>
+      <button class="key" data-number="2" aria-label="Enter 2">2</button>
+      <button class="key" data-number="3" aria-label="Enter 3">3</button>
+      <button class="key" data-number="4" aria-label="Enter 4">4</button>
+      <button class="key" data-number="5" aria-label="Enter 5">5</button>
+      <button class="key" data-number="6" aria-label="Enter 6">6</button>
+      <button class="key" data-number="7" aria-label="Enter 7">7</button>
+      <button class="key" data-number="8" aria-label="Enter 8">8</button>
+      <button class="key" data-number="9" aria-label="Enter 9">9</button>
+    </div>
+    <div class="actions">
+      <button class="action" id="reset">Reset</button>
+      <button class="action primary" id="check">Check</button>
+      <button class="action" id="new-game">New game</button>
+    </div>
+    <p class="help">Keyboard: 1–9 to enter · Backspace or Delete to clear.</p>
+  </main>
+
+  <script>
+    (() => {
+      const originalPuzzle = [
+        "530070000", "600195000", "098000060",
+        "800060003", "400803001", "700020006",
+        "060000280", "000419005", "000080079"
+      ].map(row => [...row].map(Number));
+      const boardElement = document.querySelector("#board");
+      const statusElement = document.querySelector("#status");
+      let puzzle;
+      let values;
+      let selected = -1;
+
+      function shuffled(items) {
+        for (let i = items.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [items[i], items[j]] = [items[j], items[i]];
+        }
+        return items;
+      }
+
+      function rowOrder() {
+        return shuffled([0, 1, 2]).flatMap(band =>
+          shuffled([0, 1, 2]).map(row => band * 3 + row));
+      }
+
+      function createPuzzle() {
+        const rows = rowOrder();
+        const columns = rowOrder();
+        const digits = shuffled([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        return rows.map(row => columns.map(column => {
+          const value = originalPuzzle[row][column];
+          return value === 0 ? 0 : digits[value - 1];
+        }));
+      }
+
+      function setStatus(message, kind = "") {
+        statusElement.textContent = message;
+        statusElement.className = kind;
+      }
+
+      function findConflicts() {
+        const conflicts = new Set();
+        const compareGroup = indexes => {
+          const positions = new Map();
+          indexes.forEach(index => {
+            const value = values[index];
+            if (!value) return;
+            if (!positions.has(value)) positions.set(value, []);
+            positions.get(value).push(index);
+          });
+          positions.forEach(group => {
+            if (group.length > 1) group.forEach(index => conflicts.add(index));
+          });
+        };
+
+        for (let row = 0; row < 9; row++) {
+          compareGroup(Array.from({ length: 9 }, (_, column) => row * 9 + column));
+          compareGroup(Array.from({ length: 9 }, (_, column) => column * 9 + row));
+        }
+        for (let boxRow = 0; boxRow < 3; boxRow++) {
+          for (let boxColumn = 0; boxColumn < 3; boxColumn++) {
+            compareGroup(Array.from({ length: 9 }, (_, offset) =>
+              (boxRow * 3 + Math.floor(offset / 3)) * 9 + boxColumn * 3 + offset % 3));
+          }
+        }
+        return conflicts;
+      }
+
+      function render() {
+        const conflicts = findConflicts();
+        const selectedValue = selected >= 0 ? values[selected] : 0;
+        boardElement.replaceChildren();
+
+        values.forEach((value, index) => {
+          const row = Math.floor(index / 9);
+          const column = index % 9;
+          const cell = document.createElement("button");
+          cell.type = "button";
+          cell.className = "cell";
+          cell.textContent = value || "";
+          cell.setAttribute("aria-label", `Row ${row + 1}, column ${column + 1}${value ? `, ${value}` : ", empty"}${puzzle[row][column] ? ", given" : ""}`);
+          cell.setAttribute("aria-pressed", String(selected === index));
+          if (puzzle[row][column]) cell.classList.add("given");
+          if (selected >= 0 &&
+              (Math.floor(selected / 9) === row || selected % 9 === column ||
+               (Math.floor(selected / 27) === Math.floor(index / 27) &&
+                Math.floor((selected % 9) / 3) === Math.floor(column / 3)))) {
+            cell.classList.add("related");
+          }
+          if (selectedValue && value === selectedValue) cell.classList.add("same-number");
+          if (selected === index) cell.classList.add("selected");
+          if (conflicts.has(index)) cell.classList.add("conflict");
+          cell.addEventListener("click", () => {
+            selected = index;
+            render();
+          });
+          boardElement.append(cell);
+        });
+      }
+
+      function enterNumber(number) {
+        if (selected < 0 || puzzle[Math.floor(selected / 9)][selected % 9]) return;
+        values[selected] = number;
+        setStatus(number ? "Number entered." : "Cell cleared.");
+        render();
+      }
+
+      function startGame() {
+        puzzle = createPuzzle();
+        values = puzzle.flat();
+        selected = -1;
+        setStatus("Select a cell, then enter a number.");
+        render();
+      }
+
+      document.querySelectorAll(".key").forEach(button => {
+        button.addEventListener("click", () => enterNumber(Number(button.dataset.number)));
+      });
+      document.querySelector("#reset").addEventListener("click", () => {
+        values = puzzle.flat();
+        setStatus("Board reset.");
+        render();
+      });
+      document.querySelector("#new-game").addEventListener("click", startGame);
+      document.querySelector("#check").addEventListener("click", () => {
+        const conflicts = findConflicts();
+        const empty = values.includes(0);
+        if (conflicts.size) setStatus("There are repeated numbers in a row, column, or box.", "error");
+        else if (empty) setStatus("No conflicts so far. Keep going!", "");
+        else setStatus("Congratulations — the puzzle is solved!", "success");
+        render();
+      });
+      document.addEventListener("keydown", event => {
+        if (/^[1-9]$/.test(event.key)) enterNumber(Number(event.key));
+        else if (event.key === "Backspace" || event.key === "Delete" || event.key === "0") enterNumber(0);
+      });
+
+      startGame();
+    })();
+  </script>
+</body>
+</html>
