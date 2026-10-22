@@ -233,6 +233,25 @@
       padding-bottom: env(safe-area-inset-bottom);
     }
 
+    .ad-banner-link {
+      display: flex;
+      width: 100%;
+      max-width: 728px;
+      min-height: 50px;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 10px;
+      border-radius: 10px 10px 0 0;
+      background: #fff3ec;
+      color: #222;
+      text-decoration: none;
+      box-shadow: 0 -2px 10px rgba(0,0,0,.15);
+    }
+    .ad-banner-link img { width: 42px; height: 42px; border-radius: 8px; object-fit: cover; }
+    .ad-banner-text { flex: 1; font-size: 13px; font-weight: 700; line-height: 1.25; }
+    .ad-banner-text small { display: block; color: #ee4d2d; font-weight: 600; }
+    .ad-banner-cta { padding: 6px 12px; border-radius: 6px; background: #ee4d2d; color: #fff; font-size: 12px; font-weight: 700; }
+
     @media (max-width: 680px) {
       body { padding: 19px 12px calc(28px + 50px + env(safe-area-inset-bottom)); }
       .topbar { margin-bottom: 14px; }
@@ -346,7 +365,13 @@
     </footer>
   </main>
 
-  <div id="ad-banner-container" class="ad-banner-container"></div>
+  <div id="ad-banner-container" class="ad-banner-container">
+    <a class="ad-banner-link" href="https://shopee.vn/" target="_blank" rel="noopener noreferrer sponsored">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 42 42'%3E%3Crect width='42' height='42' fill='%23ee4d2d'/%3E%3Crect x='7' y='7' width='28' height='28' fill='white'/%3E%3Cpath d='M7 21h28M7 14h28M7 28h28M14 7v28M21 7v28M28 7v28' stroke='%23ee4d2d' stroke-width='1.5'/%3E%3C/svg%3E" alt="Sách Sudoku">
+      <span class="ad-banner-text">Đồ chơi trí tuệ<small>Sách Sudoku giảm giá</small></span>
+      <span class="ad-banner-cta">Mua ngay</span>
+    </a>
+  </div>
 
   <script>
     (() => {
