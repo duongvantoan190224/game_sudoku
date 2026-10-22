@@ -213,31 +213,32 @@
     .overlay button { padding: 10px 22px; border: 0; border-radius: 12px; color: #fff; background: var(--blue); font-weight: 750; }
 
     .toast {
-      position: fixed;
-      z-index: 30;
-      bottom: calc(50px + env(safe-area-inset-bottom) + 12px);
-      left: 50%;
-      width: min(560px, calc(100vw - 24px));
-      padding: 12px 16px;
+      display: flex;
+      min-width: 0;
+      min-height: 66px;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
       border: 1px solid #dce3ef;
       border-radius: 14px;
       color: #536078;
       background: #fff;
       box-shadow: 0 8px 28px #26395826;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
-      line-height: 1.45;
+      line-height: 1.25;
       text-align: center;
       opacity: 0;
       pointer-events: none;
-      transform: translate(-50%, 12px);
-      transition: opacity .18s ease, transform .18s ease;
+      overflow-wrap: anywhere;
+      transition: opacity .18s ease;
     }
-    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.show { opacity: 1; }
     .toast.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
     .toast.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
 
-    .toolbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .tool-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: stretch; gap: 8px; }
+    .toolbar { display: grid; min-width: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
     .tool {
       position: relative;
       display: flex;
@@ -246,14 +247,14 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 3px;
       padding: 8px 4px;
       border: 1px solid #e3e8f1;
       border-radius: 14px;
       color: #536078;
       background: #fff;
       box-shadow: 0 2px 6px #26395808;
-      font-size: 11px;
+      font-size: 8px;
       font-weight: 750;
       white-space: nowrap;
       transition: color .15s ease, background-color .15s ease, border-color .15s ease, transform .12s ease;
@@ -262,7 +263,7 @@
     .tool:hover { border-color: #cbd5e5; background: #f8faff; }
     .tool:disabled { opacity: .45; cursor: default; }
     .tool.active { border-color: #c6d2ff; color: var(--blue-dark); background: #eef2ff; }
-    .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 5px; }
+    .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 3px; }
     .hint-popover {
       position: absolute;
       z-index: 5;
@@ -387,10 +388,12 @@
     @media (max-width: 380px) {
       .topbar { gap: 5px; padding: 6px; }
       .icon-button { width: 34px; height: 34px; }
+      .tool-row { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 6px; }
       .toolbar { gap: 6px; }
-      .tool { min-height: 62px; gap: 4px; padding-inline: 2px; font-size: 9px; }
+      .tool { min-height: 62px; gap: 3px; padding-inline: 2px; font-size: 8px; }
       .tool .tool-icon { width: 18px; height: 18px; }
       .tool-state { padding-inline: 4px; font-size: 7px; }
+      .toast { min-height: 62px; padding: 6px; }
       .number-pad { gap: 3px; }
       .number-button { min-height: 54px; font-size: 25px; }
     }
@@ -424,16 +427,15 @@
       <div id="score-effects" aria-hidden="true"></div>
     </div>
 
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-    <div class="toolbar" aria-label="Công cụ">
+    <div class="tool-row">
+      <div class="toolbar" aria-label="Công cụ">
       <button class="tool" id="undo" type="button" aria-label="Hoàn tác">
         <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14h-2"/></svg>
-        <span>Hoàn tác</span>
+        <span class="tool-caption">Hoàn tác</span>
       </button>
       <button class="tool" id="erase" type="button" aria-label="Xóa ô đã chọn">
         <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m3 12 7-8h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H10z"/><path d="m12 10 5 5m0-5-5 5"/></svg>
-        <span>Xóa</span>
+        <span class="tool-caption">Xóa</span>
       </button>
       <button class="tool" id="notes-toggle" type="button" aria-label="Bật chế độ ghi chú" aria-pressed="false">
         <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m4 16.5-.8 4.3 4.3-.8L20 7.5 16.5 4z"/><path d="m14.8 5.7 3.5 3.5M4 4h7M4 8h5"/></svg>
@@ -444,6 +446,8 @@
         <span class="tool-caption"><span>Gợi ý</span><span class="badge" id="hint-count">3</span></span>
         <span class="hint-popover" id="hint-popover" role="status" aria-live="polite"></span>
       </button>
+      </div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
     </div>
 
     <div class="number-pad" id="number-pad" aria-label="Bàn phím số">
