@@ -28,7 +28,7 @@
     }
     button, select { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; cursor: pointer; }
-    .app { width: min(100%, 720px); margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    .app { width: min(100%, 720px); margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
 
     .topbar {
       display: grid;
@@ -215,7 +215,7 @@
     .toast {
       display: flex;
       min-width: 0;
-      min-height: 66px;
+      min-height: 48px;
       align-items: center;
       justify-content: center;
       padding: 8px;
@@ -224,7 +224,7 @@
       color: #536078;
       background: #fff;
       box-shadow: 0 8px 28px #26395826;
-      font-size: 13px;
+      font-size: 10px;
       font-weight: 700;
       line-height: 1.25;
       text-align: center;
@@ -237,33 +237,33 @@
     .toast.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
     .toast.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
 
-    .tool-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: stretch; gap: 8px; }
-    .toolbar { display: grid; min-width: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .tool-row { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: stretch; gap: 6px; }
+    .toolbar { display: grid; min-width: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
     .tool {
       position: relative;
       display: flex;
       min-width: 0;
-      min-height: 66px;
+      min-height: 48px;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
-      padding: 8px 4px;
+      gap: 2px;
+      padding: 3px 1px;
       border: 1px solid #e3e8f1;
       border-radius: 14px;
       color: #536078;
       background: #fff;
       box-shadow: 0 2px 6px #26395808;
-      font-size: 8px;
+      font-size: 6px;
       font-weight: 750;
       white-space: nowrap;
       transition: color .15s ease, background-color .15s ease, border-color .15s ease, transform .12s ease;
     }
-    .tool .tool-icon { width: 20px; height: 20px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+    .tool .tool-icon { width: 16px; height: 16px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
     .tool:hover { border-color: #cbd5e5; background: #f8faff; }
     .tool:disabled { opacity: .45; cursor: default; }
     .tool.active { border-color: #c6d2ff; color: var(--blue-dark); background: #eef2ff; }
-    .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 3px; }
+    .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 2px; }
     .hint-popover {
       position: absolute;
       z-index: 5;
@@ -299,8 +299,8 @@
       transform: translate(-50%, -50%) rotate(45deg);
     }
     .hint-popover.show { opacity: 1; transform: translate(-50%, 0); }
-    .badge { display: inline-grid; min-width: 17px; height: 17px; place-items: center; padding: 0 5px; border-radius: 9px; color: #fff; background: var(--blue); font-size: 10px; font-weight: 800; line-height: 1; }
-    .tool-state { padding: 2px 5px; border-radius: 6px; color: #77839a; background: #eff2f7; font-size: 8px; font-weight: 850; letter-spacing: .04em; line-height: 1.2; }
+    .badge { display: inline-grid; min-width: 13px; height: 13px; place-items: center; padding: 0 3px; border-radius: 7px; color: #fff; background: var(--blue); font-size: 8px; font-weight: 800; line-height: 1; }
+    .tool-state { padding: 1px 3px; border-radius: 4px; color: #77839a; background: #eff2f7; font-size: 6px; font-weight: 850; letter-spacing: .02em; line-height: 1.2; }
     .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
     .score-float {
       position: absolute;
@@ -323,7 +323,7 @@
     .number-button {
       display: flex;
       flex-direction: column;
-      min-height: 62px;
+      min-height: 50px;
       align-items: center;
       justify-content: center;
       padding: 0;
@@ -388,14 +388,13 @@
     @media (max-width: 380px) {
       .topbar { gap: 5px; padding: 6px; }
       .icon-button { width: 34px; height: 34px; }
-      .tool-row { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 6px; }
-      .toolbar { gap: 6px; }
-      .tool { min-height: 62px; gap: 3px; padding-inline: 2px; font-size: 8px; }
-      .tool .tool-icon { width: 18px; height: 18px; }
-      .tool-state { padding-inline: 4px; font-size: 7px; }
-      .toast { min-height: 62px; padding: 6px; }
-      .number-pad { gap: 3px; }
-      .number-button { min-height: 54px; font-size: 25px; }
+      .tool-row { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 4px; }
+      .toolbar { gap: 3px; }
+      .tool { min-height: 46px; }
+      .tool .tool-icon { width: 14px; height: 14px; }
+      .toast { min-height: 46px; padding: 5px; }
+      .number-pad { gap: 2px; }
+      .number-button { min-height: 48px; font-size: 23px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
@@ -427,6 +426,18 @@
       <div id="score-effects" aria-hidden="true"></div>
     </div>
 
+    <div class="number-pad" id="number-pad" aria-label="Bàn phím số">
+      <button class="number-button" type="button" data-value="1" aria-label="Điền số 1"><span>1</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="2" aria-label="Điền số 2"><span>2</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="3" aria-label="Điền số 3"><span>3</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="4" aria-label="Điền số 4"><span>4</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="5" aria-label="Điền số 5"><span>5</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="6" aria-label="Điền số 6"><span>6</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="7" aria-label="Điền số 7"><span>7</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="8" aria-label="Điền số 8"><span>8</span><span class="remaining-count">9</span></button>
+      <button class="number-button" type="button" data-value="9" aria-label="Điền số 9"><span>9</span><span class="remaining-count">9</span></button>
+    </div>
+
     <div class="tool-row">
       <div class="toolbar" aria-label="Công cụ">
       <button class="tool" id="undo" type="button" aria-label="Hoàn tác">
@@ -448,18 +459,6 @@
       </button>
       </div>
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    </div>
-
-    <div class="number-pad" id="number-pad" aria-label="Bàn phím số">
-      <button class="number-button" type="button" data-value="1" aria-label="Điền số 1"><span>1</span><span class="remaining-count">9</span></button>
-      <button class="number-button" type="button" data-value="2" aria-label="Điền số 2"><span>2</span><span class="remaining-count">9</span></button>
-      <button class="number-button" type="button" data-value="3" aria-label="Điền số 3"><span>3</span><span class="remaining-count">9</span></button>
-      <button class="number-button" type="button" data-value="4" aria-label="Điền số 4"><span>4</span><span class="remaining-count">9</span></button>
-      <button class="number-button" type="button" data-value="5" aria-label="Điền số 5"><span>5</span><span class="remaining-count">9</span></button>
-      <button class="number-button" type="button" data-value="6" aria-label="Điền số 6"><span>6</span><span class="remaining-count">9</span></button>
-      <button class="number-button" type="button" data-value="7" aria-label="Điền số 7"><span>7</span><span class="remaining-count">9</span></button>
-      <button class="number-button" type="button" data-value="8" aria-label="Điền số 8"><span>8</span><span class="remaining-count">9</span></button>
-      <button class="number-button" type="button" data-value="9" aria-label="Điền số 9"><span>9</span><span class="remaining-count">9</span></button>
     </div>
   </main>
 
@@ -635,12 +634,12 @@
       }
 
       function fitToastText() {
-        const toolHeight = Number.parseFloat(window.getComputedStyle(toolbarElement.querySelector(".tool")).minHeight);
+        const toolHeight = toolbarElement.getBoundingClientRect().height;
         toastElement.style.height = `${toolHeight}px`;
         toastElement.style.overflow = "hidden";
-        let fontSize = 13;
+        let fontSize = 10;
         toastElement.style.fontSize = `${fontSize}px`;
-        while (fontSize > 8 && toastElement.scrollHeight > toastElement.clientHeight) {
+        while (fontSize > 6 && (toastElement.scrollHeight > toastElement.clientHeight || toastElement.scrollWidth > toastElement.clientWidth)) {
           fontSize -= 0.5;
           toastElement.style.fontSize = `${fontSize}px`;
         }
