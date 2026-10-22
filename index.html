@@ -31,6 +31,8 @@
     .app { width: min(100%, 720px); margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
 
     .topbar {
+      position: relative;
+      z-index: 6;
       display: grid;
       grid-template-columns: auto auto minmax(0, 1fr) auto auto;
       align-items: center;
@@ -45,6 +47,7 @@
     .topbar .stat:nth-child(2) { margin-left: 2px; }
     .stat { min-width: 0; text-align: left; }
     .stat-label { display: block; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .topbar .stat-label { padding-left: 3px; }
     .stat-value { display: block; overflow: hidden; font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
     .stat-value.bad { color: #d64c55; }
     .icon-button {
@@ -88,8 +91,12 @@
       border-radius: 12px;
       background: #fff;
       box-shadow: 0 8px 24px #26395826;
+      visibility: hidden;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
     }
-    .menu-dropdown[hidden] { display: none; }
+    .menu-dropdown.show { visibility: visible; opacity: 1; transform: translateY(0); transition-delay: 0s; }
     .menu-dropdown button {
       display: flex;
       align-items: center;
@@ -227,9 +234,11 @@
       display: flex;
       min-width: 0;
       min-height: 46px;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 8px;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 3px;
+      padding: 5px 8px;
       border: 1.5px solid #cbd6e8;
       border-radius: 14px;
       color: transparent;
@@ -238,11 +247,11 @@
       font-size: 10px;
       font-weight: 700;
       line-height: 1.25;
-      text-align: center;
       pointer-events: none;
-      overflow-wrap: anywhere;
       transition: color .18s ease;
     }
+    .toast-title { flex: 0 0 auto; color: inherit; font-size: 9px; font-weight: 850; line-height: 1; text-align: left; text-decoration: underline; }
+    .toast-message { display: flex; min-height: 0; flex: 1; align-items: center; justify-content: center; overflow: hidden; overflow-wrap: anywhere; font-size: 10px; line-height: 1.25; text-align: center; }
     .toast.show { color: #536078; }
     .toast.show.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
     .toast.show.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
@@ -272,7 +281,7 @@
       white-space: nowrap;
       transition: color .15s ease, background-color .15s ease, border-color .15s ease, transform .12s ease;
     }
-    #undo { --tool-color: #4569e8; --tool-bg: #eef2ff; --tool-border: #d7e0ff; }
+    #undo { --tool-color: #fff; --tool-bg: #3455ce; --tool-border: #2947b7; }
     #erase { --tool-color: #dc5964; --tool-bg: #fff0f1; --tool-border: #f5d3d6; }
     #notes-toggle { --tool-color: #8157d9; --tool-bg: #f4efff; --tool-border: #e3d7ff; }
     #hint { --tool-color: #bd7a0b; --tool-bg: #fff7e5; --tool-border: #f2dfb4; }
@@ -411,7 +420,8 @@
       .toolbar { gap: 2px; }
       .tool { min-height: 44px; gap: 2px; padding: 2px 1px; font-size: 8px; }
       .tool .tool-icon { width: 16px; height: 16px; }
-      .toast { min-height: 44px; padding: 4px; font-size: 9px; }
+      .toast { min-height: 44px; padding: 4px; }
+      .toast-message { font-size: 9px; }
       .number-pad { gap: 2px; }
       .number-button { min-height: 48px; font-size: 23px; }
     }
@@ -429,7 +439,7 @@
       <div class="timer-row"><span aria-hidden="true">⏱</span><span id="timer">00:00</span></div>
       <div class="menu-control" id="menu-control">
         <button class="menu-button" id="menu-toggle" type="button" aria-expanded="false" aria-controls="game-menu">Menu</button>
-        <div class="menu-dropdown" id="game-menu" aria-label="Menu trò chơi" hidden>
+        <div class="menu-dropdown" id="game-menu" aria-label="Menu trò chơi" aria-hidden="true">
           <button type="button" id="menu-pause"><span class="mi" aria-hidden="true">⏸</span>Tạm dừng</button>
           <button type="button" id="menu-resume"><span class="mi" aria-hidden="true">▶</span>Tiếp tục</button>
           <button type="button" id="menu-restart"><span class="mi" aria-hidden="true">↻</span>Chơi lại</button>
@@ -459,9 +469,9 @@
 
     <div class="tool-row">
       <div class="toolbar" aria-label="Công cụ">
-      <button class="tool" id="undo" type="button" aria-label="Hoàn tác">
+      <button class="tool" id="undo" type="button" aria-label="Undo">
         <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14h-2"/></svg>
-        <span class="tool-caption">Hoàn tác</span>
+        <span class="tool-caption">Undo</span>
       </button>
       <button class="tool" id="erase" type="button" aria-label="Xóa ô đã chọn">
         <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m3 12 7-8h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H10z"/><path d="m12 10 5 5m0-5-5 5"/></svg>
@@ -477,7 +487,10 @@
         <span class="hint-popover" id="hint-popover" role="status" aria-live="polite"></span>
       </button>
       </div>
-      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <div class="toast" id="toast" role="status" aria-live="polite">
+        <span class="toast-title">Thông báo</span>
+        <span class="toast-message" id="toast-message"></span>
+      </div>
     </div>
   </main>
 
@@ -542,6 +555,7 @@
       const scoreEffectsElement = document.getElementById("score-effects");
       const timerElement = document.getElementById("timer");
       const toastElement = document.getElementById("toast");
+      const toastMessageElement = document.getElementById("toast-message");
       const toolbarElement = document.querySelector(".toolbar");
       const hintPopover = document.getElementById("hint-popover");
       const difficultyElement = document.getElementById("difficulty");
@@ -655,13 +669,11 @@
       function fitToastText() {
         const toolHeight = toolbarElement.getBoundingClientRect().height;
         toastElement.style.height = `${toolHeight}px`;
-        toastElement.style.overflow = "hidden";
-        toastElement.style.whiteSpace = "normal";
         let fontSize = 10;
-        toastElement.style.fontSize = `${fontSize}px`;
-        while (fontSize > 6 && (toastElement.scrollHeight > toastElement.clientHeight || toastElement.scrollWidth > toastElement.clientWidth)) {
+        toastMessageElement.style.fontSize = `${fontSize}px`;
+        while (fontSize > 6 && (toastMessageElement.scrollHeight > toastMessageElement.clientHeight || toastMessageElement.scrollWidth > toastMessageElement.clientWidth)) {
           fontSize = Math.max(6, fontSize - 0.5);
-          toastElement.style.fontSize = `${fontSize}px`;
+          toastMessageElement.style.fontSize = `${fontSize}px`;
         }
       }
 
@@ -669,7 +681,7 @@
         window.clearTimeout(toastTimeout);
         window.clearTimeout(hintPopoverTimeout);
         hintPopover.classList.remove("show");
-        toastElement.textContent = text;
+        toastMessageElement.textContent = text;
         toastElement.className = `toast show${kind ? ` ${kind}` : ""}`;
         fitToastText();
         toastTimeout = window.setTimeout(() => toastElement.classList.remove("show"), 3200);
@@ -1027,12 +1039,15 @@
       const menuToggle = document.getElementById("menu-toggle");
       const gameMenu = document.getElementById("game-menu");
       function closeGameMenu() {
-        gameMenu.hidden = true;
+        gameMenu.classList.remove("show");
         menuToggle.setAttribute("aria-expanded", "false");
+        gameMenu.setAttribute("aria-hidden", "true");
       }
       menuToggle.addEventListener("click", () => {
-        gameMenu.hidden = !gameMenu.hidden;
-        menuToggle.setAttribute("aria-expanded", String(!gameMenu.hidden));
+        const isOpen = !gameMenu.classList.contains("show");
+        gameMenu.classList.toggle("show", isOpen);
+        menuToggle.setAttribute("aria-expanded", String(isOpen));
+        gameMenu.setAttribute("aria-hidden", String(!isOpen));
       });
       document.getElementById("menu-pause").addEventListener("click", () => { closeGameMenu(); setPaused(true); });
       document.getElementById("menu-resume").addEventListener("click", () => { closeGameMenu(); setPaused(false); });
@@ -1064,7 +1079,7 @@
 
       document.addEventListener("keydown", (event) => {
         if (event.target.matches("select, input, textarea, [contenteditable='true']")) return;
-        if (event.key === "Escape" && !gameMenu.hidden) { closeGameMenu(); return; }
+        if (event.key === "Escape" && gameMenu.classList.contains("show")) { closeGameMenu(); return; }
         if (event.key === "Escape" && settingsModal.classList.contains("show")) { closeSettings(); return; }
         if (paused) return;
         if (/^[1-9]$/.test(event.key)) {
