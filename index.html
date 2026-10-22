@@ -141,6 +141,7 @@
     .cell.selected { position: relative; z-index: 1; outline: 2px solid var(--blue); outline-offset: -2px; background: #dce5ff; }
     .cell.wrong { color: #d64c55; background: #fff0f0; }
     .cell.conflict { color: #d64c55; }
+    .cell.invalid, .cell.invalid.selected { color: #b4232e; background: #ffe1e2; box-shadow: inset 0 0 0 2px #d64c55; }
     .cell:focus-visible { position: relative; z-index: 2; outline: 3px solid #7891f5; outline-offset: -3px; }
     .cell:disabled { cursor: default; opacity: 1; }
 
@@ -351,6 +352,7 @@
       let puzzle = [];
       let values = [];
       let selectedCell = -1;
+      let invalidCell = -1;
       let mistakes = 0;
       let startedAt = Date.now();
       let finished = false;
@@ -488,7 +490,7 @@
           cell.className = "cell";
           cell.dataset.index = String(index);
           cell.setAttribute("role", "gridcell");
-          cell.setAttribute("aria-label", `Hàng ${row + 1}, cột ${column + 1}${value ? `, số ${value}` : ", ô trống"}${given ? ", số cho sẵn" : ""}`);
+          cell.setAttribute("aria-label", `Hàng ${row + 1}, cột ${column + 1}${value ? `, số ${value}` : ", ô trống"}${given ? ", số cho sẵn" : ""}${invalidCell === index ? ", số vừa nhập không hợp lệ" : ""}`);
           if (given) {
             cell.classList.add("given");
             cell.disabled = true;
@@ -503,6 +505,7 @@
           if (value && value === selectedValue) cell.classList.add("same");
           if (conflicts.has(index)) cell.classList.add("conflict");
           if (!given && value && value !== solution[row][column]) cell.classList.add("wrong");
+          if (invalidCell === index) cell.classList.add("invalid");
           cell.textContent = value ? String(value) : "";
           fragment.appendChild(cell);
         });
@@ -529,11 +532,18 @@
         const column = selectedCell % 9;
         if (puzzle[row][column] !== 0) return;
 
-        values[selectedCell] = value;
         if (value && value !== solution[row][column]) {
+          invalidCell = selectedCell;
           mistakes += 1;
-          setMessage("Số này chưa đúng với lời giải. Thử lại nhé!", "error");
-        } else if (value) {
+          setMessage("Số này sẽ trùng với đáp án chuẩn trong cùng hàng, cột và ô 3 × 3 nên chưa được điền.", "error");
+          updateStats();
+          renderBoard();
+          return;
+        }
+
+        invalidCell = -1;
+        values[selectedCell] = value;
+        if (value) {
           setMessage("Chính xác! Tiếp tục thôi.");
         } else {
           setMessage("Đã xóa số trong ô.");
@@ -552,6 +562,7 @@
         puzzle = generated.grid;
         values = puzzle.flat();
         selectedCell = -1;
+        invalidCell = -1;
         mistakes = 0;
         startedAt = Date.now();
         finished = false;
@@ -563,6 +574,7 @@
       function restartGame() {
         values = puzzle.flat();
         selectedCell = -1;
+        invalidCell = -1;
         mistakes = 0;
         startedAt = Date.now();
         finished = false;
@@ -575,6 +587,7 @@
         const cell = event.target.closest(".cell");
         if (!cell || cell.disabled) return;
         selectedCell = Number(cell.dataset.index);
+        invalidCell = -1;
         setMessage("Ô đã chọn. Nhập số từ 1 đến 9.");
         renderBoard();
       });
