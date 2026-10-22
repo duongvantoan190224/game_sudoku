@@ -18,90 +18,48 @@
       --line: #dce3ef;
       --muted: #7c879b;
     }
-
     * { box-sizing: border-box; }
     body {
       min-width: 320px;
       min-height: 100vh;
       margin: 0;
-      padding: 36px 18px calc(36px + 50px + env(safe-area-inset-bottom));
-      background:
-        radial-gradient(ellipse at 15% 0%, #e5ecff 0, transparent 38%),
-        radial-gradient(ellipse at 100% 100%, #e5f5f2 0, transparent 35%),
-        #f4f7fb;
+      padding: 12px 12px calc(62px + env(safe-area-inset-bottom));
+      background: radial-gradient(ellipse at 15% 0%, #e5ecff 0, transparent 38%), #f4f7fb;
     }
-
     button, select { font: inherit; }
-    button { -webkit-tap-highlight-color: transparent; }
-    .app { width: min(100%, 900px); margin: 0 auto; }
+    button { -webkit-tap-highlight-color: transparent; cursor: pointer; }
+    .app { width: min(100%, 480px); margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+
     .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin: 0 2px 20px;
-    }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-icon {
       display: grid;
-      width: 44px;
-      height: 44px;
-      place-items: center;
-      border-radius: 14px;
-      color: #fff;
-      background: linear-gradient(145deg, #6885f6, #4569e8);
-      box-shadow: 0 8px 18px #4569e833;
-      font-size: 23px;
-      font-weight: 800;
-    }
-    .brand-name { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: -.03em; }
-    .brand-caption { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
-    .top-tag {
-      padding: 8px 12px;
-      border: 1px solid #e3e9f3;
-      border-radius: 999px;
-      color: #69758b;
-      background: #ffffffa6;
-      font-size: 12px;
-      font-weight: 650;
-    }
-
-    .game-card {
-      overflow: hidden;
+      grid-template-columns: repeat(3, 1fr) auto auto;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
       border: 1px solid #e5eaf2;
-      border-radius: 24px;
+      border-radius: 16px;
       background: #fff;
-      box-shadow: 0 24px 70px #26395812, 0 3px 10px #26395808;
+      box-shadow: 0 6px 20px #26395812;
     }
-    .card-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 24px 28px 19px;
-    }
-    h1 { margin: 0; font-size: clamp(21px, 4vw, 27px); letter-spacing: -.045em; }
-    .subtitle { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
-    .stats { display: flex; gap: 10px; }
-    .stat {
-      min-width: 83px;
-      padding: 10px 13px;
-      border: 1px solid #edf0f5;
-      border-radius: 13px;
-      background: #fafbfe;
-      text-align: center;
-    }
-    .stat-label { display: block; margin-bottom: 3px; color: var(--muted); font-size: 10px; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
-    .stat-value { font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 750; }
-
-    .game-content {
+    .stat { min-width: 0; text-align: center; }
+    .stat-label { display: block; color: var(--muted); font-size: 10px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .stat-value { display: block; overflow: hidden; font-size: 15px; font-variant-numeric: tabular-nums; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+    .stat-value.bad { color: #d64c55; }
+    .icon-button {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(210px, .72fr);
-      align-items: center;
-      gap: clamp(20px, 5vw, 48px);
-      padding: 8px 28px 28px;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border: 1px solid #e1e6ef;
+      border-radius: 12px;
+      color: #536078;
+      background: #f8faff;
+      font-size: 18px;
     }
-    .board-wrap { width: 100%; max-width: 480px; margin: 0 auto; }
+    .icon-button:hover { background: #eef2ff; }
+    .timer-row { display: flex; justify-content: center; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    .board-wrap { position: relative; width: 100%; }
     .board {
       display: grid;
       grid-template-columns: repeat(9, minmax(0, 1fr));
@@ -113,6 +71,7 @@
       background: #fff;
       touch-action: manipulation;
     }
+    .board.hidden { visibility: hidden; }
     .cell {
       display: grid;
       position: relative;
@@ -126,8 +85,7 @@
       border-radius: 0;
       color: #4569e8;
       background: #fff;
-      cursor: pointer;
-      font-size: clamp(15px, 3.5vw, 25px);
+      font-size: clamp(16px, 5.4vw, 26px);
       font-weight: 650;
       line-height: 1;
       transition: background-color .12s ease;
@@ -139,11 +97,11 @@
     .cell.given { color: #263247; font-weight: 800; }
     .cell.peer { background: #f2f5fc; }
     .cell.same { color: #3455ce; background: #e7edff; }
-    .cell.selected { position: relative; z-index: 1; outline: 2px solid var(--blue); outline-offset: -2px; background: #dce5ff; }
+    .cell.selected { z-index: 1; outline: 2px solid var(--blue); outline-offset: -2px; background: #dce5ff; }
     .cell.wrong { color: #d64c55; background: #fff0f0; }
     .cell.conflict { color: #d64c55; }
     .cell.invalid, .cell.invalid.selected { color: #b4232e; background: #ffe1e2; box-shadow: inset 0 0 0 2px #d64c55; }
-    .cell:focus-visible { position: relative; z-index: 2; outline: 3px solid #7891f5; outline-offset: -3px; }
+    .cell:focus-visible { z-index: 2; outline: 3px solid #7891f5; outline-offset: -3px; }
     .cell:disabled { cursor: default; opacity: 1; }
     .note-grid {
       position: absolute;
@@ -154,93 +112,83 @@
       align-items: center;
       justify-items: center;
       color: #65738c;
-      font-size: clamp(7px, 1.6vw, 11px);
+      font-size: clamp(7px, 2.4vw, 11px);
       font-weight: 550;
       line-height: 1;
       pointer-events: none;
     }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border-radius: 9px;
+      color: #3455ce;
+      background: #fff;
+      border: 2px solid #65738c;
+      font-weight: 800;
+    }
+    .overlay.show { display: flex; }
+    .overlay button { padding: 10px 22px; border: 0; border-radius: 12px; color: #fff; background: var(--blue); font-weight: 750; }
 
-    .side-panel { display: flex; flex-direction: column; gap: 18px; }
-    .difficulty-label, .section-label { display: block; margin-bottom: 9px; color: #707c91; font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
-    .difficulty-select {
-      width: 100%;
-      padding: 11px 13px;
+    .message { min-height: 36px; padding: 9px 12px; border-radius: 10px; color: #657187; background: #fff; font-size: 12px; line-height: 1.5; text-align: center; }
+    .message.success { color: #18805d; background: #e9f8f1; }
+    .message.error { color: #b3474e; background: #fff0f0; }
+
+    .toolbar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .tool {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 8px 4px;
       border: 1px solid #e1e6ef;
-      border-radius: 11px;
-      color: #2d3950;
-      background: #fbfcfe;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 650;
-    }
-    .number-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .number-button {
-      display: grid;
-      min-height: 48px;
-      place-items: center;
-      border: 1px solid #e5eaf4;
-      border-radius: 11px;
-      color: #4569e8;
-      background: #f8faff;
-      cursor: pointer;
-      font-size: 19px;
-      font-weight: 750;
-      transition: transform .12s ease, background .12s ease, border-color .12s ease;
-    }
-    .number-button:hover { border-color: #bdcafa; background: #eef2ff; }
-    .number-button:active, .action-button:active { transform: scale(.97); }
-    .number-button.erase { color: #69758b; font-size: 14px; grid-column: span 2; }
-    .number-button.notes-pad-toggle { font-size: 14px; padding: 0 6px; }
-    .number-button.notes-pad-toggle.active { border-color: #4569e8; color: #3455ce; background: #e7edff; }
-    .number-entry-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
-    .number-entry-header .section-label { margin: 0; }
-    .notes-toggle { display: inline-flex; min-height: 34px; align-items: center; gap: 5px; padding: 6px 9px; }
-    .notes-toggle.active { border-color: #4569e8; color: #3455ce; background: #e7edff; }
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-    .action-button {
-      min-height: 42px;
-      padding: 9px 10px;
-      border: 1px solid #e1e6ef;
-      border-radius: 10px;
+      border-radius: 12px;
       color: #536078;
       background: #fff;
-      cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .tool .tool-icon { font-size: 20px; line-height: 1.1; }
+    .tool:hover { background: #f6f8fc; }
+    .tool:disabled { opacity: .45; cursor: default; }
+    .tool.active { border-color: var(--blue); color: var(--blue-dark); background: #e7edff; }
+    .badge { position: absolute; top: -6px; right: -4px; min-width: 18px; padding: 1px 5px; border-radius: 9px; color: #fff; background: var(--blue); font-size: 10px; font-weight: 800; }
+    .tool-state { font-size: 9px; font-weight: 800; letter-spacing: .05em; }
+
+    .number-pad { display: grid; grid-template-columns: repeat(9, 1fr); gap: 5px; }
+    .number-button {
+      display: grid;
+      min-height: 52px;
+      place-items: center;
+      padding: 0;
+      border: 1px solid #e5eaf4;
+      border-radius: 10px;
+      color: #4569e8;
+      background: #fff;
+      font-size: 24px;
       font-weight: 700;
       transition: transform .12s ease, background .12s ease;
     }
+    .number-button:hover { background: #eef2ff; }
+    .number-button:active, .tool:active { transform: scale(.96); }
+    .number-button:disabled { opacity: .3; cursor: default; }
+
+    .modal { position: fixed; z-index: 20; inset: 0; display: none; align-items: center; justify-content: center; padding: 18px; background: #1b263b66; }
+    .modal.show { display: flex; }
+    .modal-card { width: min(100%, 360px); padding: 20px; border-radius: 18px; background: #fff; box-shadow: 0 24px 60px #1b263b40; }
+    .modal-card h2 { margin: 0 0 14px; font-size: 18px; }
+    .field { display: grid; gap: 6px; margin-bottom: 12px; color: #707c91; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .field select { padding: 10px 12px; border: 1px solid #e1e6ef; border-radius: 10px; color: #2d3950; background: #fbfcfe; font-size: 14px; font-weight: 650; }
+    .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .action-button { min-height: 42px; padding: 9px 10px; border: 1px solid #e1e6ef; border-radius: 10px; color: #536078; background: #fff; font-size: 13px; font-weight: 700; }
     .action-button:hover { background: #f6f8fc; }
     .action-button.primary { grid-column: 1 / -1; border-color: var(--blue); color: #fff; background: var(--blue); }
-    .action-button.primary:hover { background: var(--blue-dark); }
-    .message {
-      min-height: 39px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      color: #657187;
-      background: #f6f8fc;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-    .message.success { color: #18805d; background: #e9f8f1; }
-    .message.error { color: #b3474e; background: #fff0f0; }
-    .instructions {
-      display: flex;
-      align-items: flex-start;
-      gap: 9px;
-      margin: 0;
-      color: #818ca0;
-      font-size: 11px;
-      line-height: 1.6;
-    }
-    .instructions-icon { flex: none; color: #8a9be1; font-size: 15px; }
-    .footer {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 15px 3px 0;
-      color: #8b95a6;
-      font-size: 11px;
-    }
+
     .ad-banner-container {
       position: fixed;
       z-index: 10;
@@ -253,7 +201,6 @@
       justify-content: center;
       padding-bottom: env(safe-area-inset-bottom);
     }
-
     .ad-banner-link {
       display: flex;
       width: 100%;
@@ -273,37 +220,10 @@
     .ad-banner-text small { display: block; color: #ee4d2d; font-weight: 600; }
     .ad-banner-cta { padding: 6px 12px; border-radius: 6px; background: #ee4d2d; color: #fff; font-size: 12px; font-weight: 700; }
 
-    @media (max-width: 680px) {
-      body { padding: 19px 12px calc(28px + 50px + env(safe-area-inset-bottom)); }
-      .topbar { margin-bottom: 14px; }
-      .brand-icon { width: 40px; height: 40px; }
-      .top-tag { padding: 7px 9px; font-size: 10px; }
-      .game-card { border-radius: 19px; }
-      .card-heading { align-items: flex-start; padding: 19px 17px 15px; }
-      .stats { gap: 6px; }
-      .stat { min-width: 63px; padding: 8px 7px; border-radius: 10px; }
-      .stat-label { font-size: 9px; }
-      .stat-value { font-size: 14px; }
-      .game-content { grid-template-columns: 1fr; gap: 20px; padding: 4px 16px 20px; }
-      .board-wrap { max-width: 480px; }
-      .side-panel { gap: 14px; }
-      .difficulty-row { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 12px; }
-      .difficulty-label { margin: 0; }
-      .difficulty-select { padding: 9px 11px; }
-      .number-pad { grid-template-columns: repeat(9, 1fr); gap: 5px; }
-      .number-button { min-height: 42px; border-radius: 9px; font-size: 17px; }
-      .number-button.erase { grid-column: span 5; min-height: 36px; }
-      .number-button.notes-pad-toggle { grid-column: span 4; min-height: 36px; }
-      .actions { grid-template-columns: 1fr 1fr; }
-      .action-button { min-height: 40px; }
-    }
-    @media (max-width: 390px) {
-      .brand-caption { display: none; }
-      .card-heading { gap: 8px; }
-      .stat { min-width: 57px; }
-      .game-content { padding-inline: 11px; }
-      .number-pad { gap: 4px; }
-      .number-button { min-height: 38px; }
+    @media (max-width: 380px) {
+      .topbar { gap: 5px; padding: 6px; }
+      .icon-button { width: 34px; height: 34px; }
+      .number-button { min-height: 46px; font-size: 21px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
@@ -313,83 +233,59 @@
 <body>
   <main class="app">
     <header class="topbar">
-      <div class="brand">
-        <div class="brand-icon" aria-hidden="true">9</div>
-        <div>
-          <p class="brand-name">Sudoku</p>
-          <p class="brand-caption">Khoảng lặng cho trí óc</p>
-        </div>
-      </div>
-      <div class="top-tag">✦ &nbsp; Rèn luyện tư duy</div>
+      <div class="stat"><span class="stat-label">Độ khó</span><span class="stat-value" id="difficulty-label">Vừa</span></div>
+      <div class="stat"><span class="stat-label">Điểm</span><span class="stat-value" id="score">0</span></div>
+      <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
+      <button class="icon-button" id="pause" type="button" aria-label="Tạm dừng">⏸</button>
+      <button class="icon-button" id="settings" type="button" aria-label="Cài đặt">⚙</button>
     </header>
+    <div class="timer-row"><span>⏱</span><span id="timer">00:00</span></div>
 
-    <section class="game-card" aria-labelledby="game-title">
-      <div class="card-heading">
-        <div>
-          <h1 id="game-title">Sudoku</h1>
-          <p class="subtitle">Điền các số từ 1 đến 9 vào bảng.</p>
-        </div>
-        <div class="stats" aria-label="Thời gian chơi">
-          <div class="stat">
-            <span class="stat-label">Thời gian</span>
-            <span class="stat-value" id="timer">00:00</span>
-          </div>
-        </div>
-      </div>
+    <div class="board-wrap">
+      <div class="board" id="board" role="grid" aria-label="Bảng Sudoku 9 nhân 9"></div>
+      <div class="overlay" id="pause-overlay"><span>Đã tạm dừng</span><button id="resume" type="button">Tiếp tục</button></div>
+    </div>
 
-      <div class="game-content">
-        <div class="board-wrap">
-          <div class="board" id="board" role="grid" aria-label="Bảng Sudoku 9 nhân 9"></div>
-        </div>
+    <div class="message" id="message" role="status" aria-live="polite">Chọn một ô trống rồi nhập số bạn muốn.</div>
 
-        <aside class="side-panel" aria-label="Điều khiển trò chơi">
-          <div class="message" id="message" role="status" aria-live="polite">Chọn một ô trống rồi nhập số bạn muốn.</div>
+    <div class="toolbar" aria-label="Công cụ">
+      <button class="tool" id="undo" type="button" aria-label="Hoàn tác"><span class="tool-icon" aria-hidden="true">↶</span>Hoàn tác</button>
+      <button class="tool" id="erase" type="button" aria-label="Xóa ô đã chọn"><span class="tool-icon" aria-hidden="true">⌫</span>Xóa</button>
+      <button class="tool" id="notes-toggle" type="button" aria-label="Bật chế độ ghi chú" aria-pressed="false"><span class="tool-icon" aria-hidden="true">✎</span>Ghi chú <span class="tool-state" id="notes-state">TẮT</span></button>
+      <button class="tool" id="hint" type="button" aria-label="Gợi ý"><span class="tool-icon" aria-hidden="true">💡</span>Gợi ý<span class="badge" id="hint-count">3</span></button>
+    </div>
 
-          <div class="difficulty-row">
-            <label class="difficulty-label" for="difficulty">Độ khó</label>
-            <select class="difficulty-select" id="difficulty">
-              <option value="easy">Dễ</option>
-              <option value="medium" selected>Vừa</option>
-              <option value="hard">Khó</option>
-            </select>
-          </div>
-
-          <div>
-            <div class="number-entry-header">
-              <span class="section-label">Chọn một số</span>
-              <button class="action-button notes-toggle" id="notes-toggle" type="button" aria-label="Bật chế độ ghi chú" aria-pressed="false"><span aria-hidden="true">✎</span> Ghi chú</button>
-            </div>
-            <div class="number-pad" aria-label="Bàn phím số">
-              <button class="number-button" type="button" data-value="1" aria-label="Điền số 1">1</button>
-              <button class="number-button" type="button" data-value="2" aria-label="Điền số 2">2</button>
-              <button class="number-button" type="button" data-value="3" aria-label="Điền số 3">3</button>
-              <button class="number-button" type="button" data-value="4" aria-label="Điền số 4">4</button>
-              <button class="number-button" type="button" data-value="5" aria-label="Điền số 5">5</button>
-              <button class="number-button" type="button" data-value="6" aria-label="Điền số 6">6</button>
-              <button class="number-button" type="button" data-value="7" aria-label="Điền số 7">7</button>
-              <button class="number-button" type="button" data-value="8" aria-label="Điền số 8">8</button>
-              <button class="number-button" type="button" data-value="9" aria-label="Điền số 9">9</button>
-              <button class="number-button notes-pad-toggle notes-toggle" type="button" aria-label="Bật chế độ ghi chú" aria-pressed="false"><span aria-hidden="true">✎</span> Ghi chú</button>
-              <button class="number-button erase" type="button" data-value="0">⌫ &nbsp; Xóa ô đã chọn</button>
-            </div>
-          </div>
-
-          <div class="actions">
-            <button class="action-button" id="restart" type="button">↺ &nbsp; Chơi lại</button>
-            <button class="action-button" id="new-game" type="button">✦ &nbsp; Bàn mới</button>
-            <button class="action-button primary" id="check-board" type="button">Kiểm tra kết quả</button>
-          </div>
-
-          <p class="instructions"><span class="instructions-icon" aria-hidden="true">ⓘ</span><span>Dùng bàn phím số hoặc các nút bên trên. Phím mũi tên để di chuyển, Backspace để xóa ô.</span></p>
-        </aside>
-      </div>
-    </section>
-
-    <footer class="footer">
-      <span>Mỗi hàng, cột và vùng 3 × 3 chỉ chứa số 1–9.</span>
-      <span>Chúc bạn chơi vui!</span>
-    </footer>
+    <div class="number-pad" id="number-pad" aria-label="Bàn phím số">
+      <button class="number-button" type="button" data-value="1" aria-label="Điền số 1">1</button>
+      <button class="number-button" type="button" data-value="2" aria-label="Điền số 2">2</button>
+      <button class="number-button" type="button" data-value="3" aria-label="Điền số 3">3</button>
+      <button class="number-button" type="button" data-value="4" aria-label="Điền số 4">4</button>
+      <button class="number-button" type="button" data-value="5" aria-label="Điền số 5">5</button>
+      <button class="number-button" type="button" data-value="6" aria-label="Điền số 6">6</button>
+      <button class="number-button" type="button" data-value="7" aria-label="Điền số 7">7</button>
+      <button class="number-button" type="button" data-value="8" aria-label="Điền số 8">8</button>
+      <button class="number-button" type="button" data-value="9" aria-label="Điền số 9">9</button>
+    </div>
   </main>
+
+  <div class="modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="modal-card">
+      <h2 id="settings-title">Cài đặt</h2>
+      <label class="field">Độ khó
+        <select id="difficulty">
+          <option value="easy">Dễ</option>
+          <option value="medium" selected>Vừa</option>
+          <option value="hard">Khó</option>
+        </select>
+      </label>
+      <div class="modal-actions">
+        <button class="action-button" id="restart" type="button">↺ Chơi lại</button>
+        <button class="action-button" id="new-game" type="button">✦ Bàn mới</button>
+        <button class="action-button" id="check-board" type="button">Kiểm tra kết quả</button>
+        <button class="action-button primary" id="close-settings" type="button">Đóng</button>
+      </div>
+    </div>
+  </div>
 
   <div id="ad-banner-container" class="ad-banner-container">
     <a class="ad-banner-link" id="ad-link" href="#" target="_blank" rel="noopener noreferrer sponsored">
@@ -427,22 +323,39 @@
     (() => {
       "use strict";
 
+      const MAX_ERRORS = 3;
+      const MAX_HINTS = 3;
+      const levelNames = { easy: "Dễ", medium: "Vừa", hard: "Khó" };
       const boardElement = document.getElementById("board");
       const timerElement = document.getElementById("timer");
       const messageElement = document.getElementById("message");
       const difficultyElement = document.getElementById("difficulty");
-      const notesToggles = document.querySelectorAll(".notes-toggle");
+      const difficultyLabel = document.getElementById("difficulty-label");
+      const scoreElement = document.getElementById("score");
+      const errorsElement = document.getElementById("errors");
+      const hintCountElement = document.getElementById("hint-count");
+      const notesToggle = document.getElementById("notes-toggle");
+      const notesState = document.getElementById("notes-state");
+      const pauseButton = document.getElementById("pause");
+      const pauseOverlay = document.getElementById("pause-overlay");
+      const settingsModal = document.getElementById("settings-modal");
       const clueTargets = { easy: 42, medium: 37, hard: 32 };
 
       let solution = [];
       let puzzle = [];
       let values = [];
       let notes = [];
+      let history = [];
       let selectedCell = -1;
       let invalidCell = -1;
-      let startedAt = Date.now();
+      let elapsedMs = 0;
+      let resumedAt = Date.now();
+      let paused = false;
       let finished = false;
       let notesMode = false;
+      let score = 0;
+      let errors = 0;
+      let hintsLeft = MAX_HINTS;
 
       function shuffled(items) {
         const result = items.slice();
@@ -613,18 +526,44 @@
         boardElement.replaceChildren(fragment);
       }
 
+      function currentElapsed() {
+        return elapsedMs + (paused || finished ? 0 : Date.now() - resumedAt);
+      }
+
       function updateStats() {
-        const seconds = Math.floor((Date.now() - startedAt) / 1000);
+        const seconds = Math.floor(currentElapsed() / 1000);
         timerElement.textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+        scoreElement.textContent = String(score);
+        errorsElement.textContent = `${errors}/${MAX_ERRORS}`;
+        errorsElement.classList.toggle("bad", errors > 0);
+        hintCountElement.textContent = String(hintsLeft);
+        document.getElementById("hint").disabled = hintsLeft === 0;
+        document.getElementById("undo").disabled = history.length === 0;
+        difficultyLabel.textContent = levelNames[difficultyElement.value];
       }
 
       function isComplete() {
         return values.every((value, index) => value === solution[Math.floor(index / 9)][index % 9]);
       }
 
+      function pushHistory() {
+        history.push({ values: values.slice(), notes: notes.map((set) => new Set(set)), score });
+        if (history.length > 200) history.shift();
+      }
+
+      function finishIfComplete() {
+        if (isComplete()) {
+          elapsedMs = currentElapsed();
+          finished = true;
+          setMessage("Tuyệt vời! Bạn đã hoàn thành Sudoku.", "success");
+          updateStats();
+        }
+      }
+
       function enterValue(value) {
-        if (finished || selectedCell < 0) {
-          if (!finished) setMessage("Hãy chọn một ô trống trước nhé.");
+        if (finished || paused) return;
+        if (selectedCell < 0) {
+          setMessage("Hãy chọn một ô trống trước nhé.");
           return;
         }
         const row = Math.floor(selectedCell / 9);
@@ -636,6 +575,7 @@
             setMessage("Xóa số chính thức trong ô trước khi thêm ghi chú.");
             return;
           }
+          pushHistory();
           if (notes[selectedCell].has(value)) {
             notes[selectedCell].delete(value);
           } else {
@@ -643,90 +583,174 @@
           }
           invalidCell = -1;
           setMessage("Đã cập nhật ghi chú cho ô.");
+          updateStats();
           renderBoard();
           return;
         }
 
         if (value && value !== solution[row][column]) {
           invalidCell = selectedCell;
-          setMessage("Số không chính xác nên chưa được điền. Hãy thử lại.", "error");
+          errors += 1;
+          score = Math.max(0, score - 50);
+          if (errors >= MAX_ERRORS) {
+            elapsedMs = currentElapsed();
+            finished = true;
+            setMessage("Bạn đã mắc quá nhiều lỗi. Hãy bắt đầu bàn mới!", "error");
+          } else {
+            setMessage("Số không chính xác nên chưa được điền. Hãy thử lại.", "error");
+          }
+          updateStats();
           renderBoard();
           return;
         }
 
+        if (!value && !values[selectedCell] && notes[selectedCell].size === 0) return;
+        pushHistory();
         if (invalidCell === selectedCell) invalidCell = -1;
         values[selectedCell] = value;
         notes[selectedCell].clear();
         if (value) {
+          score += 100;
           setMessage("Chính xác! Tiếp tục thôi.");
         } else {
           setMessage("Đã xóa số trong ô.");
         }
         updateStats();
         renderBoard();
-        if (isComplete()) {
-          finished = true;
-          setMessage("Tuyệt vời! Bạn đã hoàn thành Sudoku.", "success");
+        finishIfComplete();
+      }
+
+      function undo() {
+        if (finished || paused || history.length === 0) return;
+        const last = history.pop();
+        values = last.values;
+        notes = last.notes;
+        score = last.score;
+        invalidCell = -1;
+        setMessage("Đã hoàn tác.");
+        updateStats();
+        renderBoard();
+      }
+
+      function giveHint() {
+        if (finished || paused) return;
+        if (hintsLeft === 0) {
+          setMessage("Bạn đã dùng hết lượt gợi ý.");
+          return;
         }
+        let target = selectedCell;
+        const solvable = (index) => puzzle[Math.floor(index / 9)][index % 9] === 0 &&
+          values[index] !== solution[Math.floor(index / 9)][index % 9];
+        if (target < 0 || !solvable(target)) {
+          const candidates = values.map((_, index) => index).filter(solvable);
+          if (candidates.length === 0) return;
+          target = candidates[Math.floor(Math.random() * candidates.length)];
+        }
+        pushHistory();
+        values[target] = solution[Math.floor(target / 9)][target % 9];
+        notes[target].clear();
+        selectedCell = target;
+        invalidCell = -1;
+        hintsLeft -= 1;
+        score = Math.max(0, score - 20);
+        setMessage("Đã điền một ô gợi ý cho bạn.");
+        updateStats();
+        renderBoard();
+        finishIfComplete();
+      }
+
+      function setNotesMode(on) {
+        notesMode = on;
+        notesToggle.classList.toggle("active", on);
+        notesToggle.setAttribute("aria-pressed", String(on));
+        notesToggle.setAttribute("aria-label", `${on ? "Tắt" : "Bật"} chế độ ghi chú`);
+        notesState.textContent = on ? "BẬT" : "TẮT";
+      }
+
+      function setPaused(on) {
+        if (finished || on === paused) return;
+        if (on) {
+          elapsedMs = currentElapsed();
+        } else {
+          resumedAt = Date.now();
+        }
+        paused = on;
+        pauseOverlay.classList.toggle("show", on);
+        boardElement.classList.toggle("hidden", on);
+        pauseButton.textContent = on ? "▶" : "⏸";
+        pauseButton.setAttribute("aria-label", on ? "Tiếp tục" : "Tạm dừng");
+        updateStats();
+      }
+
+      function resetState() {
+        values = puzzle.flat();
+        notes = Array.from({ length: 81 }, () => new Set());
+        history = [];
+        selectedCell = -1;
+        invalidCell = -1;
+        elapsedMs = 0;
+        resumedAt = Date.now();
+        finished = false;
+        score = 0;
+        errors = 0;
+        hintsLeft = MAX_HINTS;
+        setNotesMode(false);
+        paused = true;
+        setPaused(false);
+        updateStats();
+        renderBoard();
       }
 
       function startNewGame() {
         const generated = createPuzzle(difficultyElement.value);
         solution = generated.answer;
         puzzle = generated.grid;
-        values = puzzle.flat();
-        notes = Array.from({ length: 81 }, () => new Set());
-        selectedCell = -1;
-        invalidCell = -1;
-        startedAt = Date.now();
-        finished = false;
+        resetState();
         setMessage("Chọn một ô trống rồi nhập số bạn muốn.");
-        updateStats();
-        renderBoard();
       }
 
       function restartGame() {
-        values = puzzle.flat();
-        notes = Array.from({ length: 81 }, () => new Set());
-        selectedCell = -1;
-        invalidCell = -1;
-        startedAt = Date.now();
-        finished = false;
+        resetState();
         setMessage("Ván chơi đã được đặt lại. Chúc bạn may mắn!");
-        updateStats();
-        renderBoard();
       }
 
       boardElement.addEventListener("click", (event) => {
         const cell = event.target.closest(".cell");
-        if (!cell || cell.disabled) return;
+        if (!cell || cell.disabled || paused) return;
         selectedCell = Number(cell.dataset.index);
         setMessage("Ô đã chọn. Nhập số từ 1 đến 9.");
         renderBoard();
       });
 
-      document.querySelector(".number-pad").addEventListener("click", (event) => {
+      document.getElementById("number-pad").addEventListener("click", (event) => {
         const button = event.target.closest("[data-value]");
         if (button) enterValue(Number(button.dataset.value));
       });
 
-      notesToggles.forEach((toggle) => toggle.addEventListener("click", () => {
-        notesMode = !notesMode;
-        notesToggles.forEach((item) => {
-          item.classList.toggle("active", notesMode);
-          item.setAttribute("aria-pressed", String(notesMode));
-          item.setAttribute("aria-label", `${notesMode ? "Tắt" : "Bật"} chế độ ghi chú`);
-        });
+      document.getElementById("erase").addEventListener("click", () => enterValue(0));
+      document.getElementById("undo").addEventListener("click", undo);
+      document.getElementById("hint").addEventListener("click", giveHint);
+      notesToggle.addEventListener("click", () => {
+        if (finished || paused) return;
+        setNotesMode(!notesMode);
         setMessage(notesMode ? "Chế độ ghi chú đang bật. Chọn ô trống rồi nhập số cần ghi chú." : "Chế độ ghi chú đã tắt.");
-      }));
+      });
+      pauseButton.addEventListener("click", () => setPaused(!paused));
+      document.getElementById("resume").addEventListener("click", () => setPaused(false));
 
-      document.getElementById("restart").addEventListener("click", restartGame);
-      document.getElementById("new-game").addEventListener("click", startNewGame);
-      difficultyElement.addEventListener("change", startNewGame);
+      function openSettings() { setPaused(true); settingsModal.classList.add("show"); }
+      function closeSettings() { settingsModal.classList.remove("show"); }
+      document.getElementById("settings").addEventListener("click", openSettings);
+      document.getElementById("close-settings").addEventListener("click", closeSettings);
+      settingsModal.addEventListener("click", (event) => { if (event.target === settingsModal) closeSettings(); });
+
+      document.getElementById("restart").addEventListener("click", () => { closeSettings(); restartGame(); });
+      document.getElementById("new-game").addEventListener("click", () => { closeSettings(); startNewGame(); });
+      difficultyElement.addEventListener("change", () => { closeSettings(); startNewGame(); });
       document.getElementById("check-board").addEventListener("click", () => {
+        closeSettings();
         if (isComplete()) {
-          finished = true;
-          setMessage("Tuyệt vời! Bạn đã hoàn thành Sudoku.", "success");
+          finishIfComplete();
         } else {
           setMessage("Bảng vẫn còn ô trống hoặc số chưa chính xác.", "error");
         }
@@ -734,6 +758,8 @@
 
       document.addEventListener("keydown", (event) => {
         if (event.target.matches("select, input, textarea, [contenteditable='true']")) return;
+        if (event.key === "Escape" && settingsModal.classList.contains("show")) { closeSettings(); return; }
+        if (paused) return;
         if (/^[1-9]$/.test(event.key)) {
           event.preventDefault();
           enterValue(Number(event.key));
