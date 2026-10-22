@@ -286,7 +286,8 @@
     #hint { --tool-color: #bd7a0b; --tool-border: #f2dfb4; --tool-active-bg: #d18a17; }
     .tool .tool-icon { width: 17px; height: 17px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
     .tool:hover { border-color: var(--tool-color); }
-    .tool:focus, .tool:active, .tool.active { border-color: var(--tool-active-bg); color: #fff; background: var(--tool-active-bg); }
+    .tool:active, .tool.active { border-color: var(--tool-active-bg); color: #fff; background: var(--tool-active-bg); }
+    .tool:focus-visible { outline: 2px solid var(--tool-active-bg); outline-offset: 2px; }
     .tool:disabled { opacity: .45; cursor: default; }
     .tool.active { box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--tool-border); }
     .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 3px; }
@@ -549,6 +550,7 @@
       let errors = 0;
       let hintsLeft = MAX_HINTS;
       let toastTimeout;
+      const toolFeedbackTimeouts = new WeakMap();
 
       function shuffled(items) {
         const result = items.slice();
@@ -922,6 +924,15 @@
         notesState.classList.toggle("on", on);
       }
 
+      function showToolFeedback(button) {
+        window.clearTimeout(toolFeedbackTimeouts.get(button));
+        button.classList.add("active");
+        toolFeedbackTimeouts.set(button, window.setTimeout(() => {
+          button.classList.remove("active");
+          toolFeedbackTimeouts.delete(button);
+        }, 250));
+      }
+
       function setPaused(on) {
         if (finished || on === paused) return;
         if (on) {
@@ -981,9 +992,18 @@
         if (button) enterValue(Number(button.dataset.value));
       });
 
-      document.getElementById("erase").addEventListener("click", () => enterValue(0));
-      document.getElementById("undo").addEventListener("click", undo);
-      document.getElementById("hint").addEventListener("click", giveHint);
+      document.getElementById("erase").addEventListener("click", (event) => {
+        showToolFeedback(event.currentTarget);
+        enterValue(0);
+      });
+      document.getElementById("undo").addEventListener("click", (event) => {
+        showToolFeedback(event.currentTarget);
+        undo();
+      });
+      document.getElementById("hint").addEventListener("click", (event) => {
+        showToolFeedback(event.currentTarget);
+        giveHint();
+      });
       notesToggle.addEventListener("click", () => {
         if (finished || paused) return;
         setNotesMode(!notesMode);
