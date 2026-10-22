@@ -32,16 +32,16 @@
 
     .topbar {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(76px, 1.15fr) auto auto;
+      grid-template-columns: auto auto minmax(0, 1fr) auto auto;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       padding: 8px;
       border: 1px solid #e5eaf2;
       border-radius: 16px;
       background: #fff;
       box-shadow: 0 6px 20px #26395812;
     }
-    .stat { min-width: 0; text-align: center; }
+    .stat { min-width: 0; text-align: left; }
     .stat-label { display: block; color: var(--muted); font-size: 10px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
     .stat-value { display: block; overflow: hidden; font-size: 15px; font-variant-numeric: tabular-nums; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
     .stat-value.bad { color: #d64c55; }
@@ -122,19 +122,25 @@
       grid-row: 1;
       display: flex;
       min-width: 0;
-      min-height: 36px;
+      min-height: 48px;
       align-items: center;
       justify-content: center;
-      gap: 3px;
+      gap: 7px;
+      padding: 0 10px;
       border: 1px solid #dfe6fa;
-      border-radius: 12px;
+      border-radius: 14px;
       color: #3455ce;
-      background: #f2f5ff;
-      font-size: 16px;
+      background: linear-gradient(135deg, #f2f5ff, #e9efff);
+      font-size: 18px;
       font-weight: 900;
       font-variant-numeric: tabular-nums;
       letter-spacing: 0;
-      transform: translateX(-4px);
+    }
+    .timer-row #timer {
+      font-size: clamp(22px, 6vw, 32px);
+      font-weight: 950;
+      letter-spacing: .035em;
+      line-height: 1;
     }
 
     .board-wrap { position: relative; width: 100%; }
@@ -215,16 +221,16 @@
     .toast {
       display: flex;
       min-width: 0;
-      min-height: 48px;
+      min-height: 52px;
       align-items: center;
       justify-content: center;
-      padding: 8px;
-      border: 1px solid #dce3ef;
+      padding: 8px 10px;
+      border: 1.5px solid #cbd6e8;
       border-radius: 14px;
       color: #536078;
-      background: #fff;
-      box-shadow: 0 8px 28px #26395826;
-      font-size: 10px;
+      background: #f8faff;
+      box-shadow: 0 4px 14px #26395812;
+      font-size: 11px;
       font-weight: 700;
       line-height: 1.25;
       text-align: center;
@@ -237,33 +243,41 @@
     .toast.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
     .toast.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
 
-    .tool-row { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); align-items: stretch; gap: 6px; }
+    .tool-row { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); align-items: stretch; gap: 6px; }
     .toolbar { display: grid; min-width: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
     .tool {
+      --tool-color: #4569e8;
+      --tool-bg: #eef2ff;
+      --tool-border: #d7e0ff;
       position: relative;
       display: flex;
       min-width: 0;
-      min-height: 48px;
+      min-height: 52px;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 2px;
-      padding: 3px 1px;
-      border: 1px solid #e3e8f1;
+      gap: 4px;
+      padding: 4px 2px;
+      border: 1px solid var(--tool-border);
       border-radius: 14px;
-      color: #536078;
-      background: #fff;
-      box-shadow: 0 2px 6px #26395808;
-      font-size: 6px;
+      color: var(--tool-color);
+      background: var(--tool-bg);
+      box-shadow: 0 3px 10px #2639580d;
+      font-size: 10px;
       font-weight: 750;
       white-space: nowrap;
       transition: color .15s ease, background-color .15s ease, border-color .15s ease, transform .12s ease;
     }
-    .tool .tool-icon { width: 16px; height: 16px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
-    .tool:hover { border-color: #cbd5e5; background: #f8faff; }
+    #undo { --tool-color: #4569e8; --tool-bg: #eef2ff; --tool-border: #d7e0ff; }
+    #erase { --tool-color: #dc5964; --tool-bg: #fff0f1; --tool-border: #f5d3d6; }
+    #notes-toggle { --tool-color: #8157d9; --tool-bg: #f4efff; --tool-border: #e3d7ff; }
+    #hint { --tool-color: #bd7a0b; --tool-bg: #fff7e5; --tool-border: #f2dfb4; }
+    .tool .tool-icon { width: 19px; height: 19px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
+    .tool:hover { border-color: var(--tool-color); background: var(--tool-bg); }
     .tool:disabled { opacity: .45; cursor: default; }
-    .tool.active { border-color: #c6d2ff; color: var(--blue-dark); background: #eef2ff; }
-    .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 2px; }
+    .tool.active { border-color: var(--tool-color); color: var(--tool-color); background: var(--tool-bg); box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--tool-border); }
+    .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 3px; }
+    #notes-toggle .tool-caption { flex-direction: column; gap: 1px; }
     .hint-popover {
       position: absolute;
       z-index: 5;
@@ -299,8 +313,9 @@
       transform: translate(-50%, -50%) rotate(45deg);
     }
     .hint-popover.show { opacity: 1; transform: translate(-50%, 0); }
-    .badge { display: inline-grid; min-width: 13px; height: 13px; place-items: center; padding: 0 3px; border-radius: 7px; color: #fff; background: var(--blue); font-size: 8px; font-weight: 800; line-height: 1; }
-    .tool-state { padding: 1px 3px; border-radius: 4px; color: #77839a; background: #eff2f7; font-size: 6px; font-weight: 850; letter-spacing: .02em; line-height: 1.2; }
+    .badge { display: inline-grid; min-width: 14px; height: 14px; place-items: center; padding: 0 3px; border-radius: 7px; color: #fff; background: var(--blue); font-size: 8px; font-weight: 800; line-height: 1; }
+    #hint .badge { background: #d18a17; }
+    .tool-state { padding: 1px 4px; border-radius: 4px; color: #7046c2; background: #e9ddff; font-size: 7px; font-weight: 850; letter-spacing: .02em; line-height: 1.2; }
     .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
     .score-float {
       position: absolute;
@@ -388,11 +403,11 @@
     @media (max-width: 380px) {
       .topbar { gap: 5px; padding: 6px; }
       .icon-button { width: 34px; height: 34px; }
-      .tool-row { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 4px; }
+      .tool-row { grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr); gap: 4px; }
       .toolbar { gap: 3px; }
-      .tool { min-height: 46px; }
-      .tool .tool-icon { width: 14px; height: 14px; }
-      .toast { min-height: 46px; padding: 5px; }
+      .tool { min-height: 48px; gap: 3px; padding: 3px 1px; font-size: 9px; }
+      .tool .tool-icon { width: 17px; height: 17px; }
+      .toast { min-height: 48px; padding: 5px; font-size: 10px; }
       .number-pad { gap: 2px; }
       .number-button { min-height: 48px; font-size: 23px; }
     }
