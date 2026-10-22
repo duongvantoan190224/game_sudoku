@@ -23,12 +23,12 @@
       min-width: 320px;
       min-height: 100vh;
       margin: 0;
-      padding: 6px 4px calc(58px + env(safe-area-inset-bottom));
+      padding: 14px 2px calc(64px + env(safe-area-inset-bottom));
       background: radial-gradient(ellipse at 15% 0%, #e5ecff 0, transparent 38%), #f4f7fb;
     }
     button, select { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; cursor: pointer; }
-    .app { width: min(100%, 720px); margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
+    .app { width: min(100%, 720px); margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
 
     .topbar {
       display: grid;
@@ -104,7 +104,7 @@
       border-radius: 0;
       color: #4569e8;
       background: #fff;
-      font-size: clamp(26px, min(8.2vw, 6.4vh), 58px);
+      font-size: clamp(30px, min(9.4vw, 7vh), 66px);
       font-weight: 800;
       line-height: 1;
       transition: background-color .12s ease;
@@ -179,7 +179,7 @@
     .toast.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
     .toast.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
 
-    .toolbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+    .toolbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
     .tool {
       position: relative;
       display: flex;
@@ -239,11 +239,11 @@
     .badge { position: absolute; top: -6px; right: -4px; min-width: 18px; padding: 1px 5px; border-radius: 9px; color: #fff; background: var(--blue); font-size: 10px; font-weight: 800; }
     .tool-state { font-size: 9px; font-weight: 800; letter-spacing: .05em; }
 
-    .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 5px; }
+    .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
     .number-button {
       display: flex;
       flex-direction: column;
-      min-height: 52px;
+      min-height: 62px;
       align-items: center;
       justify-content: center;
       padding: 0;
@@ -252,7 +252,7 @@
       border-radius: 10px;
       color: #4569e8;
       background: #fff;
-      font-size: 24px;
+      font-size: 30px;
       font-weight: 700;
       transition: transform .12s ease, background .12s ease;
     }
@@ -311,7 +311,7 @@
       .tool { gap: 3px; padding-inline: 2px; font-size: 9px; }
       .tool .tool-icon { font-size: 15px; }
       .number-pad { gap: 3px; }
-      .number-button { min-height: 46px; font-size: 20px; }
+      .number-button { min-height: 54px; font-size: 25px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
