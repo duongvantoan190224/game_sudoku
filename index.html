@@ -635,7 +635,8 @@
       }
 
       function fitToastText() {
-        toastElement.style.height = `${toolbarElement.clientHeight}px`;
+        const toolHeight = Number.parseFloat(window.getComputedStyle(toolbarElement.querySelector(".tool")).minHeight);
+        toastElement.style.height = `${toolHeight}px`;
         toastElement.style.overflow = "hidden";
         let fontSize = 13;
         toastElement.style.fontSize = `${fontSize}px`;
