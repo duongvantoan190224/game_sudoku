@@ -42,8 +42,8 @@
       box-shadow: 0 6px 20px #26395812;
     }
     .stat { min-width: 0; text-align: left; }
-    .stat-label { display: block; color: var(--muted); font-size: 10px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
-    .stat-value { display: block; overflow: hidden; font-size: 15px; font-variant-numeric: tabular-nums; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+    .stat-label { display: block; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .stat-value { display: block; overflow: hidden; font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
     .stat-value.bad { color: #d64c55; }
     .icon-button {
       display: grid;
@@ -121,23 +121,25 @@
       grid-column: 3;
       grid-row: 1;
       display: flex;
+      width: min(100%, 144px);
       min-width: 0;
-      min-height: 48px;
+      min-height: 40px;
       align-items: center;
       justify-content: center;
-      gap: 7px;
-      padding: 0 10px;
+      justify-self: center;
+      gap: 5px;
+      padding: 0 7px;
       border: 1px solid #dfe6fa;
-      border-radius: 14px;
+      border-radius: 12px;
       color: #3455ce;
       background: linear-gradient(135deg, #f2f5ff, #e9efff);
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 900;
       font-variant-numeric: tabular-nums;
       letter-spacing: 0;
     }
     .timer-row #timer {
-      font-size: clamp(22px, 6vw, 32px);
+      font-size: clamp(18px, 5vw, 24px);
       font-weight: 950;
       letter-spacing: .035em;
       line-height: 1;
@@ -221,16 +223,16 @@
     .toast {
       display: flex;
       min-width: 0;
-      min-height: 52px;
+      min-height: 46px;
       align-items: center;
       justify-content: center;
-      padding: 8px 10px;
+      padding: 6px 8px;
       border: 1.5px solid #cbd6e8;
       border-radius: 14px;
       color: #536078;
       background: #f8faff;
       box-shadow: 0 4px 14px #26395812;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       line-height: 1.25;
       text-align: center;
@@ -243,8 +245,8 @@
     .toast.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
     .toast.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
 
-    .tool-row { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); align-items: stretch; gap: 6px; }
-    .toolbar { display: grid; min-width: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+    .tool-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: stretch; gap: 5px; }
+    .toolbar { display: grid; min-width: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; }
     .tool {
       --tool-color: #4569e8;
       --tool-bg: #eef2ff;
@@ -252,18 +254,18 @@
       position: relative;
       display: flex;
       min-width: 0;
-      min-height: 52px;
+      min-height: 46px;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      padding: 4px 2px;
+      gap: 3px;
+      padding: 3px 2px;
       border: 1px solid var(--tool-border);
-      border-radius: 14px;
+      border-radius: 12px;
       color: var(--tool-color);
       background: var(--tool-bg);
       box-shadow: 0 3px 10px #2639580d;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 750;
       white-space: nowrap;
       transition: color .15s ease, background-color .15s ease, border-color .15s ease, transform .12s ease;
@@ -272,7 +274,7 @@
     #erase { --tool-color: #dc5964; --tool-bg: #fff0f1; --tool-border: #f5d3d6; }
     #notes-toggle { --tool-color: #8157d9; --tool-bg: #f4efff; --tool-border: #e3d7ff; }
     #hint { --tool-color: #bd7a0b; --tool-bg: #fff7e5; --tool-border: #f2dfb4; }
-    .tool .tool-icon { width: 19px; height: 19px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
+    .tool .tool-icon { width: 17px; height: 17px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
     .tool:hover { border-color: var(--tool-color); background: var(--tool-bg); }
     .tool:disabled { opacity: .45; cursor: default; }
     .tool.active { border-color: var(--tool-color); color: var(--tool-color); background: var(--tool-bg); box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--tool-border); }
@@ -403,11 +405,11 @@
     @media (max-width: 380px) {
       .topbar { gap: 5px; padding: 6px; }
       .icon-button { width: 34px; height: 34px; }
-      .tool-row { grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr); gap: 4px; }
-      .toolbar { gap: 3px; }
-      .tool { min-height: 48px; gap: 3px; padding: 3px 1px; font-size: 9px; }
-      .tool .tool-icon { width: 17px; height: 17px; }
-      .toast { min-height: 48px; padding: 5px; font-size: 10px; }
+      .tool-row { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 4px; }
+      .toolbar { gap: 2px; }
+      .tool { min-height: 44px; gap: 2px; padding: 2px 1px; font-size: 8px; }
+      .tool .tool-icon { width: 16px; height: 16px; }
+      .toast { min-height: 44px; padding: 4px; font-size: 9px; }
       .number-pad { gap: 2px; }
       .number-button { min-height: 48px; font-size: 23px; }
     }
@@ -652,13 +654,14 @@
         const toolHeight = toolbarElement.getBoundingClientRect().height;
         toastElement.style.height = `${toolHeight}px`;
         toastElement.style.overflow = "hidden";
+        toastElement.style.whiteSpace = "normal";
         let fontSize = 10;
         toastElement.style.fontSize = `${fontSize}px`;
         while (fontSize > 6 && (toastElement.scrollHeight > toastElement.clientHeight || toastElement.scrollWidth > toastElement.clientWidth)) {
-          fontSize -= 0.5;
+          fontSize = Math.max(6, fontSize - 0.5);
           toastElement.style.fontSize = `${fontSize}px`;
         }
-        if (toastElement.scrollHeight > toastElement.clientHeight) {
+        if (toastElement.scrollHeight > toastElement.clientHeight || toastElement.scrollWidth > toastElement.clientWidth) {
           toastElement.style.height = "auto";
           toastElement.style.overflow = "visible";
         } else {
