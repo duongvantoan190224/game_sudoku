@@ -524,6 +524,7 @@
       const scoreEffectsElement = document.getElementById("score-effects");
       const timerElement = document.getElementById("timer");
       const toastElement = document.getElementById("toast");
+      const toolbarElement = document.querySelector(".toolbar");
       const hintPopover = document.getElementById("hint-popover");
       const difficultyElement = document.getElementById("difficulty");
       const scoreElement = document.getElementById("score");
@@ -633,12 +634,31 @@
         return { answer, grid };
       }
 
+      function fitToastText() {
+        toastElement.style.height = `${toolbarElement.clientHeight}px`;
+        toastElement.style.overflow = "hidden";
+        let fontSize = 13;
+        toastElement.style.fontSize = `${fontSize}px`;
+        while (fontSize > 8 && toastElement.scrollHeight > toastElement.clientHeight) {
+          fontSize -= 0.5;
+          toastElement.style.fontSize = `${fontSize}px`;
+        }
+        if (toastElement.scrollHeight > toastElement.clientHeight) {
+          toastElement.style.height = "auto";
+          toastElement.style.overflow = "visible";
+        } else {
+          toastElement.style.height = "";
+          toastElement.style.overflow = "";
+        }
+      }
+
       function setMessage(text, kind = "") {
         window.clearTimeout(toastTimeout);
         window.clearTimeout(hintPopoverTimeout);
         hintPopover.classList.remove("show");
         toastElement.textContent = text;
         toastElement.className = `toast show${kind ? ` ${kind}` : ""}`;
+        fitToastText();
         toastTimeout = window.setTimeout(() => toastElement.classList.remove("show"), 3200);
       }
 
@@ -1009,6 +1029,7 @@
         if (!menuControl.contains(event.target)) closeGameMenu();
       });
       document.getElementById("resume").addEventListener("click", () => setPaused(false));
+      window.addEventListener("resize", fitToastText);
 
       function openSettings() { settingsModal.classList.add("show"); }
       function closeSettings() { settingsModal.classList.remove("show"); }
