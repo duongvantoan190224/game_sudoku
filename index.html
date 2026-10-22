@@ -366,12 +366,36 @@
   </main>
 
   <div id="ad-banner-container" class="ad-banner-container">
-    <a class="ad-banner-link" href="https://shopee.vn/" target="_blank" rel="noopener noreferrer sponsored">
-      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 42 42'%3E%3Crect width='42' height='42' fill='%23ee4d2d'/%3E%3Crect x='7' y='7' width='28' height='28' fill='white'/%3E%3Cpath d='M7 21h28M7 14h28M7 28h28M14 7v28M21 7v28M28 7v28' stroke='%23ee4d2d' stroke-width='1.5'/%3E%3C/svg%3E" alt="Sách Sudoku">
-      <span class="ad-banner-text">Đồ chơi trí tuệ<small>Sách Sudoku giảm giá</small></span>
-      <span class="ad-banner-cta">Mua ngay</span>
+    <a class="ad-banner-link" id="ad-link" href="#" target="_blank" rel="noopener noreferrer sponsored">
+      <img id="ad-image" src="" alt="">
+      <span class="ad-banner-text"><span id="ad-title"></span><small id="ad-description"></small></span>
+      <span class="ad-banner-cta" id="ad-cta"></span>
     </a>
   </div>
+
+  <script>
+    // ================= CẤU HÌNH BANNER QUẢNG CÁO =================
+    // Chỉnh các giá trị dưới đây; banner dưới đáy game sẽ tự cập nhật.
+    const AD_CONFIG = {
+      affiliateUrl: "https://shopee.vn/",   // Dán link affiliate Shopee/Lazada của bạn
+      imageUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 42 42'%3E%3Crect width='42' height='42' fill='%23ee4d2d'/%3E%3Crect x='7' y='7' width='28' height='28' fill='white'/%3E%3Cpath d='M7 21h28M7 14h28M7 28h28M14 7v28M21 7v28M28 7v28' stroke='%23ee4d2d' stroke-width='1.5'/%3E%3C/svg%3E",   // Link ảnh sản phẩm
+      title: "Đồ chơi trí tuệ",             // Tên sản phẩm
+      description: "Sách Sudoku giảm giá",  // Mô tả
+      buttonText: "Mua ngay"                // Chữ trên nút
+    };
+    // =============================================================
+    (() => {
+      const link = document.getElementById("ad-link");
+      if (!/^https?:\/\//i.test(AD_CONFIG.affiliateUrl)) { document.getElementById("ad-banner-container").style.display = "none"; return; }
+      link.href = AD_CONFIG.affiliateUrl;
+      const img = document.getElementById("ad-image");
+      img.src = AD_CONFIG.imageUrl;
+      img.alt = AD_CONFIG.title;
+      document.getElementById("ad-title").textContent = AD_CONFIG.title;
+      document.getElementById("ad-description").textContent = AD_CONFIG.description;
+      document.getElementById("ad-cta").textContent = AD_CONFIG.buttonText;
+    })();
+  </script>
 
   <script>
     (() => {
