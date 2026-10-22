@@ -199,6 +199,17 @@
     .cell.invalid, .cell.invalid.selected { color: #b4232e; background: #ffe1e2; box-shadow: inset 0 0 0 2px #d64c55; }
     .cell:focus-visible { z-index: 2; outline: 3px solid #7891f5; outline-offset: -3px; }
     .cell:disabled { cursor: default; opacity: 1; }
+    .cell.completion-celebration {
+      z-index: 1;
+      animation: completion-celebration 1.35s cubic-bezier(.2, .8, .2, 1) both;
+      animation-delay: var(--completion-delay, 0ms);
+    }
+    @keyframes completion-celebration {
+      0%, 100% { background-color: transparent; box-shadow: none; transform: scale(1); }
+      18% { background-color: #ffe66d; box-shadow: inset 0 0 0 2px #ff9f1c, 0 0 18px rgba(255, 159, 28, .75); transform: scale(1.06); }
+      42% { background-color: #be8bff; box-shadow: inset 0 0 0 2px #8a42e8, 0 0 18px rgba(138, 66, 232, .7); transform: scale(1.06); }
+      70% { background-color: #68e1fd; box-shadow: inset 0 0 0 2px #16a8d5, 0 0 18px rgba(22, 168, 213, .65); transform: scale(1.03); }
+    }
     .note-grid {
       position: absolute;
       inset: 2px;
@@ -396,6 +407,7 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
       .score-float { animation-duration: .01ms; }
+      .cell.completion-celebration { animation-duration: .01ms; animation-delay: 0ms; }
     }
   </style>
 </head>
@@ -685,6 +697,46 @@
         return conflicts;
       }
 
+      function showCompletionEffects(previousValues) {
+        const units = [];
+        for (let row = 0; row < 9; row += 1) {
+          units.push(Array.from({ length: 9 }, (_, column) => row * 9 + column));
+        }
+        for (let column = 0; column < 9; column += 1) {
+          units.push(Array.from({ length: 9 }, (_, row) => row * 9 + column));
+        }
+        for (let boxRow = 0; boxRow < 3; boxRow += 1) {
+          for (let boxColumn = 0; boxColumn < 3; boxColumn += 1) {
+            units.push(Array.from({ length: 9 }, (_, index) =>
+              (boxRow * 3 + Math.floor(index / 3)) * 9 + boxColumn * 3 + index % 3));
+          }
+        }
+
+        const isComplete = (indexes, grid) => {
+          const digits = new Set(indexes.map((index) => grid[index]));
+          return digits.size === 9 && !digits.has(0);
+        };
+        const delays = new Map();
+        for (const indexes of units) {
+          if (isComplete(indexes, previousValues) || !isComplete(indexes, values)) continue;
+          for (const index of indexes) {
+            const delay = (Math.floor(index / 9) - Math.floor(indexes[0] / 9)) * 55;
+            if (!delays.has(index) || delay < delays.get(index)) delays.set(index, delay);
+          }
+        }
+
+        for (const [index, delay] of delays) {
+          const cell = boardElement.querySelector(`[data-index="${index}"]`);
+          if (!cell) continue;
+          cell.style.setProperty("--completion-delay", `${delay}ms`);
+          cell.classList.add("completion-celebration");
+          cell.addEventListener("animationend", () => {
+            cell.classList.remove("completion-celebration");
+            cell.style.removeProperty("--completion-delay");
+          }, { once: true });
+        }
+      }
+
       function renderBoard() {
         const conflicts = conflictsForGrid();
         const selectedValue = selectedCell >= 0 ? values[selectedCell] : 0;
@@ -861,6 +913,7 @@
         if (!value && !values[selectedCell] && notes[selectedCell].size === 0) return;
         pushHistory();
         if (invalidCell === selectedCell) invalidCell = -1;
+        const previousValues = values.slice();
         values[selectedCell] = value;
         notes[selectedCell].clear();
         if (value) {
@@ -872,6 +925,7 @@
         }
         updateStats();
         renderBoard();
+        if (value) showCompletionEffects(previousValues);
         finishIfComplete();
       }
 
@@ -902,6 +956,7 @@
           target = candidates[Math.floor(Math.random() * candidates.length)];
         }
         pushHistory();
+        const previousValues = values.slice();
         values[target] = solution[Math.floor(target / 9)][target % 9];
         notes[target].clear();
         selectedCell = target;
@@ -911,6 +966,7 @@
         setMessage("Đã điền một ô gợi ý cho bạn.");
         updateStats();
         renderBoard();
+        showCompletionEffects(previousValues);
         finishIfComplete();
       }
 
