@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f4f7fb">
   <title>Sudoku — Thử thách trí tuệ</title>
   <style>
@@ -24,7 +24,7 @@
       min-width: 320px;
       min-height: 100vh;
       margin: 0;
-      padding: 36px 18px;
+      padding: 36px 18px calc(36px + 50px + env(safe-area-inset-bottom));
       background:
         radial-gradient(ellipse at 15% 0%, #e5ecff 0, transparent 38%),
         radial-gradient(ellipse at 100% 100%, #e5f5f2 0, transparent 35%),
@@ -220,9 +220,21 @@
       color: #8b95a6;
       font-size: 11px;
     }
+    .ad-banner-container {
+      position: fixed;
+      z-index: 10;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      min-height: calc(50px + env(safe-area-inset-bottom));
+      align-items: center;
+      justify-content: center;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
 
     @media (max-width: 680px) {
-      body { padding: 19px 12px 28px; }
+      body { padding: 19px 12px calc(28px + 50px + env(safe-area-inset-bottom)); }
       .topbar { margin-bottom: 14px; }
       .brand-icon { width: 40px; height: 40px; }
       .top-tag { padding: 7px 9px; font-size: 10px; }
@@ -333,6 +345,8 @@
       <span>Chúc bạn chơi vui!</span>
     </footer>
   </main>
+
+  <div id="ad-banner-container" class="ad-banner-container"></div>
 
   <script>
     (() => {
