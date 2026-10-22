@@ -189,7 +189,9 @@
     }
     .number-button:hover { border-color: #bdcafa; background: #eef2ff; }
     .number-button:active, .action-button:active { transform: scale(.97); }
-    .number-button.erase { color: #69758b; font-size: 14px; }
+    .number-button.erase { color: #69758b; font-size: 14px; grid-column: span 2; }
+    .number-button.notes-pad-toggle { font-size: 14px; padding: 0 6px; }
+    .number-button.notes-pad-toggle.active { border-color: #4569e8; color: #3455ce; background: #e7edff; }
     .number-entry-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
     .number-entry-header .section-label { margin: 0; }
     .notes-toggle { display: inline-flex; min-height: 34px; align-items: center; gap: 5px; padding: 6px 9px; }
@@ -290,7 +292,8 @@
       .difficulty-select { padding: 9px 11px; }
       .number-pad { grid-template-columns: repeat(9, 1fr); gap: 5px; }
       .number-button { min-height: 42px; border-radius: 9px; font-size: 17px; }
-      .number-button.erase { grid-column: 1 / -1; min-height: 36px; }
+      .number-button.erase { grid-column: span 5; min-height: 36px; }
+      .number-button.notes-pad-toggle { grid-column: span 4; min-height: 36px; }
       .actions { grid-template-columns: 1fr 1fr; }
       .action-button { min-height: 40px; }
     }
@@ -366,6 +369,7 @@
               <button class="number-button" type="button" data-value="7" aria-label="Điền số 7">7</button>
               <button class="number-button" type="button" data-value="8" aria-label="Điền số 8">8</button>
               <button class="number-button" type="button" data-value="9" aria-label="Điền số 9">9</button>
+              <button class="number-button notes-pad-toggle notes-toggle" type="button" aria-label="Bật chế độ ghi chú" aria-pressed="false"><span aria-hidden="true">✎</span> Ghi chú</button>
               <button class="number-button erase" type="button" data-value="0">⌫ &nbsp; Xóa ô đã chọn</button>
             </div>
           </div>
@@ -427,7 +431,7 @@
       const timerElement = document.getElementById("timer");
       const messageElement = document.getElementById("message");
       const difficultyElement = document.getElementById("difficulty");
-      const notesToggle = document.getElementById("notes-toggle");
+      const notesToggles = document.querySelectorAll(".notes-toggle");
       const clueTargets = { easy: 42, medium: 37, hard: 32 };
 
       let solution = [];
@@ -706,13 +710,15 @@
         if (button) enterValue(Number(button.dataset.value));
       });
 
-      notesToggle.addEventListener("click", () => {
+      notesToggles.forEach((toggle) => toggle.addEventListener("click", () => {
         notesMode = !notesMode;
-        notesToggle.classList.toggle("active", notesMode);
-        notesToggle.setAttribute("aria-pressed", String(notesMode));
-        notesToggle.setAttribute("aria-label", `${notesMode ? "Tắt" : "Bật"} chế độ ghi chú`);
+        notesToggles.forEach((item) => {
+          item.classList.toggle("active", notesMode);
+          item.setAttribute("aria-pressed", String(notesMode));
+          item.setAttribute("aria-label", `${notesMode ? "Tắt" : "Bật"} chế độ ghi chú`);
+        });
         setMessage(notesMode ? "Chế độ ghi chú đang bật. Chọn ô trống rồi nhập số cần ghi chú." : "Chế độ ghi chú đã tắt.");
-      });
+      }));
 
       document.getElementById("restart").addEventListener("click", restartGame);
       document.getElementById("new-game").addEventListener("click", startNewGame);
