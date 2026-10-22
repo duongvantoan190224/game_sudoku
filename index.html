@@ -57,7 +57,25 @@
       font-size: 18px;
     }
     .icon-button:hover { background: #eef2ff; }
-    .timer-row { display: flex; justify-content: center; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .topbar #pause { grid-row: 1; grid-column: 4; }
+    .topbar #settings { grid-row: 1; grid-column: 5; }
+    .timer-row {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      display: flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid #dfe6fa;
+      border-radius: 12px;
+      color: #3455ce;
+      background: #f2f5ff;
+      font-size: 21px;
+      font-weight: 850;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .04em;
+    }
 
     .board-wrap { position: relative; width: 100%; }
     .board {
@@ -97,6 +115,7 @@
     .cell.given { color: #263247; font-weight: 800; }
     .cell.peer { background: #f2f5fc; }
     .cell.same { color: #3455ce; background: #e7edff; }
+    .cell.user-entry { color: #087f6a; font-weight: 800; }
     .cell.selected { z-index: 1; outline: 2px solid var(--blue); outline-offset: -2px; background: #dce5ff; }
     .cell.wrong { color: #d64c55; background: #fff0f0; }
     .cell.conflict { color: #d64c55; }
@@ -134,9 +153,30 @@
     .overlay.show { display: flex; }
     .overlay button { padding: 10px 22px; border: 0; border-radius: 12px; color: #fff; background: var(--blue); font-weight: 750; }
 
-    .message { min-height: 36px; padding: 9px 12px; border-radius: 10px; color: #657187; background: #fff; font-size: 12px; line-height: 1.5; text-align: center; }
-    .message.success { color: #18805d; background: #e9f8f1; }
-    .message.error { color: #b3474e; background: #fff0f0; }
+    .toast {
+      position: fixed;
+      z-index: 30;
+      top: calc(12px + env(safe-area-inset-top));
+      left: 50%;
+      width: min(480px, calc(100vw - 24px));
+      padding: 12px 16px;
+      border: 1px solid #dce3ef;
+      border-radius: 14px;
+      color: #536078;
+      background: #fff;
+      box-shadow: 0 8px 28px #26395826;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.45;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -12px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
+    .toast.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
 
     .toolbar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .tool {
@@ -157,6 +197,41 @@
     .tool:hover { background: #f6f8fc; }
     .tool:disabled { opacity: .45; cursor: default; }
     .tool.active { border-color: var(--blue); color: var(--blue-dark); background: #e7edff; }
+    .hint-popover {
+      position: absolute;
+      z-index: 5;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      width: max-content;
+      max-width: min(220px, calc(100vw - 32px));
+      padding: 10px 12px;
+      border: 1px solid #f0d28a;
+      border-radius: 12px;
+      color: #704d08;
+      background: #fff8df;
+      box-shadow: 0 6px 20px #26395824;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.4;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 4px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .hint-popover::after {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      width: 9px;
+      height: 9px;
+      border-right: 1px solid #f0d28a;
+      border-bottom: 1px solid #f0d28a;
+      background: #fff8df;
+      content: "";
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+    .hint-popover.show { opacity: 1; transform: translate(-50%, 0); }
     .badge { position: absolute; top: -6px; right: -4px; min-width: 18px; padding: 1px 5px; border-radius: 9px; color: #fff; background: var(--blue); font-size: 10px; font-weight: 800; }
     .tool-state { font-size: 9px; font-weight: 800; letter-spacing: .05em; }
 
@@ -175,6 +250,7 @@
       transition: transform .12s ease, background .12s ease;
     }
     .number-button:hover { background: #eef2ff; }
+    .number-button.selected { border-color: var(--blue); color: #fff; background: var(--blue); box-shadow: 0 3px 10px #4569e84d; }
     .number-button:active, .tool:active { transform: scale(.96); }
     .number-button:disabled { opacity: .3; cursor: default; }
 
@@ -236,23 +312,23 @@
       <div class="stat"><span class="stat-label">Độ khó</span><span class="stat-value" id="difficulty-label">Vừa</span></div>
       <div class="stat"><span class="stat-label">Điểm</span><span class="stat-value" id="score">0</span></div>
       <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
+      <div class="timer-row"><span aria-hidden="true">⏱</span><span id="timer">00:00</span></div>
       <button class="icon-button" id="pause" type="button" aria-label="Tạm dừng">⏸</button>
       <button class="icon-button" id="settings" type="button" aria-label="Cài đặt">⚙</button>
     </header>
-    <div class="timer-row"><span>⏱</span><span id="timer">00:00</span></div>
 
     <div class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="Bảng Sudoku 9 nhân 9"></div>
       <div class="overlay" id="pause-overlay"><span>Đã tạm dừng</span><button id="resume" type="button">Tiếp tục</button></div>
     </div>
 
-    <div class="message" id="message" role="status" aria-live="polite">Chọn một ô trống rồi nhập số bạn muốn.</div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <div class="toolbar" aria-label="Công cụ">
       <button class="tool" id="undo" type="button" aria-label="Hoàn tác"><span class="tool-icon" aria-hidden="true">↶</span>Hoàn tác</button>
       <button class="tool" id="erase" type="button" aria-label="Xóa ô đã chọn"><span class="tool-icon" aria-hidden="true">⌫</span>Xóa</button>
       <button class="tool" id="notes-toggle" type="button" aria-label="Bật chế độ ghi chú" aria-pressed="false"><span class="tool-icon" aria-hidden="true">✎</span>Ghi chú <span class="tool-state" id="notes-state">TẮT</span></button>
-      <button class="tool" id="hint" type="button" aria-label="Gợi ý"><span class="tool-icon" aria-hidden="true">💡</span>Gợi ý<span class="badge" id="hint-count">3</span></button>
+      <button class="tool" id="hint" type="button" aria-label="Gợi ý"><span class="tool-icon" aria-hidden="true">💡</span>Gợi ý<span class="badge" id="hint-count">3</span><span class="hint-popover" id="hint-popover" role="status" aria-live="polite"></span></button>
     </div>
 
     <div class="number-pad" id="number-pad" aria-label="Bàn phím số">
@@ -328,7 +404,8 @@
       const levelNames = { easy: "Dễ", medium: "Vừa", hard: "Khó" };
       const boardElement = document.getElementById("board");
       const timerElement = document.getElementById("timer");
-      const messageElement = document.getElementById("message");
+      const toastElement = document.getElementById("toast");
+      const hintPopover = document.getElementById("hint-popover");
       const difficultyElement = document.getElementById("difficulty");
       const difficultyLabel = document.getElementById("difficulty-label");
       const scoreElement = document.getElementById("score");
@@ -347,6 +424,7 @@
       let notes = [];
       let history = [];
       let selectedCell = -1;
+      let selectedDigit = 0;
       let invalidCell = -1;
       let elapsedMs = 0;
       let resumedAt = Date.now();
@@ -356,6 +434,8 @@
       let score = 0;
       let errors = 0;
       let hintsLeft = MAX_HINTS;
+      let toastTimeout;
+      let hintPopoverTimeout;
 
       function shuffled(items) {
         const result = items.slice();
@@ -437,8 +517,21 @@
       }
 
       function setMessage(text, kind = "") {
-        messageElement.textContent = text;
-        messageElement.className = `message${kind ? ` ${kind}` : ""}`;
+        window.clearTimeout(toastTimeout);
+        window.clearTimeout(hintPopoverTimeout);
+        hintPopover.classList.remove("show");
+        toastElement.textContent = text;
+        toastElement.className = `toast show${kind ? ` ${kind}` : ""}`;
+        toastTimeout = window.setTimeout(() => toastElement.classList.remove("show"), 3200);
+      }
+
+      function showHintPopover(text) {
+        window.clearTimeout(toastTimeout);
+        toastElement.classList.remove("show");
+        window.clearTimeout(hintPopoverTimeout);
+        hintPopover.textContent = text;
+        hintPopover.classList.add("show");
+        hintPopoverTimeout = window.setTimeout(() => hintPopover.classList.remove("show"), 5000);
       }
 
       function conflictsForGrid() {
@@ -505,6 +598,7 @@
           }
           if (selectedCell === index) cell.classList.add("selected");
           if (value && value === selectedValue) cell.classList.add("same");
+          if (!given && value) cell.classList.add("user-entry");
           if (conflicts.has(index)) cell.classList.add("conflict");
           if (!given && value && value !== solution[row][column]) cell.classList.add("wrong");
           if (invalidCell === index) cell.classList.add("invalid");
@@ -524,6 +618,9 @@
         });
 
         boardElement.replaceChildren(fragment);
+        document.querySelectorAll(".number-button").forEach((button) => {
+          button.classList.toggle("selected", Number(button.dataset.value) === selectedDigit);
+        });
       }
 
       function currentElapsed() {
@@ -562,6 +659,10 @@
 
       function enterValue(value) {
         if (finished || paused) return;
+        selectedDigit = value || 0;
+        document.querySelectorAll(".number-button").forEach((button) => {
+          button.classList.toggle("selected", Number(button.dataset.value) === selectedDigit);
+        });
         if (selectedCell < 0) {
           setMessage("Hãy chọn một ô trống trước nhé.");
           return;
@@ -596,6 +697,10 @@
             elapsedMs = currentElapsed();
             finished = true;
             setMessage("Bạn đã mắc quá nhiều lỗi. Hãy bắt đầu bàn mới!", "error");
+          } else if (errors === 1) {
+            setMessage("Số không chính xác nên chưa được điền. Hãy thử lại.", "error");
+          } else if (errors === 2) {
+            showHintPopover("Bạn đã mắc lỗi lần thứ hai. Hãy thử dùng Gợi ý để được trợ giúp nhé!");
           } else {
             setMessage("Số không chính xác nên chưa được điền. Hãy thử lại.", "error");
           }
@@ -718,6 +823,7 @@
         const cell = event.target.closest(".cell");
         if (!cell || cell.disabled || paused) return;
         selectedCell = Number(cell.dataset.index);
+        selectedDigit = values[selectedCell] || 0;
         setMessage("Ô đã chọn. Nhập số từ 1 đến 9.");
         renderBoard();
       });
@@ -788,6 +894,7 @@
           const index = nextRow * 9 + nextColumn;
           if (puzzle[nextRow][nextColumn] === 0) {
             selectedCell = index;
+            selectedDigit = values[index] || 0;
             renderBoard();
             break;
           }
