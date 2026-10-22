@@ -23,12 +23,12 @@
       min-width: 320px;
       min-height: 100vh;
       margin: 0;
-      padding: 12px 12px calc(62px + env(safe-area-inset-bottom));
+      padding: 6px 4px calc(58px + env(safe-area-inset-bottom));
       background: radial-gradient(ellipse at 15% 0%, #e5ecff 0, transparent 38%), #f4f7fb;
     }
     button, select { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; cursor: pointer; }
-    .app { width: min(100%, 600px); margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+    .app { width: min(100%, 720px); margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
 
     .topbar {
       display: grid;
@@ -86,7 +86,7 @@
       aspect-ratio: 1;
       overflow: hidden;
       border: 2px solid #65738c;
-      border-radius: 9px;
+      border-radius: 6px;
       background: #fff;
       touch-action: manipulation;
     }
@@ -104,7 +104,7 @@
       border-radius: 0;
       color: #4569e8;
       background: #fff;
-      font-size: clamp(20px, 6.5vw, 36px);
+      font-size: clamp(26px, min(8.2vw, 6.4vh), 58px);
       font-weight: 800;
       line-height: 1;
       transition: background-color .12s ease;
@@ -132,7 +132,7 @@
       align-items: center;
       justify-items: center;
       color: #65738c;
-      font-size: clamp(7px, 2.4vw, 11px);
+      font-size: clamp(8px, 2.8vw, 15px);
       font-weight: 550;
       line-height: 1;
       pointer-events: none;
