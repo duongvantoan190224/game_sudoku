@@ -251,6 +251,7 @@
     }
     .toast-message { display: flex; min-height: 0; flex: 1; align-items: center; justify-content: center; overflow: hidden; overflow-wrap: anywhere; font-size: 10px; line-height: 1.25; text-align: center; opacity: 0; }
     .toast.show { color: #536078; }
+    .toast.show .toast-message { opacity: 1; }
     .toast.show.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
     .toast.show.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
 
@@ -289,41 +290,6 @@
     .tool.active { border-color: var(--tool-color); color: var(--tool-color); background: var(--tool-bg); box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--tool-border); }
     .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 3px; }
     #notes-toggle .tool-caption { flex-direction: column; gap: 1px; }
-    .hint-popover {
-      position: absolute;
-      z-index: 5;
-      bottom: calc(100% + 10px);
-      left: 50%;
-      width: max-content;
-      max-width: min(220px, calc(100vw - 32px));
-      padding: 10px 12px;
-      border: 1px solid #f0d28a;
-      border-radius: 12px;
-      color: #704d08;
-      background: #fff8df;
-      box-shadow: 0 6px 20px #26395824;
-      font-size: 12px;
-      font-weight: 700;
-      line-height: 1.4;
-      text-align: center;
-      opacity: 0;
-      pointer-events: none;
-      transform: translate(-50%, 4px);
-      transition: opacity .18s ease, transform .18s ease;
-    }
-    .hint-popover::after {
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      width: 9px;
-      height: 9px;
-      border-right: 1px solid #f0d28a;
-      border-bottom: 1px solid #f0d28a;
-      background: #fff8df;
-      content: "";
-      transform: translate(-50%, -50%) rotate(45deg);
-    }
-    .hint-popover.show { opacity: 1; transform: translate(-50%, 0); }
     .badge { display: inline-grid; min-width: 14px; height: 14px; place-items: center; padding: 0 3px; border-radius: 7px; color: #fff; background: var(--blue); font-size: 8px; font-weight: 800; line-height: 1; }
     #hint .badge { background: #d18a17; }
     .tool-state { padding: 1px 4px; border-radius: 4px; color: #7046c2; background: #e9ddff; font-size: 7px; font-weight: 850; letter-spacing: .02em; line-height: 1.2; }
@@ -482,7 +448,6 @@
       <button class="tool" id="hint" type="button" aria-label="Gợi ý">
         <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4m-4-6a7 7 0 1 1 4 0c-.7.5-1 1.1-1 2h-2c0-.9-.3-1.5-1-2Z"/><path d="M12 3v2"/></svg>
         <span class="tool-caption"><span>Gợi ý</span><span class="badge" id="hint-count">3</span></span>
-        <span class="hint-popover" id="hint-popover" role="status" aria-live="polite"></span>
       </button>
       </div>
       <div class="toast" id="toast" role="status" aria-live="polite">
@@ -554,7 +519,6 @@
       const toastElement = document.getElementById("toast");
       const toastMessageElement = document.getElementById("toast-message");
       const toolbarElement = document.querySelector(".toolbar");
-      const hintPopover = document.getElementById("hint-popover");
       const difficultyElement = document.getElementById("difficulty");
       const scoreElement = document.getElementById("score");
       const errorsElement = document.getElementById("errors");
@@ -582,7 +546,6 @@
       let errors = 0;
       let hintsLeft = MAX_HINTS;
       let toastTimeout;
-      let hintPopoverTimeout;
 
       function shuffled(items) {
         const result = items.slice();
@@ -676,21 +639,10 @@
 
       function setMessage(text, kind = "") {
         window.clearTimeout(toastTimeout);
-        window.clearTimeout(hintPopoverTimeout);
-        hintPopover.classList.remove("show");
         toastMessageElement.textContent = text;
         toastElement.className = `toast show${kind ? ` ${kind}` : ""}`;
         fitToastText();
         toastTimeout = window.setTimeout(() => toastElement.classList.remove("show"), 3200);
-      }
-
-      function showHintPopover(text) {
-        window.clearTimeout(toastTimeout);
-        toastElement.classList.remove("show");
-        window.clearTimeout(hintPopoverTimeout);
-        hintPopover.textContent = text;
-        hintPopover.classList.add("show");
-        hintPopoverTimeout = window.setTimeout(() => hintPopover.classList.remove("show"), 5000);
       }
 
       function conflictsForGrid() {
@@ -892,7 +844,7 @@
           } else if (errors === 1) {
             setMessage("Số này vi phạm quy tắc hàng, cột hoặc khối 3x3 nên chưa được điền.", "error");
           } else if (errors === 2) {
-            showHintPopover("Bạn đã mắc lỗi lần thứ hai. Hãy thử dùng Gợi ý để được trợ giúp nhé!");
+            setMessage("Bạn đã mắc lỗi lần thứ hai. Hãy thử dùng Gợi ý để được trợ giúp nhé!");
           } else {
             setMessage("Số này vi phạm quy tắc hàng, cột hoặc khối 3x3 nên chưa được điền.", "error");
           }
