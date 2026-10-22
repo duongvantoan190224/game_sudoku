@@ -115,6 +115,7 @@
     }
     .cell {
       display: grid;
+      position: relative;
       min-width: 0;
       min-height: 0;
       place-items: center;
@@ -144,6 +145,20 @@
     .cell.invalid, .cell.invalid.selected { color: #b4232e; background: #ffe1e2; box-shadow: inset 0 0 0 2px #d64c55; }
     .cell:focus-visible { position: relative; z-index: 2; outline: 3px solid #7891f5; outline-offset: -3px; }
     .cell:disabled { cursor: default; opacity: 1; }
+    .note-grid {
+      position: absolute;
+      inset: 2px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      align-items: center;
+      justify-items: center;
+      color: #65738c;
+      font-size: clamp(7px, 1.6vw, 11px);
+      font-weight: 550;
+      line-height: 1;
+      pointer-events: none;
+    }
 
     .side-panel { display: flex; flex-direction: column; gap: 18px; }
     .difficulty-label, .section-label { display: block; margin-bottom: 9px; color: #707c91; font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
@@ -175,6 +190,10 @@
     .number-button:hover { border-color: #bdcafa; background: #eef2ff; }
     .number-button:active, .action-button:active { transform: scale(.97); }
     .number-button.erase { color: #69758b; font-size: 14px; }
+    .number-entry-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
+    .number-entry-header .section-label { margin: 0; }
+    .notes-toggle { display: inline-flex; min-height: 34px; align-items: center; gap: 5px; padding: 6px 9px; }
+    .notes-toggle.active { border-color: #4569e8; color: #3455ce; background: #e7edff; }
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
     .action-button {
       min-height: 42px;
@@ -333,7 +352,10 @@
           </div>
 
           <div>
-            <span class="section-label">Chọn một số</span>
+            <div class="number-entry-header">
+              <span class="section-label">Chọn một số</span>
+              <button class="action-button notes-toggle" id="notes-toggle" type="button" aria-label="Bật chế độ ghi chú" aria-pressed="false"><span aria-hidden="true">✎</span> Ghi chú</button>
+            </div>
             <div class="number-pad" aria-label="Bàn phím số">
               <button class="number-button" type="button" data-value="1" aria-label="Điền số 1">1</button>
               <button class="number-button" type="button" data-value="2" aria-label="Điền số 2">2</button>
@@ -405,15 +427,18 @@
       const timerElement = document.getElementById("timer");
       const messageElement = document.getElementById("message");
       const difficultyElement = document.getElementById("difficulty");
+      const notesToggle = document.getElementById("notes-toggle");
       const clueTargets = { easy: 42, medium: 37, hard: 32 };
 
       let solution = [];
       let puzzle = [];
       let values = [];
+      let notes = [];
       let selectedCell = -1;
       let invalidCell = -1;
       let startedAt = Date.now();
       let finished = false;
+      let notesMode = false;
 
       function shuffled(items) {
         const result = items.slice();
@@ -548,7 +573,9 @@
           cell.className = "cell";
           cell.dataset.index = String(index);
           cell.setAttribute("role", "gridcell");
-          cell.setAttribute("aria-label", `Hàng ${row + 1}, cột ${column + 1}${value ? `, số ${value}` : ", ô trống"}${given ? ", số cho sẵn" : ""}${invalidCell === index ? ", số vừa nhập không hợp lệ" : ""}`);
+          const cellNotes = notes[index];
+          const notesLabel = cellNotes.size ? `, ghi chú ${Array.from(cellNotes).sort().join(", ")}` : "";
+          cell.setAttribute("aria-label", `Hàng ${row + 1}, cột ${column + 1}${value ? `, số ${value}` : ", ô trống"}${notesLabel}${given ? ", số cho sẵn" : ""}${invalidCell === index ? ", số vừa nhập không hợp lệ" : ""}`);
           if (given) {
             cell.classList.add("given");
             cell.disabled = true;
@@ -564,7 +591,18 @@
           if (conflicts.has(index)) cell.classList.add("conflict");
           if (!given && value && value !== solution[row][column]) cell.classList.add("wrong");
           if (invalidCell === index) cell.classList.add("invalid");
-          cell.textContent = value ? String(value) : "";
+          if (value) {
+            cell.textContent = String(value);
+          } else if (cellNotes.size) {
+            const noteGrid = document.createElement("span");
+            noteGrid.className = "note-grid";
+            for (let note = 1; note <= 9; note += 1) {
+              const noteElement = document.createElement("span");
+              noteElement.textContent = cellNotes.has(note) ? String(note) : "";
+              noteGrid.appendChild(noteElement);
+            }
+            cell.appendChild(noteGrid);
+          }
           fragment.appendChild(cell);
         });
 
@@ -589,6 +627,22 @@
         const column = selectedCell % 9;
         if (puzzle[row][column] !== 0) return;
 
+        if (notesMode && value) {
+          if (values[selectedCell]) {
+            setMessage("Xóa số chính thức trong ô trước khi thêm ghi chú.");
+            return;
+          }
+          if (notes[selectedCell].has(value)) {
+            notes[selectedCell].delete(value);
+          } else {
+            notes[selectedCell].add(value);
+          }
+          invalidCell = -1;
+          setMessage("Đã cập nhật ghi chú cho ô.");
+          renderBoard();
+          return;
+        }
+
         if (value && value !== solution[row][column]) {
           invalidCell = selectedCell;
           setMessage("Số không chính xác nên chưa được điền. Hãy thử lại.", "error");
@@ -598,6 +652,7 @@
 
         if (invalidCell === selectedCell) invalidCell = -1;
         values[selectedCell] = value;
+        notes[selectedCell].clear();
         if (value) {
           setMessage("Chính xác! Tiếp tục thôi.");
         } else {
@@ -616,6 +671,7 @@
         solution = generated.answer;
         puzzle = generated.grid;
         values = puzzle.flat();
+        notes = Array.from({ length: 81 }, () => new Set());
         selectedCell = -1;
         invalidCell = -1;
         startedAt = Date.now();
@@ -627,6 +683,7 @@
 
       function restartGame() {
         values = puzzle.flat();
+        notes = Array.from({ length: 81 }, () => new Set());
         selectedCell = -1;
         invalidCell = -1;
         startedAt = Date.now();
@@ -647,6 +704,14 @@
       document.querySelector(".number-pad").addEventListener("click", (event) => {
         const button = event.target.closest("[data-value]");
         if (button) enterValue(Number(button.dataset.value));
+      });
+
+      notesToggle.addEventListener("click", () => {
+        notesMode = !notesMode;
+        notesToggle.classList.toggle("active", notesMode);
+        notesToggle.setAttribute("aria-pressed", String(notesMode));
+        notesToggle.setAttribute("aria-label", `${notesMode ? "Tắt" : "Bật"} chế độ ghi chú`);
+        setMessage(notesMode ? "Chế độ ghi chú đang bật. Chọn ô trống rồi nhập số cần ghi chú." : "Chế độ ghi chú đã tắt.");
       });
 
       document.getElementById("restart").addEventListener("click", restartGame);
