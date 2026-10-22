@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>Sudoku — Thử thách trí tuệ</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #202b40;
+      background: #f4f7fb;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --blue: #4569e8;
+      --blue-dark: #3455ce;
+      --line: #dce3ef;
+      --muted: #7c879b;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      padding: 36px 18px;
+      background:
+        radial-gradient(ellipse at 15% 0%, #e5ecff 0, transparent 38%),
+        radial-gradient(ellipse at 100% 100%, #e5f5f2 0, transparent 35%),
+        #f4f7fb;
+    }
+
+    button, select { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    .app { width: min(100%, 900px); margin: 0 auto; }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 0 2px 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border-radius: 14px;
+      color: #fff;
+      background: linear-gradient(145deg, #6885f6, #4569e8);
+      box-shadow: 0 8px 18px #4569e833;
+      font-size: 23px;
+      font-weight: 800;
+    }
+    .brand-name { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: -.03em; }
+    .brand-caption { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .top-tag {
+      padding: 8px 12px;
+      border: 1px solid #e3e9f3;
+      border-radius: 999px;
+      color: #69758b;
+      background: #ffffffa6;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .game-card {
+      overflow: hidden;
+      border: 1px solid #e5eaf2;
+      border-radius: 24px;
+      background: #fff;
+      box-shadow: 0 24px 70px #26395812, 0 3px 10px #26395808;
+    }
+    .card-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 24px 28px 19px;
+    }
+    h1 { margin: 0; font-size: clamp(21px, 4vw, 27px); letter-spacing: -.045em; }
+    .subtitle { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .stats { display: flex; gap: 10px; }
+    .stat {
+      min-width: 83px;
+      padding: 10px 13px;
+      border: 1px solid #edf0f5;
+      border-radius: 13px;
+      background: #fafbfe;
+      text-align: center;
+    }
+    .stat-label { display: block; margin-bottom: 3px; color: var(--muted); font-size: 10px; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
+    .stat-value { font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 750; }
+
+    .game-content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(210px, .72fr);
+      align-items: center;
+      gap: clamp(20px, 5vw, 48px);
+      padding: 8px 28px 28px;
+    }
+    .board-wrap { width: 100%; max-width: 480px; margin: 0 auto; }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      width: 100%;
+      aspect-ratio: 1;
+      overflow: hidden;
+      border: 2px solid #65738c;
+      border-radius: 9px;
+      background: #fff;
+      touch-action: manipulation;
+    }
+    .cell {
+      display: grid;
+      min-width: 0;
+      min-height: 0;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      border-radius: 0;
+      color: #4569e8;
+      background: #fff;
+      cursor: pointer;
+      font-size: clamp(15px, 3.5vw, 25px);
+      font-weight: 650;
+      line-height: 1;
+      transition: background-color .12s ease;
+    }
+    .cell:nth-child(9n) { border-right: 0; }
+    .cell:nth-child(n+73) { border-bottom: 0; }
+    .cell.box-right { border-right: 2px solid #65738c; }
+    .cell.box-bottom { border-bottom: 2px solid #65738c; }
+    .cell.given { color: #263247; font-weight: 800; }
+    .cell.peer { background: #f2f5fc; }
+    .cell.same { color: #3455ce; background: #e7edff; }
+    .cell.selected { position: relative; z-index: 1; outline: 2px solid var(--blue); outline-offset: -2px; background: #dce5ff; }
+    .cell.wrong { color: #d64c55; background: #fff0f0; }
+    .cell.conflict { color: #d64c55; }
+    .cell:focus-visible { position: relative; z-index: 2; outline: 3px solid #7891f5; outline-offset: -3px; }
+    .cell:disabled { cursor: default; opacity: 1; }
+
+    .side-panel { display: flex; flex-direction: column; gap: 18px; }
+    .difficulty-label, .section-label { display: block; margin-bottom: 9px; color: #707c91; font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    .difficulty-select {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1px solid #e1e6ef;
+      border-radius: 11px;
+      color: #2d3950;
+      background: #fbfcfe;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 650;
+    }
+    .number-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .number-button {
+      display: grid;
+      min-height: 48px;
+      place-items: center;
+      border: 1px solid #e5eaf4;
+      border-radius: 11px;
+      color: #4569e8;
+      background: #f8faff;
+      cursor: pointer;
+      font-size: 19px;
+      font-weight: 750;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .number-button:hover { border-color: #bdcafa; background: #eef2ff; }
+    .number-button:active, .action-button:active { transform: scale(.97); }
+    .number-button.erase { color: #69758b; font-size: 14px; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .action-button {
+      min-height: 42px;
+      padding: 9px 10px;
+      border: 1px solid #e1e6ef;
+      border-radius: 10px;
+      color: #536078;
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .action-button:hover { background: #f6f8fc; }
+    .action-button.primary { grid-column: 1 / -1; border-color: var(--blue); color: #fff; background: var(--blue); }
+    .action-button.primary:hover { background: var(--blue-dark); }
+    .message {
+      min-height: 39px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: #657187;
+      background: #f6f8fc;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .message.success { color: #18805d; background: #e9f8f1; }
+    .message.error { color: #b3474e; background: #fff0f0; }
+    .instructions {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin: 0;
+      color: #818ca0;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+    .instructions-icon { flex: none; color: #8a9be1; font-size: 15px; }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 15px 3px 0;
+      color: #8b95a6;
+      font-size: 11px;
+    }
+
+    @media (max-width: 680px) {
+      body { padding: 19px 12px 28px; }
+      .topbar { margin-bottom: 14px; }
+      .brand-icon { width: 40px; height: 40px; }
+      .top-tag { padding: 7px 9px; font-size: 10px; }
+      .game-card { border-radius: 19px; }
+      .card-heading { align-items: flex-start; padding: 19px 17px 15px; }
+      .stats { gap: 6px; }
+      .stat { min-width: 63px; padding: 8px 7px; border-radius: 10px; }
+      .stat-label { font-size: 9px; }
+      .stat-value { font-size: 14px; }
+      .game-content { grid-template-columns: 1fr; gap: 20px; padding: 4px 16px 20px; }
+      .board-wrap { max-width: 480px; }
+      .side-panel { gap: 14px; }
+      .difficulty-row { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 12px; }
+      .difficulty-label { margin: 0; }
+      .difficulty-select { padding: 9px 11px; }
+      .number-pad { grid-template-columns: repeat(9, 1fr); gap: 5px; }
+      .number-button { min-height: 42px; border-radius: 9px; font-size: 17px; }
+      .number-button.erase { grid-column: 1 / -1; min-height: 36px; }
+      .actions { grid-template-columns: 1fr 1fr; }
+      .action-button { min-height: 40px; }
+    }
+    @media (max-width: 390px) {
+      .brand-caption { display: none; }
+      .card-heading { gap: 8px; }
+      .stat { min-width: 57px; }
+      .game-content { padding-inline: 11px; }
+      .number-pad { gap: 4px; }
+      .number-button { min-height: 38px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">9</div>
+        <div>
+          <p class="brand-name">Sudoku</p>
+          <p class="brand-caption">Khoảng lặng cho trí óc</p>
+        </div>
+      </div>
+      <div class="top-tag">✦ &nbsp; Rèn luyện tư duy</div>
+    </header>
+
+    <section class="game-card" aria-labelledby="game-title">
+      <div class="card-heading">
+        <div>
+          <h1 id="game-title">Sudoku</h1>
+          <p class="subtitle">Điền các số từ 1 đến 9 vào bảng.</p>
+        </div>
+        <div class="stats" aria-label="Thống kê ván chơi">
+          <div class="stat">
+            <span class="stat-label">Thời gian</span>
+            <span class="stat-value" id="timer">00:00</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Lỗi</span>
+            <span class="stat-value" id="mistakes">0 / 3</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-content">
+        <div class="board-wrap">
+          <div class="board" id="board" role="grid" aria-label="Bảng Sudoku 9 nhân 9"></div>
+        </div>
+
+        <aside class="side-panel" aria-label="Điều khiển trò chơi">
+          <div class="difficulty-row">
+            <label class="difficulty-label" for="difficulty">Độ khó</label>
+            <select class="difficulty-select" id="difficulty">
+              <option value="easy">Dễ</option>
+              <option value="medium" selected>Vừa</option>
+              <option value="hard">Khó</option>
+            </select>
+          </div>
+
+          <div>
+            <span class="section-label">Chọn một số</span>
+            <div class="number-pad" aria-label="Bàn phím số">
+              <button class="number-button" type="button" data-value="1" aria-label="Điền số 1">1</button>
+              <button class="number-button" type="button" data-value="2" aria-label="Điền số 2">2</button>
+              <button class="number-button" type="button" data-value="3" aria-label="Điền số 3">3</button>
+              <button class="number-button" type="button" data-value="4" aria-label="Điền số 4">4</button>
+              <button class="number-button" type="button" data-value="5" aria-label="Điền số 5">5</button>
+              <button class="number-button" type="button" data-value="6" aria-label="Điền số 6">6</button>
+              <button class="number-button" type="button" data-value="7" aria-label="Điền số 7">7</button>
+              <button class="number-button" type="button" data-value="8" aria-label="Điền số 8">8</button>
+              <button class="number-button" type="button" data-value="9" aria-label="Điền số 9">9</button>
+              <button class="number-button erase" type="button" data-value="0">⌫ &nbsp; Xóa ô đã chọn</button>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="action-button" id="restart" type="button">↺ &nbsp; Chơi lại</button>
+            <button class="action-button" id="new-game" type="button">✦ &nbsp; Bàn mới</button>
+            <button class="action-button primary" id="check-board" type="button">Kiểm tra kết quả</button>
+          </div>
+
+          <div class="message" id="message" role="status" aria-live="polite">Chọn một ô trống rồi nhập số bạn muốn.</div>
+          <p class="instructions"><span class="instructions-icon" aria-hidden="true">ⓘ</span><span>Dùng bàn phím số hoặc các nút bên trên. Phím mũi tên để di chuyển, Backspace để xóa ô.</span></p>
+        </aside>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Mỗi hàng, cột và vùng 3 × 3 chỉ chứa số 1–9.</span>
+      <span>Chúc bạn chơi vui!</span>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const boardElement = document.getElementById("board");
+      const timerElement = document.getElementById("timer");
+      const mistakesElement = document.getElementById("mistakes");
+      const messageElement = document.getElementById("message");
+      const difficultyElement = document.getElementById("difficulty");
+      const clueTargets = { easy: 42, medium: 37, hard: 32 };
+
+      let solution = [];
+      let puzzle = [];
+      let values = [];
+      let selectedCell = -1;
+      let mistakes = 0;
+      let startedAt = Date.now();
+      let finished = false;
+
+      function shuffled(items) {
+        const result = items.slice();
+        for (let i = result.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [result[i], result[j]] = [result[j], result[i]];
+        }
+        return result;
+      }
+
+      function randomizedSolution() {
+        const groups = shuffled([0, 1, 2]);
+        const rows = groups.flatMap((group) => shuffled([0, 1, 2]).map((row) => group * 3 + row));
+        const columns = shuffled([0, 1, 2]).flatMap((group) => shuffled([0, 1, 2]).map((column) => group * 3 + column));
+        const digits = shuffled([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        return rows.map((row) => columns.map((column) => digits[(row * 3 + Math.floor(row / 3) + column) % 9]));
+      }
+
+      function countSolutions(grid, limit = 2) {
+        let bestRow = -1;
+        let bestColumn = -1;
+        let bestCandidates = null;
+
+        for (let row = 0; row < 9; row += 1) {
+          for (let column = 0; column < 9; column += 1) {
+            if (grid[row][column] !== 0) continue;
+            const used = new Set();
+            for (let i = 0; i < 9; i += 1) {
+              used.add(grid[row][i]);
+              used.add(grid[i][column]);
+              used.add(grid[Math.floor(row / 3) * 3 + Math.floor(i / 3)][Math.floor(column / 3) * 3 + i % 3]);
+            }
+            const candidates = [];
+            for (let value = 1; value <= 9; value += 1) {
+              if (!used.has(value)) candidates.push(value);
+            }
+            if (candidates.length === 0) return 0;
+            if (bestCandidates === null || candidates.length < bestCandidates.length) {
+              bestRow = row;
+              bestColumn = column;
+              bestCandidates = candidates;
+              if (candidates.length === 1) break;
+            }
+          }
+          if (bestCandidates?.length === 1) break;
+        }
+
+        if (bestCandidates === null) return 1;
+        let total = 0;
+        for (const value of bestCandidates) {
+          grid[bestRow][bestColumn] = value;
+          total += countSolutions(grid, limit - total);
+          grid[bestRow][bestColumn] = 0;
+          if (total >= limit) return total;
+        }
+        return total;
+      }
+
+      function createPuzzle(difficulty) {
+        const answer = randomizedSolution();
+        const grid = answer.map((row) => row.slice());
+        let clues = 81;
+        const cells = shuffled(Array.from({ length: 81 }, (_, index) => index));
+        const target = clueTargets[difficulty];
+
+        for (const index of cells) {
+          if (clues <= target) break;
+          const row = Math.floor(index / 9);
+          const column = index % 9;
+          const previous = grid[row][column];
+          grid[row][column] = 0;
+          if (countSolutions(grid) === 1) {
+            clues -= 1;
+          } else {
+            grid[row][column] = previous;
+          }
+        }
+        return { answer, grid };
+      }
+
+      function setMessage(text, kind = "") {
+        messageElement.textContent = text;
+        messageElement.className = `message${kind ? ` ${kind}` : ""}`;
+      }
+
+      function conflictsForGrid() {
+        const conflicts = new Set();
+        const addDuplicates = (indexes) => {
+          const seen = new Map();
+          for (const index of indexes) {
+            const value = values[index];
+            if (!value) continue;
+            if (seen.has(value)) {
+              conflicts.add(index);
+              conflicts.add(seen.get(value));
+            } else {
+              seen.set(value, index);
+            }
+          }
+        };
+        for (let row = 0; row < 9; row += 1) {
+          addDuplicates(Array.from({ length: 9 }, (_, column) => row * 9 + column));
+        }
+        for (let column = 0; column < 9; column += 1) {
+          addDuplicates(Array.from({ length: 9 }, (_, row) => row * 9 + column));
+        }
+        for (let boxRow = 0; boxRow < 3; boxRow += 1) {
+          for (let boxColumn = 0; boxColumn < 3; boxColumn += 1) {
+            const indexes = [];
+            for (let row = 0; row < 3; row += 1) {
+              for (let column = 0; column < 3; column += 1) {
+                indexes.push((boxRow * 3 + row) * 9 + boxColumn * 3 + column);
+              }
+            }
+            addDuplicates(indexes);
+          }
+        }
+        return conflicts;
+      }
+
+      function renderBoard() {
+        const conflicts = conflictsForGrid();
+        const selectedValue = selectedCell >= 0 ? values[selectedCell] : 0;
+        const fragment = document.createDocumentFragment();
+
+        values.forEach((value, index) => {
+          const row = Math.floor(index / 9);
+          const column = index % 9;
+          const given = puzzle[row][column] !== 0;
+          const cell = document.createElement("button");
+          cell.type = "button";
+          cell.className = "cell";
+          cell.dataset.index = String(index);
+          cell.setAttribute("role", "gridcell");
+          cell.setAttribute("aria-label", `Hàng ${row + 1}, cột ${column + 1}${value ? `, số ${value}` : ", ô trống"}${given ? ", số cho sẵn" : ""}`);
+          if (given) {
+            cell.classList.add("given");
+            cell.disabled = true;
+          }
+          if (column === 2 || column === 5) cell.classList.add("box-right");
+          if (row === 2 || row === 5) cell.classList.add("box-bottom");
+          if (selectedCell >= 0 && (Math.floor(selectedCell / 9) === row || selectedCell % 9 === column ||
+              (Math.floor(Math.floor(selectedCell / 9) / 3) === Math.floor(row / 3) && Math.floor((selectedCell % 9) / 3) === Math.floor(column / 3)))) {
+            cell.classList.add("peer");
+          }
+          if (selectedCell === index) cell.classList.add("selected");
+          if (value && value === selectedValue) cell.classList.add("same");
+          if (conflicts.has(index)) cell.classList.add("conflict");
+          if (!given && value && value !== solution[row][column]) cell.classList.add("wrong");
+          cell.textContent = value ? String(value) : "";
+          fragment.appendChild(cell);
+        });
+
+        boardElement.replaceChildren(fragment);
+      }
+
+      function updateStats() {
+        const seconds = Math.floor((Date.now() - startedAt) / 1000);
+        timerElement.textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+        mistakesElement.textContent = String(mistakes);
+      }
+
+      function isComplete() {
+        return values.every((value, index) => value === solution[Math.floor(index / 9)][index % 9]);
+      }
+
+      function enterValue(value) {
+        if (finished || selectedCell < 0) {
+          if (!finished) setMessage("Hãy chọn một ô trống trước nhé.");
+          return;
+        }
+        const row = Math.floor(selectedCell / 9);
+        const column = selectedCell % 9;
+        if (puzzle[row][column] !== 0) return;
+
+        values[selectedCell] = value;
+        if (value && value !== solution[row][column]) {
+          mistakes += 1;
+          setMessage("Số này chưa đúng với lời giải. Thử lại nhé!", "error");
+        } else if (value) {
+          setMessage("Chính xác! Tiếp tục thôi.");
+        } else {
+          setMessage("Đã xóa số trong ô.");
+        }
+        updateStats();
+        renderBoard();
+        if (isComplete()) {
+          finished = true;
+          setMessage("Tuyệt vời! Bạn đã hoàn thành Sudoku.", "success");
+        }
+      }
+
+      function startNewGame() {
+        const generated = createPuzzle(difficultyElement.value);
+        solution = generated.answer;
+        puzzle = generated.grid;
+        values = puzzle.flat();
+        selectedCell = -1;
+        mistakes = 0;
+        startedAt = Date.now();
+        finished = false;
+        setMessage("Chọn một ô trống rồi nhập số bạn muốn.");
+        updateStats();
+        renderBoard();
+      }
+
+      function restartGame() {
+        values = puzzle.flat();
+        selectedCell = -1;
+        mistakes = 0;
+        startedAt = Date.now();
+        finished = false;
+        setMessage("Ván chơi đã được đặt lại. Chúc bạn may mắn!");
+        updateStats();
+        renderBoard();
+      }
+
+      boardElement.addEventListener("click", (event) => {
+        const cell = event.target.closest(".cell");
+        if (!cell || cell.disabled) return;
+        selectedCell = Number(cell.dataset.index);
+        setMessage("Ô đã chọn. Nhập số từ 1 đến 9.");
+        renderBoard();
+      });
+
+      document.querySelector(".number-pad").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-value]");
+        if (button) enterValue(Number(button.dataset.value));
+      });
+
+      document.getElementById("restart").addEventListener("click", restartGame);
+      document.getElementById("new-game").addEventListener("click", startNewGame);
+      difficultyElement.addEventListener("change", startNewGame);
+      document.getElementById("check-board").addEventListener("click", () => {
+        if (isComplete()) {
+          finished = true;
+          setMessage("Tuyệt vời! Bạn đã hoàn thành Sudoku.", "success");
+        } else {
+          setMessage("Bảng vẫn còn ô trống hoặc số chưa chính xác.", "error");
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.target.matches("select, input, textarea, [contenteditable='true']")) return;
+        if (/^[1-9]$/.test(event.key)) {
+          event.preventDefault();
+          enterValue(Number(event.key));
+          return;
+        }
+        if (event.key === "Backspace" || event.key === "Delete" || event.key === "0") {
+          event.preventDefault();
+          enterValue(0);
+          return;
+        }
+        if (!["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key) || selectedCell < 0) return;
+        event.preventDefault();
+        const row = Math.floor(selectedCell / 9);
+        const column = selectedCell % 9;
+        const delta = {
+          ArrowUp: [-1, 0],
+          ArrowDown: [1, 0],
+          ArrowLeft: [0, -1],
+          ArrowRight: [0, 1]
+        }[event.key];
+        let nextRow = row;
+        let nextColumn = column;
+        for (let attempt = 0; attempt < 81; attempt += 1) {
+          nextRow = (nextRow + delta[0] + 9) % 9;
+          nextColumn = (nextColumn + delta[1] + 9) % 9;
+          const index = nextRow * 9 + nextColumn;
+          if (puzzle[nextRow][nextColumn] === 0) {
+            selectedCell = index;
+            renderBoard();
+            break;
+          }
+        }
+      });
+
+      window.setInterval(updateStats, 1000);
+      startNewGame();
+    })();
+  </script>
+</body>
+</html>
