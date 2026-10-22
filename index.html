@@ -339,6 +339,15 @@
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
       .score-float { animation-duration: .01ms; }
     }
+    .pause-menu { position: fixed; z-index: 25; inset: 0; display: flex; align-items: center; justify-content: center; padding: 18px; background: #1b263b66; backdrop-filter: blur(3px); opacity: 0; visibility: hidden; transition: opacity .25s ease, visibility .25s; }
+    .pause-menu.show { opacity: 1; visibility: visible; }
+    .pause-card { width: min(100%, 320px); padding: 22px; border-radius: 20px; background: #fff; box-shadow: 0 24px 60px #1b263b50; text-align: center; transform: translateY(16px) scale(.92); transition: transform .28s cubic-bezier(.2,.9,.3,1.2); }
+    .pause-menu.show .pause-card { transform: none; }
+    .pause-card h2 { margin: 0 0 16px; font-size: 20px; }
+    .pause-card button { display: block; width: 100%; margin-top: 10px; padding: 13px; border: 0; border-radius: 12px; color: #fff; background: var(--blue); font-size: 15px; font-weight: 750; cursor: pointer; transition: transform .15s, filter .15s; }
+    .pause-card button:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .pause-card button.secondary { color: #1b263b; background: #e8edf5; }
+    @media (prefers-reduced-motion: reduce) { .pause-menu, .pause-card { transition: none; } }
   </style>
 </head>
 <body>
@@ -392,6 +401,15 @@
     </div>
   </main>
 
+  <div class="pause-menu" id="pause-menu" role="dialog" aria-modal="true" aria-labelledby="pause-menu-title">
+    <div class="pause-card">
+      <h2 id="pause-menu-title">Menu trò chơi</h2>
+      <button type="button" id="pm-pause" class="secondary">⏸ Tạm dừng</button>
+      <button type="button" id="pm-resume">▶ Tiếp tục chơi</button>
+      <button type="button" id="pm-restart" class="secondary">↺ Chơi lại từ đầu</button>
+      <button type="button" id="pm-new" class="secondary">✦ Đổi bàn mới</button>
+    </div>
+  </div>
   <div class="modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
     <div class="modal-card">
       <h2 id="settings-title">Cài đặt</h2>
@@ -922,7 +940,15 @@
         setNotesMode(!notesMode);
         setMessage(notesMode ? "Chế độ ghi chú đang bật. Chọn ô trống rồi nhập số cần ghi chú." : "Chế độ ghi chú đã tắt.");
       });
-      pauseButton.addEventListener("click", () => setPaused(!paused));
+      const pauseMenu = document.getElementById("pause-menu");
+      function openPauseMenu() { if (finished) return; setPaused(true); pauseOverlay.classList.remove("show"); pauseMenu.classList.add("show"); }
+      function closePauseMenu() { pauseMenu.classList.remove("show"); }
+      pauseButton.addEventListener("click", openPauseMenu);
+      document.getElementById("pm-pause").addEventListener("click", () => { closePauseMenu(); pauseOverlay.classList.add("show"); });
+      document.getElementById("pm-resume").addEventListener("click", () => { closePauseMenu(); setPaused(false); });
+      document.getElementById("pm-restart").addEventListener("click", () => { closePauseMenu(); restartGame(); });
+      document.getElementById("pm-new").addEventListener("click", () => { closePauseMenu(); startNewGame(); });
+      pauseMenu.addEventListener("click", (event) => { if (event.target === pauseMenu) { closePauseMenu(); setPaused(false); } });
       document.getElementById("resume").addEventListener("click", () => setPaused(false));
 
       function openSettings() { setPaused(true); settingsModal.classList.add("show"); }
