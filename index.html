@@ -45,6 +45,7 @@
     }
     .topbar .stat { text-align: center; }
     .topbar .stat:first-child { margin-left: 3px; margin-right: 4px; }
+    .topbar .stat:first-child .stat-value { transform: translateX(3px); }
     .topbar .stat:nth-child(2) { margin-left: 2px; }
     .stat { min-width: 0; text-align: left; }
     .stat-label { display: block; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
@@ -82,7 +83,7 @@
       position: absolute;
       z-index: 15;
       top: calc(100% + 8px);
-      left: 0;
+      left: 12px;
       display: grid;
       width: 176px;
       gap: 3px;
@@ -248,7 +249,7 @@
       pointer-events: none;
       transition: color .18s ease;
     }
-    .toast-message { display: flex; min-height: 0; flex: 1; align-items: center; justify-content: center; overflow: hidden; overflow-wrap: anywhere; font-size: 10px; line-height: 1.25; text-align: center; }
+    .toast-message { display: flex; min-height: 0; flex: 1; align-items: center; justify-content: center; overflow: hidden; overflow-wrap: anywhere; font-size: 10px; line-height: 1.25; text-align: center; opacity: 0; }
     .toast.show { color: #536078; }
     .toast.show.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
     .toast.show.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
