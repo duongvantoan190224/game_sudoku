@@ -78,7 +78,7 @@
       top: calc(100% + 8px);
       left: 0;
       display: grid;
-      width: 156px;
+      width: 172px;
       gap: 3px;
       padding: 5px;
       border: 1px solid #e1e6ef;
@@ -98,7 +98,24 @@
       text-align: left;
       white-space: nowrap;
     }
-    .menu-dropdown button:hover { color: var(--blue-dark); background: #f2f5ff; }
+    .menu-dropdown button { display: flex; align-items: center; gap: 9px; color: var(--c); background: var(--bg); }
+    .menu-dropdown button .mi {
+      display: inline-grid;
+      flex: none;
+      width: 22px;
+      height: 22px;
+      place-items: center;
+      border-radius: 7px;
+      color: #fff;
+      background: var(--c);
+      font-size: 11px;
+      line-height: 1;
+    }
+    .menu-dropdown button:hover { filter: brightness(.96); transform: translateX(2px); }
+    #menu-pause { --c: #d97706; --bg: #fff7e6; }
+    #menu-resume { --c: #16a34a; --bg: #eafaf0; }
+    #menu-restart { --c: #2563eb; --bg: #eaf1ff; }
+    #menu-new { --c: #9333ea; --bg: #f5ecff; }
     .timer-row {
       grid-column: 3;
       grid-row: 1;
@@ -391,10 +408,10 @@
       <div class="menu-control" id="menu-control">
         <button class="menu-button" id="menu-toggle" type="button" aria-expanded="false" aria-controls="game-menu">Menu</button>
         <div class="menu-dropdown" id="game-menu" aria-label="Menu trò chơi" hidden>
-          <button type="button" id="menu-pause">Tạm dừng</button>
-          <button type="button" id="menu-resume">Tiếp tục</button>
-          <button type="button" id="menu-restart">Chơi lại</button>
-          <button type="button" id="menu-new">Đổi bàn mới</button>
+          <button type="button" id="menu-pause"><span class="mi" aria-hidden="true">⏸</span>Tạm dừng</button>
+          <button type="button" id="menu-resume"><span class="mi" aria-hidden="true">▶</span>Tiếp tục</button>
+          <button type="button" id="menu-restart"><span class="mi" aria-hidden="true">↻</span>Chơi lại</button>
+          <button type="button" id="menu-new"><span class="mi" aria-hidden="true">✦</span>Đổi bàn mới</button>
         </div>
       </div>
       <button class="icon-button" id="settings" type="button" aria-label="Cài đặt">⚙</button>
