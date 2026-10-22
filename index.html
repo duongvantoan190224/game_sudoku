@@ -178,28 +178,32 @@
     .toast.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
     .toast.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
 
-    .toolbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .toolbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
     .tool {
       position: relative;
       display: flex;
       min-width: 0;
-      min-height: 40px;
+      min-height: 66px;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      padding: 6px 3px;
-      border: 1px solid #e1e6ef;
-      border-radius: 10px;
+      gap: 5px;
+      padding: 8px 4px;
+      border: 1px solid #e3e8f1;
+      border-radius: 14px;
       color: #536078;
       background: #fff;
-      font-size: 10px;
-      font-weight: 700;
+      box-shadow: 0 2px 6px #26395808;
+      font-size: 11px;
+      font-weight: 750;
       white-space: nowrap;
+      transition: color .15s ease, background-color .15s ease, border-color .15s ease, transform .12s ease;
     }
-    .tool .tool-icon { font-size: 16px; line-height: 1; }
-    .tool:hover { background: #f6f8fc; }
+    .tool .tool-icon { width: 20px; height: 20px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+    .tool:hover { border-color: #cbd5e5; background: #f8faff; }
     .tool:disabled { opacity: .45; cursor: default; }
-    .tool.active { border-color: var(--blue); color: var(--blue-dark); background: #e7edff; }
+    .tool.active { border-color: #c6d2ff; color: var(--blue-dark); background: #eef2ff; }
+    .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 5px; }
     .hint-popover {
       position: absolute;
       z-index: 5;
@@ -235,10 +239,27 @@
       transform: translate(-50%, -50%) rotate(45deg);
     }
     .hint-popover.show { opacity: 1; transform: translate(-50%, 0); }
-    .badge { position: absolute; top: -6px; right: -4px; min-width: 18px; padding: 1px 5px; border-radius: 9px; color: #fff; background: var(--blue); font-size: 10px; font-weight: 800; }
-    .tool-state { font-size: 9px; font-weight: 800; letter-spacing: .05em; }
-
+    .badge { display: inline-grid; min-width: 17px; height: 17px; place-items: center; padding: 0 5px; border-radius: 9px; color: #fff; background: var(--blue); font-size: 10px; font-weight: 800; line-height: 1; }
+    .tool-state { padding: 2px 5px; border-radius: 6px; color: #77839a; background: #eff2f7; font-size: 8px; font-weight: 850; letter-spacing: .04em; line-height: 1.2; }
     .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
+    .score-float {
+      position: absolute;
+      z-index: 4;
+      color: #087f6a;
+      font-size: clamp(13px, 3.4vw, 18px);
+      font-weight: 900;
+      line-height: 1;
+      pointer-events: none;
+      text-shadow: 0 1px 4px #fff, 0 0 8px #fff;
+      transform: translateX(-50%);
+      animation: score-float-up .9s cubic-bezier(.2, .7, .3, 1) forwards;
+    }
+    #score-effects { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+    @keyframes score-float-up {
+      from { opacity: 0; transform: translate(-50%, 4px) scale(.88); }
+      15% { opacity: 1; }
+      to { opacity: 0; transform: translate(-50%, -34px) scale(1); }
+    }
     .number-button {
       display: flex;
       flex-direction: column;
@@ -307,13 +328,16 @@
     @media (max-width: 380px) {
       .topbar { gap: 5px; padding: 6px; }
       .icon-button { width: 34px; height: 34px; }
-      .tool { gap: 3px; padding-inline: 2px; font-size: 9px; }
-      .tool .tool-icon { font-size: 15px; }
+      .toolbar { gap: 6px; }
+      .tool { min-height: 62px; gap: 4px; padding-inline: 2px; font-size: 9px; }
+      .tool .tool-icon { width: 18px; height: 18px; }
+      .tool-state { padding-inline: 4px; font-size: 7px; }
       .number-pad { gap: 3px; }
       .number-button { min-height: 54px; font-size: 25px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      .score-float { animation-duration: .01ms; }
     }
   </style>
 </head>
@@ -330,15 +354,29 @@
     <div class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="Bảng Sudoku 9 nhân 9"></div>
       <div class="overlay" id="pause-overlay"><span>Đã tạm dừng</span><button id="resume" type="button">Tiếp tục</button></div>
+      <div id="score-effects" aria-hidden="true"></div>
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <div class="toolbar" aria-label="Công cụ">
-      <button class="tool" id="undo" type="button" aria-label="Hoàn tác"><span class="tool-icon" aria-hidden="true">↶</span>Hoàn tác</button>
-      <button class="tool" id="erase" type="button" aria-label="Xóa ô đã chọn"><span class="tool-icon" aria-hidden="true">⌫</span>Xóa</button>
-      <button class="tool" id="notes-toggle" type="button" aria-label="Bật chế độ ghi chú" aria-pressed="false"><span class="tool-icon" aria-hidden="true">✎</span>Ghi chú <span class="tool-state" id="notes-state">TẮT</span></button>
-      <button class="tool" id="hint" type="button" aria-label="Gợi ý"><span class="tool-icon" aria-hidden="true">💡</span>Gợi ý<span class="badge" id="hint-count">3</span><span class="hint-popover" id="hint-popover" role="status" aria-live="polite"></span></button>
+      <button class="tool" id="undo" type="button" aria-label="Hoàn tác">
+        <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14h-2"/></svg>
+        <span>Hoàn tác</span>
+      </button>
+      <button class="tool" id="erase" type="button" aria-label="Xóa ô đã chọn">
+        <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m3 12 7-8h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H10z"/><path d="m12 10 5 5m0-5-5 5"/></svg>
+        <span>Xóa</span>
+      </button>
+      <button class="tool" id="notes-toggle" type="button" aria-label="Bật chế độ ghi chú" aria-pressed="false">
+        <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m4 16.5-.8 4.3 4.3-.8L20 7.5 16.5 4z"/><path d="m14.8 5.7 3.5 3.5M4 4h7M4 8h5"/></svg>
+        <span class="tool-caption"><span>Ghi chú</span><span class="tool-state" id="notes-state">TẮT</span></span>
+      </button>
+      <button class="tool" id="hint" type="button" aria-label="Gợi ý">
+        <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 18h6m-5 3h4m-4-6a7 7 0 1 1 4 0c-.7.5-1 1.1-1 2h-2c0-.9-.3-1.5-1-2Z"/><path d="M12 3v2"/></svg>
+        <span class="tool-caption"><span>Gợi ý</span><span class="badge" id="hint-count">3</span></span>
+        <span class="hint-popover" id="hint-popover" role="status" aria-live="polite"></span>
+      </button>
     </div>
 
     <div class="number-pad" id="number-pad" aria-label="Bàn phím số">
@@ -412,6 +450,7 @@
       const MAX_ERRORS = 3;
       const MAX_HINTS = 3;
       const boardElement = document.getElementById("board");
+      const scoreEffectsElement = document.getElementById("score-effects");
       const timerElement = document.getElementById("timer");
       const toastElement = document.getElementById("toast");
       const hintPopover = document.getElementById("hint-popover");
@@ -675,6 +714,20 @@
         if (history.length > 200) history.shift();
       }
 
+      function showScoreEffect(index, points) {
+        const cell = boardElement.querySelector(`[data-index="${index}"]`);
+        if (!cell) return;
+        const cellRect = cell.getBoundingClientRect();
+        const effectsRect = scoreEffectsElement.getBoundingClientRect();
+        const effect = document.createElement("span");
+        effect.className = "score-float";
+        effect.textContent = `+${points}`;
+        effect.style.left = `${cellRect.left - effectsRect.left + cellRect.width / 2}px`;
+        effect.style.top = `${cellRect.top - effectsRect.top + cellRect.height / 2}px`;
+        effect.addEventListener("animationend", () => effect.remove(), { once: true });
+        scoreEffectsElement.appendChild(effect);
+      }
+
       function finishIfComplete() {
         if (isComplete()) {
           elapsedMs = currentElapsed();
@@ -743,6 +796,7 @@
         notes[selectedCell].clear();
         if (value) {
           score += 100;
+          if (value === solution[row][column]) showScoreEffect(selectedCell, 100);
           setMessage("Chính xác! Tiếp tục thôi.");
         } else {
           setMessage("Đã xóa số trong ô.");
