@@ -366,6 +366,10 @@
     .action-button { min-height: 42px; padding: 9px 10px; border: 1px solid #e1e6ef; border-radius: 10px; color: #536078; background: #fff; font-size: 13px; font-weight: 700; }
     .action-button:hover { background: #f6f8fc; }
     .action-button.primary { grid-column: 1 / -1; border-color: var(--blue); color: #fff; background: var(--blue); }
+    .game-over-card { text-align: center; }
+    .game-over-card p { margin: 0 0 18px; color: #65738c; font-size: 14px; line-height: 1.5; }
+    .game-over-card .modal-actions { grid-template-columns: 1fr; }
+    .game-over-card .action-button.primary { grid-column: auto; }
 
     .ad-banner-container {
       position: fixed;
@@ -497,6 +501,17 @@
     </div>
   </div>
 
+  <div class="modal" id="game-over-modal" role="dialog" aria-modal="true" aria-labelledby="game-over-title" aria-describedby="game-over-message">
+    <div class="modal-card game-over-card">
+      <h2 id="game-over-title">Trò chơi kết thúc</h2>
+      <p id="game-over-message">Bạn đã thua trò chơi vì bạn mắc 3 lỗi.</p>
+      <div class="modal-actions">
+        <button class="action-button primary" id="game-over-restart" type="button">Khởi động lại</button>
+        <button class="action-button" id="game-over-new" type="button">Trò chơi mới</button>
+      </div>
+    </div>
+  </div>
+
   <div id="ad-banner-container" class="ad-banner-container">
     <a class="ad-banner-link" id="ad-link" href="#" target="_blank" rel="noopener noreferrer sponsored">
       <img id="ad-image" src="" alt="">
@@ -549,6 +564,7 @@
       const notesState = document.getElementById("notes-state");
       const pauseOverlay = document.getElementById("pause-overlay");
       const settingsModal = document.getElementById("settings-modal");
+      const gameOverModal = document.getElementById("game-over-modal");
       const clueTargets = { easy: 42, medium: 37, hard: 32 };
 
       let solution = [];
@@ -903,7 +919,9 @@
           if (errors >= MAX_ERRORS) {
             elapsedMs = currentElapsed();
             finished = true;
-            setMessage("Bạn đã mắc quá nhiều lỗi. Hãy bắt đầu bàn mới!", "error");
+            gameOverModal.classList.add("show");
+            document.getElementById("game-over-restart").focus();
+            setMessage("Bạn đã thua trò chơi vì bạn mắc 3 lỗi.", "error");
           } else if (errors === 1) {
             setMessage("Số này vi phạm quy tắc hàng, cột hoặc khối 3x3 nên chưa được điền.", "error");
           } else if (errors === 2) {
@@ -1009,6 +1027,7 @@
       }
 
       function resetState() {
+        gameOverModal.classList.remove("show");
         values = puzzle.flat();
         notes = Array.from({ length: 81 }, () => new Set());
         history = [];
@@ -1103,6 +1122,8 @@
 
       document.getElementById("restart").addEventListener("click", () => { closeSettings(); restartGame(); });
       document.getElementById("new-game").addEventListener("click", () => { closeSettings(); startNewGame(); });
+      document.getElementById("game-over-restart").addEventListener("click", restartGame);
+      document.getElementById("game-over-new").addEventListener("click", startNewGame);
       difficultyElement.addEventListener("change", () => { closeSettings(); startNewGame(); });
       document.getElementById("check-board").addEventListener("click", () => {
         closeSettings();
