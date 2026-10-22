@@ -513,7 +513,7 @@
       function updateStats() {
         const seconds = Math.floor((Date.now() - startedAt) / 1000);
         timerElement.textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
-        mistakesElement.textContent = `${mistakes} / 3`;
+        mistakesElement.textContent = String(mistakes);
       }
 
       function isComplete() {
