@@ -1170,16 +1170,14 @@
         updateStats();
       }
 
-      function resetState(newBoard = false) {
+      function resetState() {
         gameOverModal.classList.remove("show");
         victoryModal.classList.remove("show");
         values = puzzle.flat();
         notes = Array.from({ length: 81 }, () => new Set());
         history = [];
-        if (newBoard) {
-          undoUsed = false;
-          eraseUsed = false;
-        }
+        undoUsed = false;
+        eraseUsed = false;
         selectedCell = -1;
         invalidCells = new Set();
         elapsedMs = 0;
@@ -1199,7 +1197,7 @@
         const generated = createPuzzle(difficultyState.value);
         solution = generated.answer;
         puzzle = generated.grid;
-        resetState(true);
+        resetState();
         setMessage("Chọn một ô trống rồi nhập số bạn muốn.");
       }
 
