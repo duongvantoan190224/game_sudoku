@@ -341,13 +341,11 @@
       white-space: nowrap;
       transition: color .15s ease, background-color .15s ease, border-color .15s ease, transform .12s ease;
     }
-    #undo { --tool-color: #3455ce; --tool-border: #d7e0ff; --tool-active-bg: #3455ce; }
-    #erase { --tool-color: #dc5964; --tool-border: #f5d3d6; --tool-active-bg: #dc5964; }
-    #notes-toggle { --tool-color: #8157d9; --tool-border: #e3d7ff; --tool-active-bg: #8157d9; }
-    #hint { --tool-color: #bd7a0b; --tool-border: #f2dfb4; --tool-active-bg: #d18a17; }
-    .tool .tool-icon { width: 17px; height: 17px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
+    #undo { --tool-color: #4569e8; --tool-border: #d7e0ff; --tool-active-bg: #3455ce; }
+    #erase, #notes-toggle, #hint { --tool-color: #4569e8; --tool-border: #d7e0ff; --tool-active-bg: #3455ce; }
+    .tool .tool-icon { width: 17px; height: 17px; flex: 0 0 auto; color: var(--tool-color); fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
     .tool:hover { border-color: var(--tool-color); }
-    .tool:active, .tool.active { border-color: var(--tool-active-bg); color: #fff; background: var(--tool-active-bg); }
+    .tool:active, .tool.active { border-color: var(--tool-active-bg); color: var(--tool-color); background: #eef2ff; }
     .tool:focus-visible { outline: 2px solid var(--tool-active-bg); outline-offset: 2px; }
     .tool:disabled { opacity: .45; cursor: default; }
     .tool.active { box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--tool-border); }
@@ -358,7 +356,9 @@
     .tool-state { padding: 1px 4px; border-radius: 4px; font-size: 7px; font-weight: 850; letter-spacing: .02em; line-height: 1.2; }
     .tool-state.off { color: #c62828; background: #ffebee; }
     .tool-state.on { color: #18805d; background: #e9f8f1; }
-    #notes-toggle .tool-state { position: absolute; top: 6px; left: calc(50% + 4px); padding: 0; border-radius: 0; color: #dc3545; background: transparent; }
+    #notes-toggle .tool-state { position: absolute; top: 6px; left: calc(50% + 4px); padding: 0; border-radius: 0; background: transparent; }
+    #notes-toggle .tool-state.off { color: #dc3545; }
+    #notes-toggle .tool-state.on { color: #18805d; }
     #number-lock-toggle .tool-state { position: absolute; top: 6px; left: calc(50% + 4px); padding: 0; }
     #hint .badge, #notes-toggle .tool-state, .difficulty-label { height: 8.4px; line-height: 8.4px; }
     .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
@@ -979,6 +979,13 @@
         scoreEffectsElement.appendChild(effect);
       }
 
+      function awardCorrectEntry(index, value, previousValue) {
+        const expectedValue = solution[Math.floor(index / 9)][index % 9];
+        if (!value || value !== expectedValue || previousValue === expectedValue) return;
+        score += 100;
+        showScoreEffect(index, 100);
+      }
+
       function finishIfComplete() {
         if (isComplete()) {
           elapsedMs = currentElapsed();
@@ -1003,6 +1010,7 @@
         const row = Math.floor(selectedCell / 9);
         const column = selectedCell % 9;
         if (puzzle[row][column] !== 0) return;
+        const previousValue = values[selectedCell];
 
         if (notesMode && value) {
           if (values[selectedCell]) {
@@ -1034,6 +1042,7 @@
           invalidCells.add(selectedCell);
           errors += 1;
           score = Math.max(0, score - 50);
+          awardCorrectEntry(selectedCell, value, previousValue);
           if (errors >= MAX_ERRORS) {
             elapsedMs = currentElapsed();
             finished = true;
@@ -1066,9 +1075,8 @@
         notes[selectedCell].clear();
         if (value) {
           removePeerNotes(selectedCell, value);
-          score += 100;
-          if (value === solution[row][column]) showScoreEffect(selectedCell, 100);
-          setMessage("Chính xác! Tiếp tục thôi.");
+          awardCorrectEntry(selectedCell, value, previousValue);
+          setMessage(value === solution[row][column] ? "Chính xác! Tiếp tục thôi." : "Đã điền số. Hãy kiểm tra lời giải.");
         } else {
           setMessage("Đã xóa số trong ô.");
         }
