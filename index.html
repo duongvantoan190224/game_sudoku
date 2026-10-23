@@ -361,6 +361,18 @@
     #notes-toggle .tool-state { position: absolute; top: 6px; left: calc(50% + 4px); padding: 0; border-radius: 0; color: #dc3545; background: transparent; }
     #hint .badge, #notes-toggle .tool-state, .difficulty-label { height: 8.4px; line-height: 8.4px; }
     .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
+    .number-lock-toggle {
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px 12px;
+      border: 1px solid #dce3ef;
+      border-radius: 9px;
+      color: #65738c;
+      background: #fff;
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .number-lock-toggle[aria-pressed="true"] { border-color: var(--blue); color: var(--blue-dark); background: #eef2ff; }
     .score-float {
       position: absolute;
       z-index: 4;
@@ -563,6 +575,7 @@
       <button class="number-button" type="button" data-value="8" aria-label="Điền số 8"><span>8</span><span class="remaining-count">9</span></button>
       <button class="number-button" type="button" data-value="9" aria-label="Điền số 9"><span>9</span><span class="remaining-count">9</span></button>
     </div>
+    <button class="number-lock-toggle" id="number-lock-toggle" type="button" aria-pressed="true">🔒 Giữ số: Bật</button>
   </main>
 
   <div class="toast" id="toast" role="alert" aria-live="assertive">
@@ -658,6 +671,7 @@
       const errorsElement = document.getElementById("errors");
       const hintCountElement = document.getElementById("hint-count");
       const notesToggle = document.getElementById("notes-toggle");
+      const numberLockToggle = document.getElementById("number-lock-toggle");
       const notesState = document.getElementById("notes-state");
       const pauseOverlay = document.getElementById("pause-overlay");
       const settingsModal = document.getElementById("settings-modal");
@@ -680,6 +694,7 @@
       let paused = false;
       let finished = false;
       let notesMode = false;
+      let numberLock = true;
       let score = 0;
       let errors = 0;
       let hintsLeft = MAX_HINTS;
@@ -1122,6 +1137,12 @@
         notesState.classList.toggle("on", on);
       }
 
+      function setNumberLock(on) {
+        numberLock = on;
+        numberLockToggle.setAttribute("aria-pressed", String(on));
+        numberLockToggle.textContent = `${on ? "🔒" : "🔓"} Giữ số: ${on ? "Bật" : "Tắt"}`;
+      }
+
       function showToolFeedback(button) {
         window.clearTimeout(toolFeedbackTimeouts.get(button));
         button.classList.add("active");
@@ -1186,6 +1207,11 @@
         const cell = event.target.closest(".cell");
         if (!cell || cell.disabled || paused) return;
         selectedCell = Number(cell.dataset.index);
+        if (numberLock && selectedDigit) {
+          setMessage("Ô đã chọn. Đang điền số đã giữ.");
+          enterValue(selectedDigit);
+          return;
+        }
         selectedDigit = values[selectedCell] || 0;
         setMessage("Ô đã chọn. Nhập số từ 1 đến 9.");
         renderBoard();
@@ -1195,6 +1221,7 @@
         const button = event.target.closest("[data-value]");
         if (button) enterValue(Number(button.dataset.value));
       });
+      numberLockToggle.addEventListener("click", () => setNumberLock(!numberLock));
 
       document.getElementById("erase").addEventListener("click", (event) => {
         showToolFeedback(event.currentTarget);
