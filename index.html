@@ -355,8 +355,11 @@
     .number-button.selected .remaining-count { color: #fff; }
     .number-button.note-highlight { border-color: #8157d9; color: #fff; background: #8157d9; box-shadow: 0 3px 10px #8157d94d; }
     .number-button.note-highlight .remaining-count { color: #fff; }
+    .number-button.note-conflict { border-color: #dc3545; color: #fff; background: #dc3545; box-shadow: 0 3px 10px #dc35454d; }
+    .number-button.note-conflict .remaining-count { color: #fff; }
     .number-pad.notes-mode .number-button:not(:disabled) { opacity: .55; }
     .number-pad.notes-mode .number-button.note-highlight:not(:disabled) { opacity: 1; }
+    .number-pad.notes-mode .number-button.note-conflict:not(:disabled) { opacity: 1; }
     .number-button:active, .tool:active { transform: scale(.96); }
     .number-button:disabled { opacity: .3; cursor: default; }
 
@@ -846,8 +849,11 @@
           const remaining = 9 - digitCounts[digit];
           button.classList.toggle("selected", digit === selectedDigit);
           button.classList.toggle("note-highlight", selectedCell >= 0 && notes[selectedCell].has(digit));
+          const noteConflict = notesMode && selectedCell >= 0 && !values[selectedCell] &&
+            !notes[selectedCell].has(digit) && violatesRules(selectedCell, digit);
+          button.classList.toggle("note-conflict", noteConflict);
           button.querySelector(".remaining-count").textContent = String(remaining);
-          button.setAttribute("aria-label", `Điền số ${digit}, còn ${remaining} ô`);
+          button.setAttribute("aria-label", `Điền số ${digit}, còn ${remaining} ô${noteConflict ? ", đã có trong hàng, cột hoặc khối 3x3 của ô đang chọn, không thể ghi chú" : ""}`);
         });
       }
 
@@ -947,6 +953,11 @@
         if (notesMode && value) {
           if (values[selectedCell]) {
             setMessage("Xóa số chính thức trong ô trước khi thêm ghi chú.");
+            return;
+          }
+          if (!notes[selectedCell].has(value) && violatesRules(selectedCell, value)) {
+            setMessage("Số này đã có trong hàng, cột hoặc khối 3x3 nên không thể ghi chú.", "error");
+            renderBoard();
             return;
           }
           pushHistory();
