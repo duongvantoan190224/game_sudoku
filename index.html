@@ -669,6 +669,8 @@
       let values = [];
       let notes = [];
       let history = [];
+      let undoUsed = false;
+      let eraseUsed = false;
       let selectedCell = -1;
       let selectedDigit = 0;
       let invalidCells = new Set();
@@ -883,7 +885,8 @@
         errorsElement.classList.toggle("bad", errors > 0);
         hintCountElement.textContent = String(hintsLeft);
         document.getElementById("hint").disabled = hintsLeft === 0;
-        document.getElementById("undo").disabled = history.length === 0;
+        document.getElementById("undo").disabled = undoUsed || history.length === 0;
+        document.getElementById("erase").disabled = eraseUsed;
       }
 
       function isComplete() {
@@ -1041,7 +1044,12 @@
         }
 
         if (!value && !values[selectedCell] && notes[selectedCell].size === 0) return;
+        if (!value && eraseUsed) {
+          setMessage("Bạn đã dùng hết lượt xóa trong bàn chơi này.", "error");
+          return;
+        }
         pushHistory();
+        if (!value) eraseUsed = true;
         if (!value) invalidCells.delete(selectedCell);
         const previousValues = values.slice();
         values[selectedCell] = value;
@@ -1061,8 +1069,9 @@
       }
 
       function undo() {
-        if (finished || paused || history.length === 0) return;
+        if (finished || paused || undoUsed || history.length === 0) return;
         const last = history.pop();
+        undoUsed = true;
         values = last.values;
         notes = last.notes;
         invalidCells = last.invalidCells;
@@ -1134,12 +1143,16 @@
         updateStats();
       }
 
-      function resetState() {
+      function resetState(newBoard = false) {
         gameOverModal.classList.remove("show");
         victoryModal.classList.remove("show");
         values = puzzle.flat();
         notes = Array.from({ length: 81 }, () => new Set());
         history = [];
+        if (newBoard) {
+          undoUsed = false;
+          eraseUsed = false;
+        }
         selectedCell = -1;
         invalidCells = new Set();
         elapsedMs = 0;
@@ -1159,7 +1172,7 @@
         const generated = createPuzzle(difficultyState.value);
         solution = generated.answer;
         puzzle = generated.grid;
-        resetState();
+        resetState(true);
         setMessage("Chọn một ô trống rồi nhập số bạn muốn.");
       }
 
