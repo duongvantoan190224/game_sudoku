@@ -255,6 +255,7 @@
     .difficulty-control > .tool { width: 100%; height: 100%; --tool-color: #4569e8; --tool-border: #d7e0ff; --tool-active-bg: #4569e8; }
     .difficulty-control .tool-icon { color: #4569e8; }
     .difficulty-label { position: absolute; top: 6px; left: calc(50% + 4px); max-width: calc(50% - 6px); overflow: hidden; color: #dc3545; font-size: 7px; font-weight: 850; line-height: 1.2; text-overflow: ellipsis; }
+    .difficulty-label[data-value="expert"] { left: 2px; max-width: calc(100% - 4px); font-size: 6px; text-align: center; }
     .difficulty-popover {
       position: absolute;
       z-index: 15;
@@ -516,9 +517,9 @@
 
     <div class="tool-row">
       <div class="toolbar" aria-label="Công cụ">
-      <button class="tool" id="undo" type="button" aria-label="Undo">
+      <button class="tool" id="undo" type="button" aria-label="Hoàn tác">
         <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14h-2"/></svg>
-        <span class="tool-caption">Undo</span>
+        <span class="tool-caption">Hoàn tác</span>
       </button>
       <button class="tool" id="erase" type="button" aria-label="Xóa ô đã chọn">
         <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m3 12 7-8h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H10z"/><path d="m12 10 5 5m0-5-5 5"/></svg>
@@ -536,7 +537,7 @@
       </button>
       <div class="difficulty-control" id="difficulty-control">
         <button class="tool" id="difficulty-toggle" type="button" aria-label="Độ khó: Vừa" aria-expanded="false" aria-controls="difficulty-popover">
-          <span class="difficulty-label" id="difficulty-label">Vừa</span>
+          <span class="difficulty-label" id="difficulty-label" data-value="medium">Vừa</span>
           <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/><circle cx="12" cy="12" r="7"/><path d="m9 13 2 2 4-5"/></svg>
           <span class="tool-caption">Độ khó</span>
         </button>
@@ -1263,6 +1264,7 @@
         if (option.dataset.value === difficultyState.value) return;
         difficultyState.value = option.dataset.value;
         difficultyLabel.textContent = option.textContent.trim();
+        difficultyLabel.dataset.value = option.dataset.value;
         difficultyToggle.setAttribute("aria-label", `Độ khó: ${difficultyLabel.textContent}`);
         difficultyOptions.forEach((item) => item.setAttribute("aria-selected", String(item === option)));
         startNewGame();
