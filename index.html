@@ -48,7 +48,7 @@
     }
     .topbar .stat { text-align: center; }
     .topbar .stat:first-child { margin-left: 3px; margin-right: 4px; }
-    .topbar .stat:nth-child(2) { margin-left: 2px; }
+    .topbar .stat:nth-child(2) { margin-left: 10px; }
     .stat { min-width: 0; text-align: left; }
     .stat-label { display: block; color: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
     .stat-value { display: block; overflow: hidden; font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
@@ -73,14 +73,24 @@
       min-width: 52px;
       height: 36px;
       padding: 0 8px;
-      border: 1px solid #e1e6ef;
+      border: 1px solid #4569e8;
       border-radius: 10px;
-      color: #536078;
-      background: #f8faff;
+      color: #fff;
+      background: linear-gradient(135deg, #6682f3, #4569e8);
       font-size: 12px;
       font-weight: 750;
     }
-    .menu-button:hover, .menu-button[aria-expanded="true"] { background: #eef2ff; }
+    .menu-button:hover, .menu-button[aria-expanded="true"] {
+      border-color: #3455ce;
+      background: linear-gradient(135deg, #5573eb, #3455ce);
+    }
+    #settings {
+      border-color: #7954d6;
+      color: #fff;
+      background: linear-gradient(135deg, #a278f2, #7954d6);
+      box-shadow: 0 3px 9px #7954d633;
+    }
+    #settings:hover { background: linear-gradient(135deg, #9068e7, #6844c5); }
     .menu-dropdown {
       position: absolute;
       z-index: 15;
