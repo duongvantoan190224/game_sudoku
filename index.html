@@ -202,13 +202,12 @@
     .cell.same { color: #3455ce; background: #e7edff; }
     .cell.user-entry { color: #087f6a; font-weight: 800; }
     .cell.selected { z-index: 1; outline: 2px solid var(--blue); outline-offset: -2px; background: #dce5ff; }
-    .cell.conflict { color: #d64c55; }
     .cell.invalid, .cell.invalid.selected { color: #b4232e; background: #ffe1e2; box-shadow: inset 0 0 0 2px #d64c55; }
     .cell:focus-visible { z-index: 2; outline: 3px solid #7891f5; outline-offset: -3px; }
     .cell:disabled { cursor: default; opacity: 1; }
     .cell.note-warning { animation: note-warning-flash .7s ease-in-out 2; }
     @keyframes note-warning-flash {
-      25%, 75% { box-shadow: inset 0 0 0 3px #dc3545, 0 0 16px rgba(220, 53, 69, .8); filter: brightness(1.2); }
+      25%, 75% { color: #d64c55; background: #ffe1e2; box-shadow: inset 0 0 0 3px #dc3545, 0 0 16px rgba(220, 53, 69, .8); filter: brightness(1.2); }
     }
     .cell.completion-celebration {
       z-index: 1;
@@ -762,41 +761,6 @@
         toastTimeout = window.setTimeout(() => toastElement.classList.remove("show"), 3200);
       }
 
-      function conflictsForGrid() {
-        const conflicts = new Set();
-        const addDuplicates = (indexes) => {
-          const seen = new Map();
-          for (const index of indexes) {
-            const value = values[index];
-            if (!value) continue;
-            if (seen.has(value)) {
-              conflicts.add(index);
-              conflicts.add(seen.get(value));
-            } else {
-              seen.set(value, index);
-            }
-          }
-        };
-        for (let row = 0; row < 9; row += 1) {
-          addDuplicates(Array.from({ length: 9 }, (_, column) => row * 9 + column));
-        }
-        for (let column = 0; column < 9; column += 1) {
-          addDuplicates(Array.from({ length: 9 }, (_, row) => row * 9 + column));
-        }
-        for (let boxRow = 0; boxRow < 3; boxRow += 1) {
-          for (let boxColumn = 0; boxColumn < 3; boxColumn += 1) {
-            const indexes = [];
-            for (let row = 0; row < 3; row += 1) {
-              for (let column = 0; column < 3; column += 1) {
-                indexes.push((boxRow * 3 + row) * 9 + boxColumn * 3 + column);
-              }
-            }
-            addDuplicates(indexes);
-          }
-        }
-        return conflicts;
-      }
-
       function showCompletionEffects(previousValues) {
         const units = [];
         for (let row = 0; row < 9; row += 1) {
@@ -838,7 +802,6 @@
       }
 
       function renderBoard() {
-        const conflicts = conflictsForGrid();
         const selectedValue = selectedCell >= 0 ? values[selectedCell] : 0;
         const fragment = document.createDocumentFragment();
 
@@ -867,7 +830,6 @@
           if (selectedCell === index) cell.classList.add("selected");
           if (value && value === selectedValue) cell.classList.add("same");
           if (!given && value) cell.classList.add("user-entry");
-          if (conflicts.has(index)) cell.classList.add("conflict");
           if (invalidCell === index) cell.classList.add("invalid");
           if (value) {
             cell.textContent = String(value);
