@@ -251,29 +251,35 @@
     .overlay.show { display: flex; }
     .overlay button { padding: 10px 22px; border: 0; border-radius: 12px; color: #fff; background: var(--blue); font-weight: 750; }
 
+    .difficulty-selector { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px; border: 1.5px solid #cbd6e8; border-radius: 14px; background: #f8faff; }
+    .difficulty-option { min-height: 34px; padding: 4px; border: 0; border-radius: 10px; color: #536078; background: transparent; font-size: 12px; font-weight: 750; cursor: pointer; }
+    .difficulty-option[aria-checked="true"] { color: #fff; background: var(--blue); box-shadow: 0 3px 8px #26395826; }
     .toast {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      z-index: 50;
       display: flex;
-      min-width: 0;
-      min-height: 46px;
-      align-items: stretch;
-      justify-content: center;
-      padding: 5px 8px;
+      max-width: calc(100vw - 24px);
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
       border: 1.5px solid #cbd6e8;
       border-radius: 14px;
-      color: transparent;
+      color: #536078;
       background: #f8faff;
-      box-shadow: 0 4px 14px #26395812;
-      font-size: 10px;
+      box-shadow: 0 8px 24px #26395833;
+      font-size: 14px;
       font-weight: 700;
-      line-height: 1.25;
       pointer-events: none;
-      transition: color .18s ease;
+      opacity: 0;
+      transform: translate(-50%, -150%);
+      transition: transform .4s ease, opacity .4s ease;
     }
-    .toast-message { display: flex; min-height: 0; flex: 1; align-items: center; justify-content: center; overflow: hidden; overflow-wrap: anywhere; font-size: 10px; line-height: 1.25; text-align: center; opacity: 0; }
-    .toast.show { color: #536078; }
-    .toast.show .toast-message { opacity: 1; }
-    .toast.show.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
-    .toast.show.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
+    .toast-icon { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.success { color: #18805d; border-color: #c7ebdc; background: #e9f8f1; }
+    .toast.error { color: #b3474e; border-color: #f3caca; background: #fff0f0; }
 
     .tool-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: stretch; gap: 5px; }
     .toolbar { display: grid; min-width: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; }
@@ -433,8 +439,6 @@
       .toolbar { gap: 2px; }
       .tool { min-height: 44px; gap: 2px; padding: 2px 1px; font-size: 8px; }
       .tool .tool-icon { width: 16px; height: 16px; }
-      .toast { min-height: 44px; padding: 4px; }
-      .toast-message { font-size: 9px; }
       .number-pad { gap: 2px; }
       .number-button { min-height: 48px; font-size: 23px; }
     }
@@ -488,8 +492,10 @@
         <span class="tool-caption"><span>Gợi ý</span><span class="badge" id="hint-count">3</span></span>
       </button>
       </div>
-      <div class="toast" id="toast" role="status" aria-live="polite">
-        <span class="toast-message" id="toast-message"></span>
+      <div class="difficulty-selector" id="difficulty" role="radiogroup" aria-label="Mức độ khó">
+        <button class="difficulty-option" type="button" role="radio" data-value="easy" aria-checked="false">Dễ</button>
+        <button class="difficulty-option" type="button" role="radio" data-value="medium" aria-checked="true">Vừa</button>
+        <button class="difficulty-option" type="button" role="radio" data-value="hard" aria-checked="false">Khó</button>
       </div>
     </div>
 
@@ -506,16 +512,14 @@
     </div>
   </main>
 
+  <div class="toast" id="toast" role="alert" aria-live="assertive">
+    <svg class="toast-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4m0 3h.01"/></svg>
+    <span class="toast-message" id="toast-message"></span>
+  </div>
+
   <div class="modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
     <div class="modal-card">
       <h2 id="settings-title">Cài đặt</h2>
-      <label class="field">Độ khó
-        <select id="difficulty">
-          <option value="easy">Dễ</option>
-          <option value="medium" selected>Vừa</option>
-          <option value="hard">Khó</option>
-        </select>
-      </label>
       <div class="modal-actions">
         <button class="action-button" id="restart" type="button">↺ Chơi lại</button>
         <button class="action-button" id="new-game" type="button">✦ Bàn mới</button>
@@ -590,8 +594,10 @@
       const timerElement = document.getElementById("timer");
       const toastElement = document.getElementById("toast");
       const toastMessageElement = document.getElementById("toast-message");
+      const difficultyState = { value: "medium" };
       const toolbarElement = document.querySelector(".toolbar");
       const difficultyElement = document.getElementById("difficulty");
+      const difficultyOptions = difficultyElement.querySelectorAll(".difficulty-option");
       const scoreElement = document.getElementById("score");
       const errorsElement = document.getElementById("errors");
       const hintCountElement = document.getElementById("hint-count");
@@ -701,22 +707,10 @@
         return { answer, grid };
       }
 
-      function fitToastText() {
-        const toolHeight = toolbarElement.getBoundingClientRect().height;
-        toastElement.style.height = `${toolHeight}px`;
-        let fontSize = 10;
-        toastMessageElement.style.fontSize = `${fontSize}px`;
-        while (fontSize > 6 && (toastMessageElement.scrollHeight > toastMessageElement.clientHeight || toastMessageElement.scrollWidth > toastMessageElement.clientWidth)) {
-          fontSize = Math.max(6, fontSize - 0.5);
-          toastMessageElement.style.fontSize = `${fontSize}px`;
-        }
-      }
-
       function setMessage(text, kind = "") {
         window.clearTimeout(toastTimeout);
         toastMessageElement.textContent = text;
         toastElement.className = `toast show${kind ? ` ${kind}` : ""}`;
-        fitToastText();
         toastTimeout = window.setTimeout(() => toastElement.classList.remove("show"), 3200);
       }
 
@@ -891,6 +885,16 @@
         return false;
       }
 
+      function conflictLocation(index, value) {
+        const row = Math.floor(index / 9);
+        const column = index % 9;
+        for (let i = 0; i < 9; i += 1) {
+          if (i !== column && values[row * 9 + i] === value) return "hàng";
+          if (i !== row && values[i * 9 + column] === value) return "cột";
+        }
+        return "khối 3x3";
+      }
+
       function flashConflictingCells(index, value) {
         const row = Math.floor(index / 9);
         const column = index % 9;
@@ -1002,11 +1006,11 @@
             document.getElementById("game-over-restart").focus();
             setMessage("Bạn đã thua trò chơi vì bạn mắc 3 lỗi.", "error");
           } else if (errors === 1) {
-            setMessage("Số này vi phạm quy tắc hàng, cột hoặc khối 3x3 nên chưa được điền.", "error");
+            setMessage(`Trùng ở ${conflictLocation(selectedCell, value)}!`, "error");
           } else if (errors === 2) {
             setMessage("Bạn đã mắc lỗi lần thứ hai. Hãy thử dùng Gợi ý để được trợ giúp nhé!");
           } else {
-            setMessage("Số này vi phạm quy tắc hàng, cột hoặc khối 3x3 nên chưa được điền.", "error");
+            setMessage(`Trùng ở ${conflictLocation(selectedCell, value)}!`, "error");
           }
           updateStats();
           renderBoard();
@@ -1130,7 +1134,7 @@
       }
 
       function startNewGame() {
-        const generated = createPuzzle(difficultyElement.value);
+        const generated = createPuzzle(difficultyState.value);
         solution = generated.answer;
         puzzle = generated.grid;
         resetState();
@@ -1195,7 +1199,6 @@
         if (!menuControl.contains(event.target)) closeGameMenu();
       });
       document.getElementById("resume").addEventListener("click", () => setPaused(false));
-      window.addEventListener("resize", fitToastText);
 
       function openSettings() { settingsModal.classList.add("show"); }
       function closeSettings() { settingsModal.classList.remove("show"); }
@@ -1209,7 +1212,12 @@
       document.getElementById("game-over-new").addEventListener("click", startNewGame);
       document.getElementById("victory-restart").addEventListener("click", restartGame);
       document.getElementById("victory-new").addEventListener("click", startNewGame);
-      difficultyElement.addEventListener("change", () => { closeSettings(); startNewGame(); });
+      difficultyOptions.forEach((option) => option.addEventListener("click", () => {
+        if (option.dataset.value === difficultyState.value) return;
+        difficultyState.value = option.dataset.value;
+        difficultyOptions.forEach((item) => item.setAttribute("aria-checked", String(item === option)));
+        startNewGame();
+      }));
       document.getElementById("check-board").addEventListener("click", () => {
         closeSettings();
         if (isComplete()) {
