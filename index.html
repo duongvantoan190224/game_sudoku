@@ -661,7 +661,7 @@
       let history = [];
       let selectedCell = -1;
       let selectedDigit = 0;
-      let invalidCell = -1;
+      let invalidCells = new Set();
       let elapsedMs = 0;
       let resumedAt = Date.now();
       let paused = false;
@@ -816,7 +816,7 @@
           cell.setAttribute("role", "gridcell");
           const cellNotes = notes[index];
           const notesLabel = cellNotes.size ? `, ghi chú ${Array.from(cellNotes).sort().join(", ")}` : "";
-          cell.setAttribute("aria-label", `Hàng ${row + 1}, cột ${column + 1}${value ? `, số ${value}` : ", ô trống"}${notesLabel}${given ? ", số cho sẵn" : ""}${invalidCell === index ? ", số vừa nhập không hợp lệ" : ""}`);
+          cell.setAttribute("aria-label", `Hàng ${row + 1}, cột ${column + 1}${value ? `, số ${value}` : ", ô trống"}${notesLabel}${given ? ", số cho sẵn" : ""}${invalidCells.has(index) ? ", số vừa nhập không hợp lệ" : ""}`);
           if (given) {
             cell.classList.add("given");
             cell.disabled = true;
@@ -830,7 +830,7 @@
           if (selectedCell === index) cell.classList.add("selected");
           if (value && value === selectedValue) cell.classList.add("same");
           if (!given && value) cell.classList.add("user-entry");
-          if (invalidCell === index) cell.classList.add("invalid");
+          if (invalidCells.has(index)) cell.classList.add("invalid");
           if (value) {
             cell.textContent = String(value);
           } else if (cellNotes.size) {
@@ -938,7 +938,7 @@
       }
 
       function pushHistory() {
-        history.push({ values: values.slice(), notes: notes.map((set) => new Set(set)), score });
+        history.push({ values: values.slice(), notes: notes.map((set) => new Set(set)), invalidCells: new Set(invalidCells), score });
         if (history.length > 200) history.shift();
       }
 
@@ -998,7 +998,6 @@
           } else {
             notes[selectedCell].add(value);
           }
-          invalidCell = -1;
           setMessage("Đã cập nhật ghi chú cho ô.");
           updateStats();
           renderBoard();
@@ -1009,7 +1008,7 @@
           pushHistory();
           values[selectedCell] = value;
           notes[selectedCell].clear();
-          invalidCell = selectedCell;
+          invalidCells.add(selectedCell);
           errors += 1;
           score = Math.max(0, score - 50);
           if (errors >= MAX_ERRORS) {
@@ -1033,7 +1032,7 @@
 
         if (!value && !values[selectedCell] && notes[selectedCell].size === 0) return;
         pushHistory();
-        if (invalidCell === selectedCell) invalidCell = -1;
+        if (!value) invalidCells.delete(selectedCell);
         const previousValues = values.slice();
         values[selectedCell] = value;
         notes[selectedCell].clear();
@@ -1056,8 +1055,8 @@
         const last = history.pop();
         values = last.values;
         notes = last.notes;
+        invalidCells = last.invalidCells;
         score = last.score;
-        invalidCell = -1;
         setMessage("Đã hoàn tác.");
         updateStats();
         renderBoard();
@@ -1083,7 +1082,6 @@
         notes[target].clear();
         removePeerNotes(target, values[target]);
         selectedCell = target;
-        invalidCell = -1;
         hintsLeft -= 1;
         score = Math.max(0, score - 20);
         setMessage("Đã điền một ô gợi ý cho bạn.", "hint");
@@ -1133,7 +1131,7 @@
         notes = Array.from({ length: 81 }, () => new Set());
         history = [];
         selectedCell = -1;
-        invalidCell = -1;
+        invalidCells = new Set();
         elapsedMs = 0;
         resumedAt = Date.now();
         finished = false;
