@@ -917,7 +917,7 @@
         values.forEach((value) => { if (value) digitCounts[value] += 1; });
         document.querySelectorAll(".number-button").forEach((button) => {
           const digit = Number(button.dataset.value);
-          const remaining = 9 - digitCounts[digit];
+          const remaining = Math.max(0, 9 - digitCounts[digit]);
           button.classList.toggle("selected", digit === selectedDigit);
           button.classList.toggle("note-highlight", selectedCell >= 0 && notes[selectedCell].has(digit));
           const noteConflict = notesMode && selectedCell >= 0 && !values[selectedCell] &&
