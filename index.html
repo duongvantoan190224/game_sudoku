@@ -353,6 +353,10 @@
     .number-button:hover { background: #eef2ff; }
     .number-button.selected { border-color: var(--blue); color: #fff; background: var(--blue); box-shadow: 0 3px 10px #4569e84d; }
     .number-button.selected .remaining-count { color: #fff; }
+    .number-button.note-highlight { border-color: #8157d9; color: #fff; background: #8157d9; box-shadow: 0 3px 10px #8157d94d; }
+    .number-button.note-highlight .remaining-count { color: #fff; }
+    .number-pad.notes-mode .number-button:not(:disabled) { opacity: .55; }
+    .number-pad.notes-mode .number-button.note-highlight:not(:disabled) { opacity: 1; }
     .number-button:active, .tool:active { transform: scale(.96); }
     .number-button:disabled { opacity: .3; cursor: default; }
 
@@ -813,6 +817,7 @@
           const digit = Number(button.dataset.value);
           const remaining = 9 - digitCounts[digit];
           button.classList.toggle("selected", digit === selectedDigit);
+          button.classList.toggle("note-highlight", selectedCell >= 0 && notes[selectedCell].has(digit));
           button.querySelector(".remaining-count").textContent = String(remaining);
           button.setAttribute("aria-label", `Điền số ${digit}, còn ${remaining} ô`);
         });
@@ -1013,6 +1018,7 @@
 
       function setNotesMode(on) {
         notesMode = on;
+        document.getElementById("number-pad").classList.toggle("notes-mode", on);
         notesToggle.classList.toggle("active", on);
         notesToggle.setAttribute("aria-pressed", String(on));
         notesToggle.setAttribute("aria-label", `${on ? "Tắt" : "Bật"} chế độ ghi chú`);
