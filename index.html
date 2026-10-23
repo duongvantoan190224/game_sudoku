@@ -25,13 +25,13 @@
       height: 100vh;
       height: 100dvh;
       margin: 0;
-      padding: 14px 2px calc(64px + env(safe-area-inset-bottom));
+      padding: 8px 2px calc(64px + env(safe-area-inset-bottom));
       overflow: hidden;
       background: radial-gradient(ellipse at 15% 0%, #e5ecff 0, transparent 38%), #f4f7fb;
     }
     button, select { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; cursor: pointer; }
-    .app { width: min(100%, 720px); height: calc(100vh - 78px - env(safe-area-inset-bottom)); height: calc(100dvh - 78px - env(safe-area-inset-bottom)); min-height: 0; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+    .app { width: min(100%, 720px); height: calc(100vh - 72px - env(safe-area-inset-bottom)); height: calc(100dvh - 72px - env(safe-area-inset-bottom)); min-height: 0; margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
 
     .topbar {
       position: relative;
@@ -40,7 +40,7 @@
       grid-template-columns: auto auto minmax(0, 1fr) auto auto;
       align-items: center;
       gap: 6px;
-      padding: 8px;
+      padding: 6px;
       border: 1px solid #e5eaf2;
       border-radius: 16px;
       background: #fff;
@@ -162,6 +162,7 @@
     .board {
       display: grid;
       grid-template-columns: repeat(9, minmax(0, 1fr));
+      grid-template-rows: repeat(9, minmax(0, 1fr));
       width: min(100%, 100cqh);
       max-width: 100%;
       height: auto;
@@ -471,6 +472,13 @@
       .number-pad { gap: 2px; }
       .number-button { min-height: 48px; font-size: 23px; }
     }
+    @media (max-height: 620px) {
+      .app { gap: 4px; }
+      .topbar { padding: 4px; }
+      .toolbar { gap: 3px; }
+      .tool { min-height: 40px; }
+      .number-button { min-height: 42px; font-size: 22px; }
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
       .score-float { animation-duration: .01ms; }
@@ -746,10 +754,11 @@
       }
 
       function setMessage(text, kind = "") {
+        if (kind !== "error" && kind !== "hint") return;
         window.clearTimeout(toastTimeout);
-        toastTitleElement.textContent = kind === "error" ? "Có lỗi xảy ra" : kind === "success" ? "Hoàn thành!" : "Thông báo";
+        toastTitleElement.textContent = kind === "error" ? "Có lỗi xảy ra" : "Gợi ý quan trọng";
         toastMessageElement.textContent = text;
-        toastElement.className = `toast show${kind ? ` ${kind}` : ""}`;
+        toastElement.className = kind === "error" ? "toast show error" : "toast show success";
         toastTimeout = window.setTimeout(() => toastElement.classList.remove("show"), 3200);
       }
 
@@ -989,7 +998,7 @@
         if (isComplete()) {
           elapsedMs = currentElapsed();
           finished = true;
-          setMessage("Tuyệt vời! Bạn đã hoàn thành Sudoku.", "success");
+          setMessage("Tuyệt vời! Bạn đã hoàn thành Sudoku.");
           updateStats();
           victoryModal.classList.add("show");
           document.getElementById("victory-new").focus();
@@ -1047,7 +1056,7 @@
           } else if (errors === 1) {
             setMessage(`Trùng ở ${conflictLocation(selectedCell, value)}!`, "error");
           } else if (errors === 2) {
-            setMessage("Bạn đã mắc lỗi lần thứ hai. Hãy thử dùng Gợi ý để được trợ giúp nhé!");
+            setMessage("Bạn đã mắc lỗi lần thứ hai. Hãy thử dùng Gợi ý để được trợ giúp nhé!", "error");
           } else {
             setMessage(`Trùng ở ${conflictLocation(selectedCell, value)}!`, "error");
           }
@@ -1091,7 +1100,7 @@
       function giveHint() {
         if (finished || paused) return;
         if (hintsLeft === 0) {
-          setMessage("Bạn đã dùng hết lượt gợi ý.");
+          setMessage("Bạn đã dùng hết lượt gợi ý.", "error");
           return;
         }
         let target = selectedCell;
@@ -1111,7 +1120,7 @@
         invalidCell = -1;
         hintsLeft -= 1;
         score = Math.max(0, score - 20);
-        setMessage("Đã điền một ô gợi ý cho bạn.");
+        setMessage("Đã điền một ô gợi ý cho bạn.", "hint");
         updateStats();
         renderBoard();
         showCompletionEffects(previousValues);
