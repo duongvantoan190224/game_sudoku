@@ -341,11 +341,11 @@
       white-space: nowrap;
       transition: color .15s ease, background-color .15s ease, border-color .15s ease, transform .12s ease;
     }
-    #undo { --tool-color: #3455ce; --tool-border: #d7e0ff; --tool-active-bg: #3455ce; }
+    #undo { --tool-color: #4569e8; --tool-border: #d7e0ff; --tool-active-bg: #3455ce; }
     #erase, #notes-toggle, #hint { --tool-color: #4569e8; --tool-border: #d7e0ff; --tool-active-bg: #3455ce; }
-    .tool .tool-icon { width: 17px; height: 17px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
+    .tool .tool-icon { width: 17px; height: 17px; flex: 0 0 auto; color: var(--tool-color); fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
     .tool:hover { border-color: var(--tool-color); }
-    .tool:active, .tool.active { border-color: var(--tool-active-bg); color: #fff; background: var(--tool-active-bg); }
+    .tool:active, .tool.active { border-color: var(--tool-active-bg); color: var(--tool-color); background: #eef2ff; }
     .tool:focus-visible { outline: 2px solid var(--tool-active-bg); outline-offset: 2px; }
     .tool:disabled { opacity: .45; cursor: default; }
     .tool.active { box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--tool-border); }
