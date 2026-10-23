@@ -915,15 +915,18 @@
         boardElement.replaceChildren(fragment);
         const digitCounts = Array(10).fill(0);
         values.forEach((value) => { if (value) digitCounts[value] += 1; });
+        if (selectedDigit && digitCounts[selectedDigit] >= 9) selectedDigit = 0;
         document.querySelectorAll(".number-button").forEach((button) => {
           const digit = Number(button.dataset.value);
           const remaining = Math.max(0, 9 - digitCounts[digit]);
-          button.classList.toggle("selected", digit === selectedDigit);
+          const exhausted = remaining === 0;
+          button.disabled = exhausted;
+          button.classList.toggle("selected", digit === selectedDigit && !exhausted);
           button.classList.toggle("note-highlight", selectedCell >= 0 && notes[selectedCell].has(digit));
           const noteConflict = notesMode && selectedCell >= 0 && !values[selectedCell] &&
             !notes[selectedCell].has(digit) && violatesRules(selectedCell, digit);
           button.querySelector(".remaining-count").textContent = String(remaining);
-          button.setAttribute("aria-label", `Điền số ${digit}, còn ${remaining} ô${noteConflict ? ", đã có trong hàng, cột hoặc khối 3x3 của ô đang chọn, không thể ghi chú" : ""}`);
+          button.setAttribute("aria-label", `Điền số ${digit}, còn ${remaining} ô${exhausted ? ", đã đủ 9 số, không thể chọn" : noteConflict ? ", đã có trong hàng, cột hoặc khối 3x3 của ô đang chọn, không thể ghi chú" : ""}`);
         });
       }
 
@@ -1043,6 +1046,7 @@
 
       function enterValue(value) {
         if (finished || paused) return;
+        if (value && values.filter((entry) => entry === value).length >= 9) return;
         if (value || !numberLock) selectedDigit = value || 0;
         document.querySelectorAll(".number-button").forEach((button) => {
           button.classList.toggle("selected", Number(button.dataset.value) === selectedDigit);
