@@ -205,6 +205,10 @@
     .cell.invalid, .cell.invalid.selected { color: #b4232e; background: #ffe1e2; box-shadow: inset 0 0 0 2px #d64c55; }
     .cell:focus-visible { z-index: 2; outline: 3px solid #7891f5; outline-offset: -3px; }
     .cell:disabled { cursor: default; opacity: 1; }
+    .cell.note-warning { animation: note-warning-flash .7s ease-in-out 2; }
+    @keyframes note-warning-flash {
+      25%, 75% { box-shadow: inset 0 0 0 3px #dc3545, 0 0 16px rgba(220, 53, 69, .8); filter: brightness(1.2); }
+    }
     .cell.completion-celebration {
       z-index: 1;
       animation: completion-celebration 1.35s cubic-bezier(.2, .8, .2, 1) both;
@@ -891,6 +895,23 @@
         return false;
       }
 
+      function flashConflictingCells(index, value) {
+        const row = Math.floor(index / 9);
+        const column = index % 9;
+        values.forEach((cellValue, peerIndex) => {
+          if (cellValue !== value || peerIndex === index) return;
+          const peerRow = Math.floor(peerIndex / 9);
+          const peerColumn = peerIndex % 9;
+          const sameBox = Math.floor(row / 3) === Math.floor(peerRow / 3) &&
+            Math.floor(column / 3) === Math.floor(peerColumn / 3);
+          if (peerRow !== row && peerColumn !== column && !sameBox) return;
+          const cell = boardElement.querySelector(`[data-index="${peerIndex}"]`);
+          if (!cell) return;
+          cell.classList.add("note-warning");
+          cell.addEventListener("animationend", () => cell.classList.remove("note-warning"), { once: true });
+        });
+      }
+
       function removePeerNotes(index, value) {
         const row = Math.floor(index / 9);
         const column = index % 9;
@@ -958,6 +979,7 @@
           if (!notes[selectedCell].has(value) && violatesRules(selectedCell, value)) {
             setMessage("Số này đã có trong hàng, cột hoặc khối 3x3 nên không thể ghi chú.", "error");
             renderBoard();
+            flashConflictingCells(selectedCell, value);
             return;
           }
           pushHistory();
