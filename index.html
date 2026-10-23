@@ -1044,6 +1044,9 @@
         }
 
         if (value && violatesRules(selectedCell, value)) {
+          pushHistory();
+          values[selectedCell] = value;
+          notes[selectedCell].clear();
           invalidCell = selectedCell;
           errors += 1;
           score = Math.max(0, score - 50);
