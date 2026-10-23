@@ -182,6 +182,7 @@
       border: 2px solid #65738c;
       border-radius: 6px;
       background: #fff;
+      container-type: inline-size;
       touch-action: manipulation;
     }
     .board.hidden { visibility: hidden; }
@@ -198,7 +199,7 @@
       border-radius: 0;
       color: #4569e8;
       background: #fff;
-      font-size: clamp(28px, min(10vw, 8vh), 76px);
+      font-size: clamp(20px, 8.5cqi, 76px);
       font-weight: 800;
       line-height: 1;
       transition: background-color .12s ease;
@@ -239,7 +240,7 @@
       align-items: center;
       justify-items: center;
       color: #65738c;
-      font-size: clamp(8px, 2.8vw, 15px);
+      font-size: clamp(7px, 2.5cqi, 15px);
       font-weight: 550;
       line-height: 1;
       pointer-events: none;
@@ -487,6 +488,39 @@
       .tool .tool-icon { width: 16px; height: 16px; }
       .number-pad { gap: 2px; }
       .number-button { min-height: 48px; font-size: 23px; }
+    }
+    @media (min-width: 600px) {
+      .topbar { gap: 9px; padding: 9px; }
+      .topbar .stat:first-child, .topbar .stat:nth-child(2) { margin-right: 0; margin-left: 0; }
+      .icon-button { width: 44px; height: 44px; }
+      .toolbar { gap: 7px; }
+      .tool { height: 54px; gap: 4px; font-size: 10px; }
+      .tool .tool-icon { width: 19px; height: 19px; }
+      .number-pad { gap: 6px; }
+      .number-button { min-height: 58px; font-size: clamp(27px, 3.4vw, 36px); }
+    }
+    @media (min-width: 768px) {
+      body {
+        display: grid;
+        height: auto;
+        min-height: 100vh;
+        min-height: 100dvh;
+        place-items: center;
+        padding: 24px 16px calc(74px + env(safe-area-inset-bottom));
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+      .app {
+        width: min(100%, 520px);
+        height: min(900px, calc(100dvh - 122px - env(safe-area-inset-bottom)));
+        min-height: 620px;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid #e5eaf2;
+        border-radius: 26px;
+        background: #fff;
+        box-shadow: 0 24px 70px #2639581c;
+      }
     }
     @media (max-height: 620px) {
       .app { gap: 4px; }
@@ -1327,6 +1361,11 @@
         if (/^[1-9]$/.test(event.key)) {
           event.preventDefault();
           enterValue(Number(event.key));
+          return;
+        }
+        if (event.key.toLowerCase() === "z" && !event.altKey && !event.shiftKey) {
+          event.preventDefault();
+          undo();
           return;
         }
         if (event.key === "Backspace" || event.key === "Delete" || event.key === "0") {
