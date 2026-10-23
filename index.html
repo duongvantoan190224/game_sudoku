@@ -852,6 +852,21 @@
         return false;
       }
 
+      function removePeerNotes(index, value) {
+        const row = Math.floor(index / 9);
+        const column = index % 9;
+        notes.forEach((cellNotes, peerIndex) => {
+          if (peerIndex === index) return;
+          const peerRow = Math.floor(peerIndex / 9);
+          const peerColumn = peerIndex % 9;
+          const sameBox = Math.floor(row / 3) === Math.floor(peerRow / 3) &&
+            Math.floor(column / 3) === Math.floor(peerColumn / 3);
+          if (peerRow === row || peerColumn === column || sameBox) {
+            cellNotes.delete(value);
+          }
+        });
+      }
+
       function pushHistory() {
         history.push({ values: values.slice(), notes: notes.map((set) => new Set(set)), score });
         if (history.length > 200) history.shift();
@@ -941,6 +956,7 @@
         values[selectedCell] = value;
         notes[selectedCell].clear();
         if (value) {
+          removePeerNotes(selectedCell, value);
           score += 100;
           if (value === solution[row][column]) showScoreEffect(selectedCell, 100);
           setMessage("Chính xác! Tiếp tục thôi.");
@@ -983,6 +999,7 @@
         const previousValues = values.slice();
         values[target] = solution[Math.floor(target / 9)][target % 9];
         notes[target].clear();
+        removePeerNotes(target, values[target]);
         selectedCell = target;
         invalidCell = -1;
         hintsLeft -= 1;
