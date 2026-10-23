@@ -276,9 +276,13 @@
     .difficulty-option[data-value="easy"][aria-selected="true"] { background: #23a879; }
     .difficulty-option[data-value="medium"][aria-selected="true"] { background: #ed9d26; }
     .difficulty-option[data-value="hard"][aria-selected="true"] { background: #e45d68; }
+    .difficulty-option[data-value="harder"][aria-selected="true"] { background: #a64ec2; }
+    .difficulty-option[data-value="expert"][aria-selected="true"] { background: #7041a6; }
     .difficulty-dot { width: 10px; height: 10px; flex: none; border-radius: 50%; background: #23a879; }
     .difficulty-option[data-value="medium"] .difficulty-dot { background: #ed9d26; }
     .difficulty-option[data-value="hard"] .difficulty-dot { background: #e45d68; }
+    .difficulty-option[data-value="harder"] .difficulty-dot { background: #a64ec2; }
+    .difficulty-option[data-value="expert"] .difficulty-dot { background: #7041a6; }
     .toast {
       position: fixed;
       top: 12px;
@@ -354,6 +358,7 @@
     .tool-state.off { color: #c62828; background: #ffebee; }
     .tool-state.on { color: #18805d; background: #e9f8f1; }
     #notes-toggle .tool-state { position: absolute; top: 6px; left: calc(50% + 4px); padding: 0; border-radius: 0; color: #dc3545; background: transparent; }
+    #hint .badge, #notes-toggle .tool-state, .difficulty-label { height: 8.4px; line-height: 8.4px; }
     .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
     .score-float {
       position: absolute;
@@ -539,6 +544,8 @@
           <button class="difficulty-option" type="button" role="option" data-value="easy" aria-selected="false"><span class="difficulty-dot" aria-hidden="true"></span>Dễ</button>
           <button class="difficulty-option" type="button" role="option" data-value="medium" aria-selected="true"><span class="difficulty-dot" aria-hidden="true"></span>Vừa</button>
           <button class="difficulty-option" type="button" role="option" data-value="hard" aria-selected="false"><span class="difficulty-dot" aria-hidden="true"></span>Khó</button>
+          <button class="difficulty-option" type="button" role="option" data-value="harder" aria-selected="false" title="Ít số cho sẵn hơn, cần suy luận nâng cao"><span class="difficulty-dot" aria-hidden="true"></span>Khó hơn</button>
+          <button class="difficulty-option" type="button" role="option" data-value="expert" aria-selected="false" title="Rất ít số khởi tạo, cần các chiến thuật nâng cao như X-Wing và Swordfish"><span class="difficulty-dot" aria-hidden="true"></span>Chuyên gia</button>
         </div>
       </div>
       </div>
@@ -655,7 +662,7 @@
       const settingsModal = document.getElementById("settings-modal");
       const gameOverModal = document.getElementById("game-over-modal");
       const victoryModal = document.getElementById("victory-modal");
-      const clueTargets = { easy: 42, medium: 37, hard: 32 };
+      const clueTargets = { easy: 42, medium: 37, hard: 32, harder: 27, expert: 22 };
 
       let solution = [];
       let puzzle = [];
