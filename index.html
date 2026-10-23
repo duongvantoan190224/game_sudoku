@@ -255,6 +255,7 @@
     .difficulty-control > .tool { width: 100%; height: 100%; --tool-color: #4569e8; --tool-border: #d7e0ff; --tool-active-bg: #4569e8; }
     .difficulty-control .tool-icon { color: #4569e8; }
     .difficulty-label { position: absolute; top: 6px; left: calc(50% + 4px); max-width: calc(50% - 6px); overflow: hidden; color: #dc3545; font-size: 7px; font-weight: 850; line-height: 1.2; text-overflow: ellipsis; }
+    .difficulty-label[data-value="harder"], .difficulty-label[data-value="expert"] { top: 4px; right: 2px; left: auto; width: 30px; max-width: 52%; height: auto; overflow: visible; font-size: 7px; line-height: 1.05; text-align: center; text-overflow: clip; white-space: normal; }
     .difficulty-popover {
       position: absolute;
       z-index: 15;
@@ -315,7 +316,7 @@
     .toast.error .toast-icon-wrap { color: #b3474e; background: #fff0f0; }
 
     .tool-row { min-width: 0; }
-    .toolbar { display: grid; min-width: 0; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: stretch; gap: 5px; }
+    .toolbar { display: grid; min-width: 0; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: stretch; gap: 5px; }
     .tool {
       --tool-color: #4569e8;
       --tool-bg: #fff;
@@ -358,6 +359,7 @@
     .tool-state.off { color: #c62828; background: #ffebee; }
     .tool-state.on { color: #18805d; background: #e9f8f1; }
     #notes-toggle .tool-state { position: absolute; top: 6px; left: calc(50% + 4px); padding: 0; border-radius: 0; color: #dc3545; background: transparent; }
+    #number-lock-toggle .tool-state { position: absolute; top: 6px; left: calc(50% + 4px); padding: 0; }
     #hint .badge, #notes-toggle .tool-state, .difficulty-label { height: 8.4px; line-height: 8.4px; }
     .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
     .score-float {
@@ -521,8 +523,13 @@
         <span class="tool-caption">Hoàn tác</span>
       </button>
       <button class="tool" id="erase" type="button" aria-label="Xóa ô đã chọn">
-        <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m3 12 7-8h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H10z"/><path d="m12 10 5 5m0-5-5 5"/></svg>
+        <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m7 21-4-4a2.8 2.8 0 0 1 0-4l8-8a2.8 2.8 0 0 1 4 0l6 6a2.8 2.8 0 0 1 0 4l-6 6H7Z"/><path d="m8 8 8 8"/></svg>
         <span class="tool-caption">Xóa</span>
+      </button>
+      <button class="tool" id="number-lock-toggle" type="button" aria-label="Bật Giữ số" aria-pressed="false">
+        <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></svg>
+        <span class="tool-caption">Giữ số</span>
+        <span class="tool-state off" id="number-lock-state">OFF</span>
       </button>
       <button class="tool" id="notes-toggle" type="button" aria-label="Bật chế độ ghi chú" aria-pressed="false">
         <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m4 16.5-.8 4.3 4.3-.8L20 7.5 16.5 4z"/><path d="m14.8 5.7 3.5 3.5M4 4h7M4 8h5"/></svg>
@@ -536,7 +543,7 @@
       </button>
       <div class="difficulty-control" id="difficulty-control">
         <button class="tool" id="difficulty-toggle" type="button" aria-label="Độ khó: Vừa" aria-expanded="false" aria-controls="difficulty-popover">
-          <span class="difficulty-label" id="difficulty-label">Vừa</span>
+          <span class="difficulty-label" id="difficulty-label" data-value="medium">Vừa</span>
           <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/><circle cx="12" cy="12" r="7"/><path d="m9 13 2 2 4-5"/></svg>
           <span class="tool-caption">Độ khó</span>
         </button>
@@ -657,6 +664,8 @@
       const errorsElement = document.getElementById("errors");
       const hintCountElement = document.getElementById("hint-count");
       const notesToggle = document.getElementById("notes-toggle");
+      const numberLockToggle = document.getElementById("number-lock-toggle");
+      const numberLockState = document.getElementById("number-lock-state");
       const notesState = document.getElementById("notes-state");
       const pauseOverlay = document.getElementById("pause-overlay");
       const settingsModal = document.getElementById("settings-modal");
@@ -669,6 +678,8 @@
       let values = [];
       let notes = [];
       let history = [];
+      let undoUsed = false;
+      let eraseUsed = false;
       let selectedCell = -1;
       let selectedDigit = 0;
       let invalidCells = new Set();
@@ -677,6 +688,7 @@
       let paused = false;
       let finished = false;
       let notesMode = false;
+      let numberLock = false;
       let score = 0;
       let errors = 0;
       let hintsLeft = MAX_HINTS;
@@ -883,7 +895,7 @@
         errorsElement.classList.toggle("bad", errors > 0);
         hintCountElement.textContent = String(hintsLeft);
         document.getElementById("hint").disabled = hintsLeft === 0;
-        document.getElementById("undo").disabled = history.length === 0 || undoUsed;
+        document.getElementById("undo").disabled = undoUsed || history.length === 0;
         document.getElementById("erase").disabled = eraseUsed;
       }
 
@@ -948,9 +960,6 @@
         });
       }
 
-      let undoUsed = false;
-      let eraseUsed = false;
-
       function pushHistory() {
         history.push({ values: values.slice(), notes: notes.map((set) => new Set(set)), invalidCells: new Set(invalidCells), score });
         if (history.length > 200) history.shift();
@@ -983,7 +992,7 @@
 
       function enterValue(value) {
         if (finished || paused) return;
-        selectedDigit = value || 0;
+        if (value || !numberLock) selectedDigit = value || 0;
         document.querySelectorAll(".number-button").forEach((button) => {
           button.classList.toggle("selected", Number(button.dataset.value) === selectedDigit);
         });
@@ -1019,8 +1028,6 @@
         }
 
         if (value && violatesRules(selectedCell, value)) {
-          undoUsed = false;
-          eraseUsed = false;
           pushHistory();
           values[selectedCell] = value;
           notes[selectedCell].clear();
@@ -1047,13 +1054,12 @@
         }
 
         if (!value && !values[selectedCell] && notes[selectedCell].size === 0) return;
-        if (value) {
-          undoUsed = false;
-          eraseUsed = false;
-        } else {
-          eraseUsed = true;
+        if (!value && eraseUsed) {
+          setMessage("Bạn đã dùng hết lượt xóa trong bàn chơi này.", "error");
+          return;
         }
         pushHistory();
+        if (!value) eraseUsed = true;
         if (!value) invalidCells.delete(selectedCell);
         const previousValues = values.slice();
         values[selectedCell] = value;
@@ -1073,9 +1079,9 @@
       }
 
       function undo() {
-        if (finished || paused || history.length === 0) return;
-        undoUsed = true;
+        if (finished || paused || undoUsed || history.length === 0) return;
         const last = history.pop();
+        undoUsed = true;
         values = last.values;
         notes = last.notes;
         invalidCells = last.invalidCells;
@@ -1125,6 +1131,15 @@
         notesState.classList.toggle("on", on);
       }
 
+      function setNumberLock(on) {
+        numberLock = on;
+        numberLockToggle.setAttribute("aria-pressed", String(on));
+        numberLockState.textContent = on ? "ON" : "OFF";
+        numberLockState.classList.toggle("off", !on);
+        numberLockState.classList.toggle("on", on);
+        numberLockToggle.setAttribute("aria-label", `${on ? "Tắt" : "Bật"} Giữ số`);
+      }
+
       function showToolFeedback(button) {
         window.clearTimeout(toolFeedbackTimeouts.get(button));
         button.classList.add("active");
@@ -1147,14 +1162,16 @@
         updateStats();
       }
 
-      function resetState() {
+      function resetState(newBoard = false) {
         gameOverModal.classList.remove("show");
         victoryModal.classList.remove("show");
         values = puzzle.flat();
         notes = Array.from({ length: 81 }, () => new Set());
         history = [];
-        undoUsed = false;
-        eraseUsed = false;
+        if (newBoard) {
+          undoUsed = false;
+          eraseUsed = false;
+        }
         selectedCell = -1;
         invalidCells = new Set();
         elapsedMs = 0;
@@ -1174,7 +1191,7 @@
         const generated = createPuzzle(difficultyState.value);
         solution = generated.answer;
         puzzle = generated.grid;
-        resetState();
+        resetState(true);
         setMessage("Chọn một ô trống rồi nhập số bạn muốn.");
       }
 
@@ -1187,7 +1204,12 @@
         const cell = event.target.closest(".cell");
         if (!cell || cell.disabled || paused) return;
         selectedCell = Number(cell.dataset.index);
-        selectedDigit = values[selectedCell] || 0;
+        if (numberLock && selectedDigit) {
+          setMessage("Ô đã chọn. Đang điền số đã giữ.");
+          enterValue(selectedDigit);
+          return;
+        }
+        if (!numberLock) selectedDigit = values[selectedCell] || 0;
         setMessage("Ô đã chọn. Nhập số từ 1 đến 9.");
         renderBoard();
       });
@@ -1196,9 +1218,9 @@
         const button = event.target.closest("[data-value]");
         if (button) enterValue(Number(button.dataset.value));
       });
+      numberLockToggle.addEventListener("click", () => setNumberLock(!numberLock));
 
       document.getElementById("erase").addEventListener("click", (event) => {
-        if (eraseUsed) return;
         showToolFeedback(event.currentTarget);
         enterValue(0);
       });
@@ -1266,6 +1288,7 @@
         if (option.dataset.value === difficultyState.value) return;
         difficultyState.value = option.dataset.value;
         difficultyLabel.textContent = option.textContent.trim();
+        difficultyLabel.dataset.value = option.dataset.value;
         difficultyToggle.setAttribute("aria-label", `Độ khó: ${difficultyLabel.textContent}`);
         difficultyOptions.forEach((item) => item.setAttribute("aria-selected", String(item === option)));
         startNewGame();
@@ -1313,7 +1336,7 @@
           const index = nextRow * 9 + nextColumn;
           if (puzzle[nextRow][nextColumn] === 0) {
             selectedCell = index;
-            selectedDigit = values[index] || 0;
+            if (!numberLock) selectedDigit = values[index] || 0;
             renderBoard();
             break;
           }
