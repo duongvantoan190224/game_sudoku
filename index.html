@@ -516,9 +516,9 @@
 
     <div class="tool-row">
       <div class="toolbar" aria-label="Công cụ">
-      <button class="tool" id="undo" type="button" aria-label="Undo">
+      <button class="tool" id="undo" type="button" aria-label="Hoàn tác">
         <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14h-2"/></svg>
-        <span class="tool-caption">Undo</span>
+        <span class="tool-caption">Hoàn tác</span>
       </button>
       <button class="tool" id="erase" type="button" aria-label="Xóa ô đã chọn">
         <svg class="tool-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m3 12 7-8h10a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H10z"/><path d="m12 10 5 5m0-5-5 5"/></svg>
@@ -883,7 +883,8 @@
         errorsElement.classList.toggle("bad", errors > 0);
         hintCountElement.textContent = String(hintsLeft);
         document.getElementById("hint").disabled = hintsLeft === 0;
-        document.getElementById("undo").disabled = history.length === 0;
+        document.getElementById("undo").disabled = history.length === 0 || undoUsed;
+        document.getElementById("erase").disabled = eraseUsed;
       }
 
       function isComplete() {
@@ -946,6 +947,9 @@
           }
         });
       }
+
+      let undoUsed = false;
+      let eraseUsed = false;
 
       function pushHistory() {
         history.push({ values: values.slice(), notes: notes.map((set) => new Set(set)), invalidCells: new Set(invalidCells), score });
@@ -1015,6 +1019,8 @@
         }
 
         if (value && violatesRules(selectedCell, value)) {
+          undoUsed = false;
+          eraseUsed = false;
           pushHistory();
           values[selectedCell] = value;
           notes[selectedCell].clear();
@@ -1041,6 +1047,12 @@
         }
 
         if (!value && !values[selectedCell] && notes[selectedCell].size === 0) return;
+        if (value) {
+          undoUsed = false;
+          eraseUsed = false;
+        } else {
+          eraseUsed = true;
+        }
         pushHistory();
         if (!value) invalidCells.delete(selectedCell);
         const previousValues = values.slice();
@@ -1062,6 +1074,7 @@
 
       function undo() {
         if (finished || paused || history.length === 0) return;
+        undoUsed = true;
         const last = history.pop();
         values = last.values;
         notes = last.notes;
@@ -1140,6 +1153,8 @@
         values = puzzle.flat();
         notes = Array.from({ length: 81 }, () => new Set());
         history = [];
+        undoUsed = false;
+        eraseUsed = false;
         selectedCell = -1;
         invalidCells = new Set();
         elapsedMs = 0;
@@ -1183,6 +1198,7 @@
       });
 
       document.getElementById("erase").addEventListener("click", (event) => {
+        if (eraseUsed) return;
         showToolFeedback(event.currentTarget);
         enterValue(0);
       });
