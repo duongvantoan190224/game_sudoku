@@ -83,7 +83,8 @@
       font-variant-numeric: tabular-nums;
     }
     .timer-row svg { width: 18px; height: 18px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
-    .timer-row #timer { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; line-height: 1; }
+    .timer-row #timer { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; font-size: 14px; font-weight: 700; line-height: 1; }
+    .timer-value { display: inline-flex; align-items: center; gap: 4px; }
     .icon-button {
       display: grid;
       width: 32px;
@@ -512,7 +513,7 @@
       <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
       <div class="stat"><span class="stat-label">Điểm số</span><span class="stat-value" id="score">0</span></div>
       <div class="info-controls">
-        <div class="timer-row"><span id="timer" role="timer" aria-label="00:00"><span id="timer-minutes">00</span><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9 2h6m-3 0v3"/></svg><span id="timer-seconds">00</span></span></div>
+        <div class="timer-row"><span id="timer" role="timer" aria-label="00:00"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9 2h6m-3 0v3"/></svg><span class="timer-value"><span id="timer-minutes">00</span><span>:</span><span id="timer-seconds">00</span></span></span></div>
       </div>
     </section>
 
