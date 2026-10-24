@@ -74,24 +74,26 @@
       min-width: 52px;
       height: 36px;
       padding: 0 8px;
-      border: 1px solid #d9e2fa;
+      border: 0;
       border-radius: 10px;
       color: #4569e8;
-      background: #f2f5ff;
+      background: transparent;
+      box-shadow: none;
       font-size: 12px;
       font-weight: 750;
     }
     .menu-button:hover, .menu-button[aria-expanded="true"] {
-      border-color: #c6d3f4;
-      background: #e9efff;
+      border: 0;
+      background: transparent;
+      opacity: .7;
     }
     #settings {
-      border-color: #dce3f0;
+      border: 0;
       color: #536078;
-      background: #f8faff;
+      background: transparent;
       box-shadow: none;
     }
-    #settings:hover { border-color: #cbd5e5; background: #eef2ff; }
+    #settings:hover { border: 0; background: transparent; opacity: .7; }
     .menu-dropdown {
       position: absolute;
       z-index: 15;
@@ -348,11 +350,11 @@
       justify-content: center;
       gap: 3px;
       padding: 3px 2px;
-      border: 1px solid var(--tool-border);
+      border: 0;
       border-radius: 12px;
       color: var(--tool-color);
-      background: var(--tool-bg);
-      box-shadow: 0 3px 10px #2639580d;
+      background: transparent;
+      box-shadow: none;
       font-size: 9px;
       font-weight: 750;
       white-space: nowrap;
@@ -361,12 +363,12 @@
     #undo { --tool-color: #4569e8; --tool-border: #d7e0ff; --tool-active-bg: #3455ce; }
     #erase, #notes-toggle, #hint { --tool-color: #4569e8; --tool-border: #d7e0ff; --tool-active-bg: #3455ce; }
     .tool .tool-icon { width: 17px; height: 17px; flex: 0 0 auto; color: var(--tool-color); fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
-    .tool:hover { border-color: var(--tool-color); }
-    .tool:active, .tool.active { border-color: var(--tool-active-bg); color: var(--tool-color); background: #eef2ff; }
+    .tool:hover { opacity: .7; }
+    .tool:active, .tool.active { color: var(--tool-active-bg); background: transparent; }
     .tool:focus-visible { outline: 2px solid var(--tool-active-bg); outline-offset: 2px; }
     .tool:disabled { opacity: .45; cursor: default; }
-    .tool.active { box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--tool-border); }
-    #number-lock-toggle[aria-pressed="true"], #notes-toggle[aria-pressed="true"] { background: rgb(69 105 232 / 10%); }
+    .tool.active { box-shadow: none; }
+    #number-lock-toggle[aria-pressed="true"], #notes-toggle[aria-pressed="true"] { background: transparent; }
     .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 3px; }
     #notes-toggle .tool-caption { flex-direction: column; gap: 1px; }
     .badge { display: inline-grid; min-width: 14px; height: 14px; place-items: center; padding: 0 3px; border-radius: 7px; color: #fff; background: var(--blue); font-size: 8px; font-weight: 800; line-height: 1; }
