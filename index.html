@@ -728,6 +728,7 @@
       const gameOverModal = document.getElementById("game-over-modal");
       const victoryModal = document.getElementById("victory-modal");
       const clueTargets = { easy: 42, medium: 37, hard: 32, harder: 27, expert: 22 };
+      const correctEntryPoints = { easy: 50, medium: 100, hard: 150, harder: 200, expert: 250 };
 
       let solution = [];
       let puzzle = [];
@@ -1043,13 +1044,16 @@
         const expectedValue = solution[Math.floor(index / 9)][index % 9];
         const wasCorrect = previousValue === expectedValue;
         const isCorrect = value === expectedValue;
-        if (wasCorrect === isCorrect) return;
-        if (isCorrect) {
-          score += 100;
-          showScoreEffect(index, 100);
-        } else {
-          score = Math.max(0, score - 100);
+        const points = correctEntryPoints[difficultyState.value] || correctEntryPoints.medium;
+        if (wasCorrect !== isCorrect) {
+          if (isCorrect) {
+            score += points;
+            showScoreEffect(index, points);
+          } else {
+            score = Math.max(0, score - points);
+          }
         }
+        scoreElement.textContent = String(score);
       }
 
       function finishIfComplete() {
