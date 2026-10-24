@@ -35,140 +35,68 @@
     .app { width: min(100%, 720px); height: calc(100vh - 72px - env(safe-area-inset-bottom)); height: calc(100dvh - 72px - env(safe-area-inset-bottom)); min-height: 0; margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
 
     .topbar {
-      position: relative;
-      z-index: 6;
-      display: grid;
-      grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+      display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px;
-      border: 0;
-      border-radius: 14px;
-      background: transparent;
-      box-shadow: none;
+      justify-content: space-between;
+      padding: 0 2px;
     }
-    .topbar .stat { text-align: center; }
-    .topbar .stat:first-child { margin-left: 3px; margin-right: 4px; }
-    .topbar .stat:nth-child(2) { margin-left: 10px; }
-    .stat { min-width: 0; text-align: left; }
-    .stat-label { display: block; color: var(--stat-ink); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
-    .stat-value { display: block; overflow: hidden; color: var(--stat-ink); font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-    .stat-value.bad { color: var(--stat-ink); }
-    .icon-button {
+    .topbar-button {
       display: grid;
-      width: 40px;
-      height: 40px;
-      place-items: center;
-      border: 1px solid #e1e6ef;
-      border-radius: 12px;
-      color: #536078;
-      background: #f8faff;
-      font-size: 18px;
-    }
-    .icon-button:hover { background: #eef2ff; }
-    .topbar #menu-control { grid-row: 1; grid-column: 4; }
-    .topbar #settings { grid-row: 1; grid-column: 5; }
-    .menu-control { position: relative; }
-    .topbar #menu-control { transform: translateX(-8px); }
-    .menu-button {
-      min-width: 52px;
+      width: 36px;
       height: 36px;
-      padding: 0 8px;
+      place-items: center;
+      padding: 0;
       border: 0;
       border-radius: 10px;
-      color: #4569e8;
-      background: transparent;
-      box-shadow: none;
-      font-size: 12px;
-      font-weight: 750;
-    }
-    .menu-button:hover, .menu-button[aria-expanded="true"] {
-      border: 0;
-      background: transparent;
-      opacity: .7;
-    }
-    #settings {
-      border: 0;
       color: #536078;
       background: transparent;
-      box-shadow: none;
+      font-size: 24px;
     }
-    #settings:hover { border: 0; background: transparent; opacity: .7; }
-    .menu-dropdown {
-      position: absolute;
-      z-index: 15;
-      top: calc(100% + 8px);
-      right: 0;
+    .topbar-button:hover { background: #eef2ff; }
+    .info-bar {
       display: grid;
-      width: 176px;
-      gap: 3px;
-      padding: 5px;
-      border: 1px solid #e1e6ef;
-      border-radius: 12px;
-      background: #fff;
-      box-shadow: 0 8px 24px #26395826;
-      visibility: hidden;
-      opacity: 0;
-      transform: translateY(-4px);
-      transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
-    }
-    .menu-dropdown.show { visibility: visible; opacity: 1; transform: translateY(0); transition-delay: 0s; }
-    .menu-dropdown button {
-      display: flex;
+      min-height: 44px;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      gap: 9px;
-      padding: 8px 9px;
-      border: 0;
-      border-radius: 8px;
-      color: var(--c, #536078);
-      background: transparent;
-      font-size: 12px;
-      font-weight: 650;
-      text-align: left;
-      white-space: nowrap;
+      gap: 6px;
+      padding: 0 6px;
     }
-    .menu-dropdown button:hover { background: color-mix(in srgb, var(--c) 12%, #fff); }
-    .menu-dropdown button .mi {
-      display: inline-grid;
-      place-items: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 7px;
-      color: #fff;
-      background: var(--c);
-      font-size: 12px;
-      line-height: 1;
-    }
-    #menu-pause { --c: #f59e0b; }
-    #menu-resume { --c: #10b981; }
-    #menu-restart { --c: #3b6df0; }
-    #menu-new { --c: #8b5cf6; }
-    .timer-row {
-      grid-column: 3;
-      grid-row: 1;
+    .stat { min-width: 0; text-align: left; }
+    .info-bar .stat:nth-child(2) { text-align: center; }
+    .stat-label { display: block; color: var(--stat-ink); font-size: 10px; font-weight: 650; letter-spacing: .04em; }
+    .stat-value { display: block; overflow: hidden; color: var(--stat-ink); font-size: 15px; font-variant-numeric: tabular-nums; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .stat-value.bad { color: var(--stat-ink); }
+    .info-controls {
       display: flex;
-      width: min(100%, 120px);
       min-width: 0;
-      min-height: 36px;
       align-items: center;
-      justify-content: center;
-      justify-self: center;
+      justify-self: end;
       gap: 5px;
-      padding: 0 7px;
+    }
+    .timer-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
       color: var(--stat-ink);
-      background: transparent;
       font-size: 12px;
-      font-weight: 400;
       font-variant-numeric: tabular-nums;
-      letter-spacing: 0;
     }
-    .timer-row #timer {
-      color: var(--stat-ink);
-      font-size: clamp(16px, 4.5vw, 20px);
-      font-weight: 600;
-      letter-spacing: .035em;
-      line-height: 1;
+    .timer-row #timer { font-size: 14px; font-weight: 700; line-height: 1; }
+    .icon-button {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 auto;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 10px;
+      color: #536078;
+      background: transparent;
     }
+    .icon-button:hover { background: #eef2ff; }
+    .icon-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
+    .info-bar #pause-game svg { width: 20px; height: 20px; stroke-width: 2; }
 
     .board-wrap { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; width: 100%; container-type: size; }
     .board {
@@ -555,20 +483,23 @@
 <body>
   <main class="app">
     <header class="topbar">
-      <div class="stat"><span class="stat-label">Điểm</span><span class="stat-value" id="score">0</span></div>
-      <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
-      <div class="timer-row"><span aria-hidden="true">⏱</span><span id="timer">00:00</span></div>
-      <div class="menu-control" id="menu-control">
-        <button class="menu-button" id="menu-toggle" type="button" aria-expanded="false" aria-controls="game-menu">Menu</button>
-        <div class="menu-dropdown" id="game-menu" aria-label="Menu trò chơi" aria-hidden="true">
-          <button type="button" id="menu-pause"><span class="mi" aria-hidden="true">⏸</span>Tạm dừng</button>
-          <button type="button" id="menu-resume"><span class="mi" aria-hidden="true">▶</span>Tiếp tục</button>
-          <button type="button" id="menu-restart"><span class="mi" aria-hidden="true">↻</span>Chơi lại</button>
-          <button type="button" id="menu-new"><span class="mi" aria-hidden="true">✦</span>Đổi bàn mới</button>
-        </div>
-      </div>
-      <button class="icon-button" id="settings" type="button" aria-label="Cài đặt">⚙</button>
+      <button class="topbar-button" id="go-back" type="button" aria-label="Quay lại">‹</button>
+      <button class="topbar-button" id="settings" type="button" aria-label="Cài đặt">⚙</button>
     </header>
+
+    <section class="info-bar" aria-label="Thông tin ván chơi">
+      <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
+      <div class="stat"><span class="stat-label">Điểm số</span><span class="stat-value" id="score">0</span></div>
+      <div class="info-controls">
+        <div class="timer-row"><span aria-hidden="true">⏱</span><span id="timer">00:00</span></div>
+        <button class="icon-button" id="change-game" type="button" aria-label="Đổi bài">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M4.9 9a8 8 0 0 1 13.4-2L20 12M4 17v-5h5"/><path d="M19.1 15a8 8 0 0 1-13.4 2L4 12"/></svg>
+        </button>
+        <button class="icon-button" id="pause-game" type="button" aria-label="Tạm dừng">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9v6m4-6v6"/></svg>
+        </button>
+      </div>
+    </section>
 
     <div class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="Bảng Sudoku 9 nhân 9"></div>
