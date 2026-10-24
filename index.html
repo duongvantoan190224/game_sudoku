@@ -919,18 +919,26 @@
         boardElement.replaceChildren(fragment);
         const digitCounts = Array(10).fill(0);
         values.forEach((value) => { if (value) digitCounts[value] += 1; });
-        if (selectedDigit && digitCounts[selectedDigit] >= 9) selectedDigit = 0;
+        const selectedCellValue = selectedCell >= 0
+          ? solution[Math.floor(selectedCell / 9)][selectedCell % 9]
+          : 0;
+        const canEnterCorrectValue = selectedCell >= 0 && puzzle[Math.floor(selectedCell / 9)][selectedCell % 9] === 0;
+        if (selectedDigit && digitCounts[selectedDigit] >= 9 &&
+            !(canEnterCorrectValue && selectedDigit === selectedCellValue && !notesMode)) {
+          selectedDigit = 0;
+        }
         document.querySelectorAll(".number-button").forEach((button) => {
           const digit = Number(button.dataset.value);
           const remaining = Math.max(0, 9 - digitCounts[digit]);
           const exhausted = remaining === 0;
-          button.disabled = exhausted;
-          button.classList.toggle("selected", digit === activePadDigit && !exhausted);
+          const correctEntryAvailable = canEnterCorrectValue && digit === selectedCellValue && !notesMode;
+          button.disabled = exhausted && !correctEntryAvailable;
+          button.classList.toggle("selected", digit === activePadDigit && (!exhausted || correctEntryAvailable));
           button.classList.toggle("note-highlight", selectedCell >= 0 && notes[selectedCell].has(digit));
           const noteConflict = notesMode && selectedCell >= 0 && !values[selectedCell] &&
             !notes[selectedCell].has(digit) && violatesRules(selectedCell, digit);
           button.querySelector(".remaining-count").textContent = String(remaining);
-          button.setAttribute("aria-label", `Điền số ${digit}, còn ${remaining} ô${exhausted ? ", đã đủ 9 số, không thể chọn" : noteConflict ? ", đã có trong hàng, cột hoặc khối 3x3 của ô đang chọn, không thể ghi chú" : ""}`);
+          button.setAttribute("aria-label", `Điền số ${digit}, còn ${remaining} ô${exhausted && !correctEntryAvailable ? ", đã đủ 9 số, không thể chọn" : correctEntryAvailable && exhausted ? ", đây là đáp án đúng cho ô đang chọn" : noteConflict ? ", đã có trong hàng, cột hoặc khối 3x3 của ô đang chọn, không thể ghi chú" : ""}`);
         });
       }
 
@@ -1073,7 +1081,6 @@
 
       function enterValue(value) {
         if (finished || paused) return;
-        if (value && values.filter((entry) => entry === value).length >= 9) return;
         if (value || !numberLock) selectedDigit = value || 0;
         if (selectedCell < 0) {
           setMessage("Hãy chọn một ô trống trước nhé.");
@@ -1084,6 +1091,8 @@
         const column = selectedCell % 9;
         if (puzzle[row][column] !== 0) return;
         const previousValue = values[selectedCell];
+        if (value && values.filter((entry) => entry === value).length >= 9 &&
+            (notesMode || value !== solution[row][column])) return;
 
         if (notesMode && value) {
           if (values[selectedCell]) {
@@ -1109,7 +1118,7 @@
           return;
         }
 
-        if (value && violatesRules(selectedCell, value)) {
+        if (value && value !== solution[row][column] && violatesRules(selectedCell, value)) {
           pushHistory();
           values[selectedCell] = value;
           notes[selectedCell].clear();
@@ -1145,7 +1154,7 @@
         }
         pushHistory();
         if (!value) eraseUsed = true;
-        if (!value) invalidCells.delete(selectedCell);
+        invalidCells.delete(selectedCell);
         const previousValues = values.slice();
         values[selectedCell] = value;
         notes[selectedCell].clear();
