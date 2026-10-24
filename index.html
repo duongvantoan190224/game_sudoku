@@ -1026,11 +1026,17 @@
         scoreEffectsElement.appendChild(effect);
       }
 
-      function awardCorrectEntry(index, value, previousValue) {
+      function updateCorrectEntryScore(index, value, previousValue) {
         const expectedValue = solution[Math.floor(index / 9)][index % 9];
-        if (!value || value !== expectedValue || previousValue === expectedValue) return;
-        score += 100;
-        showScoreEffect(index, 100);
+        const wasCorrect = previousValue === expectedValue;
+        const isCorrect = value === expectedValue;
+        if (wasCorrect === isCorrect) return;
+        if (isCorrect) {
+          score += 100;
+          showScoreEffect(index, 100);
+        } else {
+          score = Math.max(0, score - 100);
+        }
       }
 
       function finishIfComplete() {
@@ -1090,7 +1096,7 @@
           invalidCells.add(selectedCell);
           errors += 1;
           score = Math.max(0, score - 50);
-          awardCorrectEntry(selectedCell, value, previousValue);
+          updateCorrectEntryScore(selectedCell, value, previousValue);
           if (errors >= MAX_ERRORS) {
             elapsedMs = currentElapsed();
             finished = true;
@@ -1121,9 +1127,9 @@
         const previousValues = values.slice();
         values[selectedCell] = value;
         notes[selectedCell].clear();
+        updateCorrectEntryScore(selectedCell, value, previousValue);
         if (value) {
           removePeerNotes(selectedCell, value);
-          awardCorrectEntry(selectedCell, value, previousValue);
           setMessage(value === solution[row][column] ? "Chính xác! Tiếp tục thôi." : "Đã điền số. Hãy kiểm tra lời giải.");
         } else {
           setMessage("Đã xóa số trong ô.");
