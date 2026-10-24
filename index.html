@@ -210,7 +210,7 @@
     .cell.box-bottom { border-bottom: 2px solid #65738c; }
     .cell.given { color: #263247; font-weight: 800; }
     .cell.peer { background: #f2f5fc; }
-    .cell.same { color: #3455ce; background: #e7edff; }
+    .cell.same { color: #18805d; background: #e9f8f1; }
     .cell.user-entry { color: #087f6a; font-weight: 800; }
     .cell.selected { z-index: 1; outline: 2px solid var(--blue); outline-offset: -2px; background: #dce5ff; }
     .cell.invalid, .cell.invalid.selected { color: #b4232e; background: #ffe1e2; box-shadow: inset 0 0 0 2px #d64c55; }
@@ -415,6 +415,11 @@
     }
     .number-button .remaining-count { color: var(--muted); font-size: 9px; font-weight: 750; line-height: 1; }
     .number-button:hover { background: #eef2ff; }
+    .number-button.digit-pop { animation: number-button-pop .28s cubic-bezier(.2, .8, .2, 1); }
+    @keyframes number-button-pop {
+      45% { transform: translateY(-4px) scale(1.08); }
+      100% { transform: translateY(0) scale(1); }
+    }
     .number-button.selected { border-color: var(--blue); color: #fff; background: var(--blue); box-shadow: 0 3px 10px #4569e84d; }
     .number-button.selected .remaining-count { color: #fff; }
     .number-button.note-highlight { border-color: #8157d9; color: #fff; background: #8157d9; box-shadow: 0 3px 10px #8157d94d; }
@@ -1298,6 +1303,10 @@
       document.getElementById("number-pad").addEventListener("click", (event) => {
         const button = event.target.closest("[data-value]");
         if (button) {
+          button.classList.remove("digit-pop");
+          void button.offsetWidth;
+          button.classList.add("digit-pop");
+          button.addEventListener("animationend", () => button.classList.remove("digit-pop"), { once: true });
           activePadDigit = Number(button.dataset.value);
           enterValue(activePadDigit);
         }
