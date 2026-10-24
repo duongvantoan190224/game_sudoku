@@ -40,8 +40,7 @@
       justify-content: space-between;
       padding: 0;
     }
-    .topbar-leading { display: flex; min-width: 0; align-items: center; gap: 4px; }
-    .topbar-error { flex-direction: row; align-items: center; gap: 4px; }
+    .topbar-leading { display: flex; min-width: 0; align-items: center; }
     .topbar-actions { display: flex; align-items: center; gap: 2px; }
     .topbar-button {
       display: grid;
@@ -62,13 +61,13 @@
     .info-bar {
       display: grid;
       min-height: 44px;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       align-items: center;
       gap: 6px;
       padding: 0;
     }
     .stat { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: 1px; white-space: nowrap; }
-    .info-bar .stat:nth-child(-n+2) { align-items: center; }
+    .info-bar .stat:nth-child(2) { align-items: center; }
     .stat-label { color: var(--stat-ink); font-size: 14px; font-weight: 750; }
     .stat-value { overflow: hidden; color: var(--stat-ink); font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
     .stat-value.bad { color: var(--stat-ink); }
@@ -87,7 +86,7 @@
       font-variant-numeric: tabular-nums;
     }
     .timer-row svg { width: 18px; height: 18px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
-    .timer-row #timer { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; font-size: 14px; font-weight: 700; line-height: 1; }
+    .timer-row #timer { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; line-height: 1; }
     .timer-value { display: inline-flex; align-items: center; gap: 4px; }
     .icon-button {
       display: grid;
@@ -502,7 +501,6 @@
         <button class="topbar-button" id="go-back" type="button" aria-label="Quay lại">
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m14.5 18-6-6 6-6"/></svg>
         </button>
-        <div class="stat topbar-error"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
       </div>
       <div class="topbar-actions">
         <button class="icon-button" id="change-game" type="button" aria-label="Đổi bài">
@@ -518,6 +516,7 @@
     </header>
 
     <section class="info-bar" aria-label="Thông tin ván chơi">
+      <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
       <div class="stat"><span class="stat-label">Điểm số</span><span class="stat-value" id="score">0</span></div>
       <div class="info-controls">
         <div class="timer-row"><span id="timer" role="timer" aria-label="00:00"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9 2h6m-3 0v3"/></svg><span class="timer-value"><span id="timer-minutes">00</span><span>:</span><span id="timer-seconds">00</span></span></span></div>
