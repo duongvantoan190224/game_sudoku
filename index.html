@@ -35,140 +35,68 @@
     .app { width: min(100%, 720px); height: calc(100vh - 72px - env(safe-area-inset-bottom)); height: calc(100dvh - 72px - env(safe-area-inset-bottom)); min-height: 0; margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
 
     .topbar {
-      position: relative;
-      z-index: 6;
-      display: grid;
-      grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+      display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px;
-      border: 0;
-      border-radius: 14px;
-      background: transparent;
-      box-shadow: none;
+      justify-content: space-between;
+      padding: 0 2px;
     }
-    .topbar .stat { text-align: center; }
-    .topbar .stat:first-child { margin-left: 3px; margin-right: 4px; }
-    .topbar .stat:nth-child(2) { margin-left: 10px; }
-    .stat { min-width: 0; text-align: left; }
-    .stat-label { display: block; color: var(--stat-ink); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
-    .stat-value { display: block; overflow: hidden; color: var(--stat-ink); font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-    .stat-value.bad { color: var(--stat-ink); }
-    .icon-button {
+    .topbar-button {
       display: grid;
-      width: 40px;
-      height: 40px;
-      place-items: center;
-      border: 1px solid #e1e6ef;
-      border-radius: 12px;
-      color: #536078;
-      background: #f8faff;
-      font-size: 18px;
-    }
-    .icon-button:hover { background: #eef2ff; }
-    .topbar #menu-control { grid-row: 1; grid-column: 4; }
-    .topbar #settings { grid-row: 1; grid-column: 5; }
-    .menu-control { position: relative; }
-    .topbar #menu-control { transform: translateX(-8px); }
-    .menu-button {
-      min-width: 52px;
+      width: 36px;
       height: 36px;
-      padding: 0 8px;
+      place-items: center;
+      padding: 0;
       border: 0;
       border-radius: 10px;
-      color: #4569e8;
-      background: transparent;
-      box-shadow: none;
-      font-size: 12px;
-      font-weight: 750;
-    }
-    .menu-button:hover, .menu-button[aria-expanded="true"] {
-      border: 0;
-      background: transparent;
-      opacity: .7;
-    }
-    #settings {
-      border: 0;
       color: #536078;
       background: transparent;
-      box-shadow: none;
+      font-size: 24px;
     }
-    #settings:hover { border: 0; background: transparent; opacity: .7; }
-    .menu-dropdown {
-      position: absolute;
-      z-index: 15;
-      top: calc(100% + 8px);
-      right: 0;
+    .topbar-button:hover { background: #eef2ff; }
+    .info-bar {
       display: grid;
-      width: 176px;
-      gap: 3px;
-      padding: 5px;
-      border: 1px solid #e1e6ef;
-      border-radius: 12px;
-      background: #fff;
-      box-shadow: 0 8px 24px #26395826;
-      visibility: hidden;
-      opacity: 0;
-      transform: translateY(-4px);
-      transition: opacity .18s ease, transform .18s ease, visibility 0s linear .18s;
-    }
-    .menu-dropdown.show { visibility: visible; opacity: 1; transform: translateY(0); transition-delay: 0s; }
-    .menu-dropdown button {
-      display: flex;
+      min-height: 44px;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      gap: 9px;
-      padding: 8px 9px;
-      border: 0;
-      border-radius: 8px;
-      color: var(--c, #536078);
-      background: transparent;
-      font-size: 12px;
-      font-weight: 650;
-      text-align: left;
-      white-space: nowrap;
+      gap: 6px;
+      padding: 0 6px;
     }
-    .menu-dropdown button:hover { background: color-mix(in srgb, var(--c) 12%, #fff); }
-    .menu-dropdown button .mi {
-      display: inline-grid;
-      place-items: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 7px;
-      color: #fff;
-      background: var(--c);
-      font-size: 12px;
-      line-height: 1;
-    }
-    #menu-pause { --c: #f59e0b; }
-    #menu-resume { --c: #10b981; }
-    #menu-restart { --c: #3b6df0; }
-    #menu-new { --c: #8b5cf6; }
-    .timer-row {
-      grid-column: 3;
-      grid-row: 1;
+    .stat { min-width: 0; text-align: left; }
+    .info-bar .stat:nth-child(2) { text-align: center; }
+    .stat-label { display: block; color: var(--stat-ink); font-size: 10px; font-weight: 650; letter-spacing: .04em; }
+    .stat-value { display: block; overflow: hidden; color: var(--stat-ink); font-size: 15px; font-variant-numeric: tabular-nums; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .stat-value.bad { color: var(--stat-ink); }
+    .info-controls {
       display: flex;
-      width: min(100%, 120px);
       min-width: 0;
-      min-height: 36px;
       align-items: center;
-      justify-content: center;
-      justify-self: center;
+      justify-self: end;
       gap: 5px;
-      padding: 0 7px;
+    }
+    .timer-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
       color: var(--stat-ink);
-      background: transparent;
       font-size: 12px;
-      font-weight: 400;
       font-variant-numeric: tabular-nums;
-      letter-spacing: 0;
     }
-    .timer-row #timer {
-      color: var(--stat-ink);
-      font-size: clamp(16px, 4.5vw, 20px);
-      font-weight: 600;
-      letter-spacing: .035em;
-      line-height: 1;
+    .timer-row #timer { font-size: 14px; font-weight: 700; line-height: 1; }
+    .icon-button {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 auto;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 10px;
+      color: #536078;
+      background: transparent;
     }
+    .icon-button:hover { background: #eef2ff; }
+    .icon-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
+    .info-bar #pause-game svg { width: 20px; height: 20px; stroke-width: 2; }
 
     .board-wrap { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; width: 100%; container-type: size; }
     .board {
@@ -443,6 +371,12 @@
     .action-button { min-height: 42px; padding: 9px 10px; border: 1px solid #e1e6ef; border-radius: 10px; color: #536078; background: #fff; font-size: 13px; font-weight: 700; }
     .action-button:hover { background: #f6f8fc; }
     .action-button.primary { grid-column: 1 / -1; border-color: var(--blue); color: #fff; background: var(--blue); }
+    .modal-card > p { margin: 0 0 16px; color: #65738c; font-size: 13px; line-height: 1.5; }
+    .pause-summary { display: grid; gap: 10px; margin: 0 0 18px; }
+    .pause-summary div { display: flex; justify-content: space-between; gap: 12px; color: #65738c; font-size: 13px; }
+    .pause-summary strong { color: var(--stat-ink); font-variant-numeric: tabular-nums; }
+    .pause-card .modal-actions { grid-template-columns: 1fr; }
+    .pause-card .action-button.primary { grid-column: auto; }
     .game-over-card { text-align: center; }
     .game-over-card p { margin: 0 0 18px; color: #65738c; font-size: 14px; line-height: 1.5; }
     .game-over-card .modal-actions { grid-template-columns: 1fr; }
@@ -496,8 +430,13 @@
     .ad-banner-cta { padding: 6px 12px; border-radius: 6px; background: #ee4d2d; color: #fff; font-size: 12px; font-weight: 700; }
 
     @media (max-width: 380px) {
-      .topbar { gap: 5px; padding: 6px; }
-      .icon-button { width: 34px; height: 34px; }
+      .topbar { padding: 0 1px; }
+      .topbar-button { width: 32px; height: 32px; }
+      .info-bar { gap: 3px; padding: 0 2px; }
+      .info-controls { gap: 2px; }
+      .icon-button { width: 29px; height: 29px; }
+      .timer-row { gap: 2px; }
+      .timer-row #timer { font-size: 12px; }
       .toolbar { gap: 3px; }
       .tool { height: 44px; gap: 2px; padding: 2px 1px; font-size: 8px; }
       .tool .tool-icon { width: 16px; height: 16px; }
@@ -505,9 +444,8 @@
       .number-button { min-height: 48px; font-size: 23px; }
     }
     @media (min-width: 600px) {
-      .topbar { gap: 9px; padding: 9px; }
-      .topbar .stat:first-child, .topbar .stat:nth-child(2) { margin-right: 0; margin-left: 0; }
-      .icon-button { width: 44px; height: 44px; }
+      .topbar { padding: 0 4px; }
+      .icon-button { width: 32px; height: 32px; }
       .toolbar { gap: 7px; }
       .tool { height: 54px; gap: 4px; font-size: 10px; }
       .tool .tool-icon { width: 19px; height: 19px; }
@@ -555,20 +493,23 @@
 <body>
   <main class="app">
     <header class="topbar">
-      <div class="stat"><span class="stat-label">Điểm</span><span class="stat-value" id="score">0</span></div>
-      <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
-      <div class="timer-row"><span aria-hidden="true">⏱</span><span id="timer">00:00</span></div>
-      <div class="menu-control" id="menu-control">
-        <button class="menu-button" id="menu-toggle" type="button" aria-expanded="false" aria-controls="game-menu">Menu</button>
-        <div class="menu-dropdown" id="game-menu" aria-label="Menu trò chơi" aria-hidden="true">
-          <button type="button" id="menu-pause"><span class="mi" aria-hidden="true">⏸</span>Tạm dừng</button>
-          <button type="button" id="menu-resume"><span class="mi" aria-hidden="true">▶</span>Tiếp tục</button>
-          <button type="button" id="menu-restart"><span class="mi" aria-hidden="true">↻</span>Chơi lại</button>
-          <button type="button" id="menu-new"><span class="mi" aria-hidden="true">✦</span>Đổi bàn mới</button>
-        </div>
-      </div>
-      <button class="icon-button" id="settings" type="button" aria-label="Cài đặt">⚙</button>
+      <button class="topbar-button" id="go-back" type="button" aria-label="Quay lại">‹</button>
+      <button class="topbar-button" id="settings" type="button" aria-label="Cài đặt">⚙</button>
     </header>
+
+    <section class="info-bar" aria-label="Thông tin ván chơi">
+      <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
+      <div class="stat"><span class="stat-label">Điểm số</span><span class="stat-value" id="score">0</span></div>
+      <div class="info-controls">
+        <div class="timer-row"><span aria-hidden="true">⏱</span><span id="timer">00:00</span></div>
+        <button class="icon-button" id="change-game" type="button" aria-label="Đổi bài">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M4.9 9a8 8 0 0 1 13.4-2L20 12M4 17v-5h5"/><path d="M19.1 15a8 8 0 0 1-13.4 2L4 12"/></svg>
+        </button>
+        <button class="icon-button" id="pause-game" type="button" aria-label="Tạm dừng">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9v6m4-6v6"/></svg>
+        </button>
+      </div>
+    </section>
 
     <div class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="Bảng Sudoku 9 nhân 9"></div>
@@ -644,6 +585,31 @@
         <button class="action-button" id="new-game" type="button">✦ Bàn mới</button>
         <button class="action-button" id="check-board" type="button">Kiểm tra kết quả</button>
         <button class="action-button primary" id="close-settings" type="button">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="change-game-modal" role="dialog" aria-modal="true" aria-labelledby="change-game-title" aria-describedby="change-game-message">
+    <div class="modal-card">
+      <h2 id="change-game-title">Đổi Bài</h2>
+      <p id="change-game-message">Bạn có muốn đổi sang một bàn Sudoku mới không?</p>
+      <div class="modal-actions">
+        <button class="action-button" id="cancel-change-game" type="button">Hủy</button>
+        <button class="action-button primary" id="confirm-change-game" type="button">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="pause-modal" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+    <div class="modal-card pause-card">
+      <h2 id="pause-title">Tạm dừng</h2>
+      <div class="pause-summary">
+        <div><span>Thời gian</span><strong id="pause-time">00:00</strong></div>
+        <div><span>Lỗi</span><strong id="pause-errors">0/3</strong></div>
+        <div><span>Độ khó</span><strong id="pause-difficulty">Vừa</strong></div>
+      </div>
+      <div class="modal-actions">
+        <button class="action-button primary" id="resume-game" type="button">Tiếp tục</button>
       </div>
     </div>
   </div>
@@ -729,6 +695,8 @@
       const notesState = document.getElementById("notes-state");
       const pauseOverlay = document.getElementById("pause-overlay");
       const settingsModal = document.getElementById("settings-modal");
+      const pauseModal = document.getElementById("pause-modal");
+      const changeGameModal = document.getElementById("change-game-modal");
       const gameOverModal = document.getElementById("game-over-modal");
       const victoryModal = document.getElementById("victory-modal");
       const clueTargets = { easy: 42, medium: 37, hard: 32, harder: 27, expert: 22 };
@@ -958,6 +926,9 @@
         scoreElement.textContent = String(score);
         errorsElement.textContent = `${errors}/${MAX_ERRORS}`;
         errorsElement.classList.toggle("bad", errors > 0);
+        document.getElementById("pause-time").textContent = timerElement.textContent;
+        document.getElementById("pause-errors").textContent = errorsElement.textContent;
+        document.getElementById("pause-difficulty").textContent = difficultyLabel.textContent;
         hintCountElement.textContent = String(hintsLeft);
         document.getElementById("hint").disabled = hintsLeft === 0;
         document.getElementById("undo").disabled = undoUsed || history.length === 0;
@@ -1254,12 +1225,14 @@
         paused = on;
         pauseOverlay.classList.toggle("show", on);
         boardElement.classList.toggle("hidden", on);
+        pauseModal.classList.toggle("show", on);
         updateStats();
       }
 
       function resetState() {
         gameOverModal.classList.remove("show");
         victoryModal.classList.remove("show");
+        changeGameModal.classList.remove("show");
         values = puzzle.flat();
         notes = Array.from({ length: 81 }, () => new Set());
         history = [];
@@ -1338,27 +1311,18 @@
         setNotesMode(!notesMode);
         setMessage(notesMode ? "Chế độ ghi chú đang bật. Chọn ô trống rồi nhập số cần ghi chú." : "Chế độ ghi chú đã tắt.");
       });
-      const menuControl = document.getElementById("menu-control");
-      const menuToggle = document.getElementById("menu-toggle");
-      const gameMenu = document.getElementById("game-menu");
-      function closeGameMenu() {
-        gameMenu.classList.remove("show");
-        menuToggle.setAttribute("aria-expanded", "false");
-        gameMenu.setAttribute("aria-hidden", "true");
-      }
-      menuToggle.addEventListener("click", () => {
-        const isOpen = !gameMenu.classList.contains("show");
-        gameMenu.classList.toggle("show", isOpen);
-        menuToggle.setAttribute("aria-expanded", String(isOpen));
-        gameMenu.setAttribute("aria-hidden", String(!isOpen));
+      document.getElementById("go-back").addEventListener("click", () => window.history.back());
+      document.getElementById("change-game").addEventListener("click", () => changeGameModal.classList.add("show"));
+      document.getElementById("cancel-change-game").addEventListener("click", () => changeGameModal.classList.remove("show"));
+      document.getElementById("confirm-change-game").addEventListener("click", () => {
+        changeGameModal.classList.remove("show");
+        startNewGame();
       });
-      document.getElementById("menu-pause").addEventListener("click", () => { closeGameMenu(); setPaused(true); });
-      document.getElementById("menu-resume").addEventListener("click", () => { closeGameMenu(); setPaused(false); });
-      document.getElementById("menu-restart").addEventListener("click", () => { closeGameMenu(); restartGame(); });
-      document.getElementById("menu-new").addEventListener("click", () => { closeGameMenu(); startNewGame(); });
-      document.addEventListener("click", (event) => {
-        if (!menuControl.contains(event.target)) closeGameMenu();
+      changeGameModal.addEventListener("click", (event) => {
+        if (event.target === changeGameModal) changeGameModal.classList.remove("show");
       });
+      document.getElementById("pause-game").addEventListener("click", () => setPaused(true));
+      document.getElementById("resume-game").addEventListener("click", () => setPaused(false));
       document.getElementById("resume").addEventListener("click", () => setPaused(false));
 
       function openSettings() { settingsModal.classList.add("show"); }
@@ -1405,7 +1369,7 @@
 
       document.addEventListener("keydown", (event) => {
         if (event.target.matches("select, input, textarea, [contenteditable='true']")) return;
-        if (event.key === "Escape" && gameMenu.classList.contains("show")) { closeGameMenu(); return; }
+        if (event.key === "Escape" && changeGameModal.classList.contains("show")) { changeGameModal.classList.remove("show"); return; }
         if (event.key === "Escape" && difficultyElement.classList.contains("show")) { closeDifficultyPopover(); return; }
         if (event.key === "Escape" && settingsModal.classList.contains("show")) { closeSettings(); return; }
         if (paused) return;
