@@ -28,7 +28,7 @@
       margin: 0;
       padding: 8px 2px calc(64px + env(safe-area-inset-bottom));
       overflow: hidden;
-      background: radial-gradient(ellipse at 15% 0%, #e5ecff 0, transparent 38%), #f4f7fb;
+      background: #f4f7fb;
     }
     button, select { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; cursor: pointer; }
@@ -44,15 +44,15 @@
       padding: 6px;
       border: 0;
       border-radius: 14px;
-      background: #fff;
+      background: transparent;
       box-shadow: none;
     }
     .topbar .stat { text-align: center; }
     .topbar .stat:first-child { margin-left: 3px; margin-right: 4px; }
     .topbar .stat:nth-child(2) { margin-left: 10px; }
     .stat { min-width: 0; text-align: left; }
-    .stat-label { display: block; color: var(--stat-ink); font-size: 11px; font-weight: 400; letter-spacing: .06em; text-transform: uppercase; }
-    .stat-value { display: block; overflow: hidden; color: var(--stat-ink); font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 300; text-overflow: ellipsis; white-space: nowrap; }
+    .stat-label { display: block; color: var(--stat-ink); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+    .stat-value { display: block; overflow: hidden; color: var(--stat-ink); font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
     .stat-value.bad { color: var(--stat-ink); }
     .icon-button {
       display: grid;
@@ -163,7 +163,7 @@
     .timer-row #timer {
       color: var(--stat-ink);
       font-size: clamp(16px, 4.5vw, 20px);
-      font-weight: 300;
+      font-weight: 600;
       letter-spacing: .035em;
       line-height: 1;
     }
