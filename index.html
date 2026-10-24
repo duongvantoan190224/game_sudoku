@@ -216,6 +216,12 @@
     .cell.invalid, .cell.invalid.selected { color: #b4232e; background: #ffe1e2; box-shadow: inset 0 0 0 2px #d64c55; }
     .cell:focus-visible { z-index: 2; outline: 3px solid #7891f5; outline-offset: -3px; }
     .cell:disabled { cursor: default; opacity: 1; }
+    .cell.value-entry-pop { z-index: 2; animation: value-entry-pop .26s cubic-bezier(.2, .8, .2, 1); }
+    @keyframes value-entry-pop {
+      0% { transform: scale(.88); }
+      45% { box-shadow: inset 0 0 0 2px #4569e866; transform: scale(1.07); }
+      100% { box-shadow: none; transform: scale(1); }
+    }
     .cell.note-warning { animation: note-warning-flash .7s ease-in-out 2; }
     @keyframes note-warning-flash {
       25%, 75% { color: #d64c55; background: #ffe1e2; box-shadow: inset 0 0 0 3px #dc3545, 0 0 16px rgba(220, 53, 69, .8); filter: brightness(1.2); }
@@ -533,6 +539,7 @@
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
       .score-float { animation-duration: .01ms; }
       .cell.completion-celebration { animation-duration: .01ms; animation-delay: 0ms; }
+      .cell.value-entry-pop { animation-duration: .01ms; }
     }
   </style>
 </head>
@@ -726,6 +733,7 @@
       let eraseUsed = false;
       let selectedCell = -1;
       let selectedDigit = 0;
+      let activePadDigit = 0;
       let invalidCells = new Set();
       let elapsedMs = 0;
       let resumedAt = Date.now();
@@ -921,7 +929,7 @@
           const remaining = Math.max(0, 9 - digitCounts[digit]);
           const exhausted = remaining === 0;
           button.disabled = exhausted;
-          button.classList.toggle("selected", digit === selectedDigit && !exhausted);
+          button.classList.toggle("selected", digit === activePadDigit && !exhausted);
           button.classList.toggle("note-highlight", selectedCell >= 0 && notes[selectedCell].has(digit));
           const noteConflict = notesMode && selectedCell >= 0 && !values[selectedCell] &&
             !notes[selectedCell].has(digit) && violatesRules(selectedCell, digit);
@@ -1050,15 +1058,20 @@
         }
       }
 
+      function showValueEntryEffect() {
+        const cell = boardElement.querySelector(`[data-index="${selectedCell}"]`);
+        if (!cell) return;
+        cell.classList.add("value-entry-pop");
+        cell.addEventListener("animationend", () => cell.classList.remove("value-entry-pop"), { once: true });
+      }
+
       function enterValue(value) {
         if (finished || paused) return;
         if (value && values.filter((entry) => entry === value).length >= 9) return;
         if (value || !numberLock) selectedDigit = value || 0;
-        document.querySelectorAll(".number-button").forEach((button) => {
-          button.classList.toggle("selected", Number(button.dataset.value) === selectedDigit);
-        });
         if (selectedCell < 0) {
           setMessage("Hãy chọn một ô trống trước nhé.");
+          renderBoard();
           return;
         }
         const row = Math.floor(selectedCell / 9);
@@ -1084,6 +1097,7 @@
             notes[selectedCell].add(value);
           }
           setMessage("Đã cập nhật ghi chú cho ô.");
+          activePadDigit = 0;
           updateStats();
           renderBoard();
           return;
@@ -1111,7 +1125,9 @@
             setMessage(`Trùng ở ${conflictLocation(selectedCell, value)}!`, "error");
           }
           updateStats();
+          activePadDigit = 0;
           renderBoard();
+          showValueEntryEffect();
           flashConflictingCells(selectedCell, value);
           return;
         }
@@ -1135,8 +1151,12 @@
           setMessage("Đã xóa số trong ô.");
         }
         updateStats();
+        activePadDigit = 0;
         renderBoard();
-        if (value) showCompletionEffects(previousValues);
+        if (value) {
+          showValueEntryEffect();
+          showCompletionEffects(previousValues);
+        }
         finishIfComplete();
       }
 
@@ -1264,6 +1284,7 @@
         const cell = event.target.closest(".cell");
         if (!cell || cell.disabled || paused) return;
         selectedCell = Number(cell.dataset.index);
+        activePadDigit = 0;
         if (numberLock && selectedDigit) {
           setMessage("Ô đã chọn. Đang điền số đã giữ.");
           enterValue(selectedDigit);
@@ -1276,7 +1297,10 @@
 
       document.getElementById("number-pad").addEventListener("click", (event) => {
         const button = event.target.closest("[data-value]");
-        if (button) enterValue(Number(button.dataset.value));
+        if (button) {
+          activePadDigit = Number(button.dataset.value);
+          enterValue(activePadDigit);
+        }
       });
       numberLockToggle.addEventListener("click", () => setNumberLock(!numberLock));
 
@@ -1401,6 +1425,7 @@
           const index = nextRow * 9 + nextColumn;
           if (puzzle[nextRow][nextColumn] === 0) {
             selectedCell = index;
+            activePadDigit = 0;
             if (!numberLock) selectedDigit = values[index] || 0;
             renderBoard();
             break;
