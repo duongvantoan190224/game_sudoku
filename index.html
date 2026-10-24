@@ -63,9 +63,9 @@
       padding: 0 6px;
     }
     .stat { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: 1px; white-space: nowrap; }
-    .info-bar .stat:nth-child(2) { align-items: center; }
-    .stat-label { color: var(--stat-ink); font-size: 10px; font-weight: 650; letter-spacing: .04em; }
-    .stat-value { overflow: hidden; color: var(--stat-ink); font-size: 15px; font-variant-numeric: tabular-nums; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .info-bar .stat:nth-child(-n+2) { align-items: center; }
+    .stat-label { color: var(--stat-ink); font-size: 14px; font-weight: 750; }
+    .stat-value { overflow: hidden; color: var(--stat-ink); font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
     .stat-value.bad { color: var(--stat-ink); }
     .info-controls {
       display: flex;
@@ -76,15 +76,13 @@
     }
     .timer-row {
       display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 1px;
+      align-items: center;
       color: var(--stat-ink);
       font-size: 12px;
       font-variant-numeric: tabular-nums;
     }
-    .timer-row svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
-    .timer-row #timer { font-size: 14px; font-weight: 700; line-height: 1; }
+    .timer-row svg { width: 18px; height: 18px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+    .timer-row #timer { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; line-height: 1; }
     .icon-button {
       display: grid;
       width: 32px;
@@ -437,8 +435,8 @@
       .info-bar { gap: 3px; padding: 0 2px; }
       .info-controls { gap: 2px; }
       .icon-button { width: 29px; height: 29px; }
-      .timer-row { gap: 2px; }
-      .timer-row #timer { font-size: 12px; }
+      .timer-row svg { width: 16px; height: 16px; }
+      .timer-row #timer { gap: 3px; font-size: 12px; }
       .toolbar { gap: 3px; }
       .tool { height: 44px; gap: 2px; padding: 2px 1px; font-size: 8px; }
       .tool .tool-icon { width: 16px; height: 16px; }
@@ -513,7 +511,7 @@
       <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
       <div class="stat"><span class="stat-label">Điểm số</span><span class="stat-value" id="score">0</span></div>
       <div class="info-controls">
-        <div class="timer-row"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9 2h6m-3 0v3"/></svg><span id="timer">00:00</span></div>
+        <div class="timer-row"><span id="timer" role="timer" aria-label="00:00"><span id="timer-minutes">00</span><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9 2h6m-3 0v3"/></svg><span id="timer-seconds">00</span></span></div>
       </div>
     </section>
 
@@ -928,11 +926,15 @@
 
       function updateStats() {
         const seconds = Math.floor(currentElapsed() / 1000);
-        timerElement.textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+        const minutesText = String(Math.floor(seconds / 60)).padStart(2, "0");
+        const secondsText = String(seconds % 60).padStart(2, "0");
+        timerElement.querySelector("#timer-minutes").textContent = minutesText;
+        timerElement.querySelector("#timer-seconds").textContent = secondsText;
+        timerElement.setAttribute("aria-label", `${minutesText}:${secondsText}`);
         scoreElement.textContent = String(score);
         errorsElement.textContent = `${errors}/${MAX_ERRORS}`;
         errorsElement.classList.toggle("bad", errors > 0);
-        document.getElementById("pause-time").textContent = timerElement.textContent;
+        document.getElementById("pause-time").textContent = `${minutesText}:${secondsText}`;
         document.getElementById("pause-errors").textContent = errorsElement.textContent;
         document.getElementById("pause-difficulty").textContent = difficultyLabel.textContent;
         hintCountElement.textContent = String(hintsLeft);
