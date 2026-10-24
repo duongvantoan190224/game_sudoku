@@ -276,25 +276,25 @@
       position: relative;
       display: flex;
       min-width: 0;
-      height: 46px;
+      height: 56px;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
+      gap: 4px;
       padding: 3px 2px;
       border: 0;
       border-radius: 12px;
       color: var(--tool-color);
       background: transparent;
       box-shadow: none;
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 750;
       white-space: nowrap;
       transition: color .15s ease, background-color .15s ease, border-color .15s ease, transform .12s ease;
     }
     #undo { --tool-color: #4569e8; --tool-border: #d7e0ff; --tool-active-bg: #3455ce; }
     #erase, #notes-toggle, #hint { --tool-color: #4569e8; --tool-border: #d7e0ff; --tool-active-bg: #3455ce; }
-    .tool .tool-icon { width: 17px; height: 17px; flex: 0 0 auto; color: var(--tool-color); fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
+    .tool .tool-icon { width: 20px; height: 20px; flex: 0 0 auto; color: var(--tool-color); fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
     .tool:hover { opacity: .7; }
     .tool:active, .tool.active { color: var(--tool-active-bg); background: transparent; }
     .tool:focus-visible { outline: 2px solid var(--tool-active-bg); outline-offset: 2px; }
@@ -314,7 +314,7 @@
     #number-lock-toggle .tool-state.on, #notes-toggle .tool-state.on { color: #087f6a; font-size: 8px; font-weight: 900; }
     #number-lock-toggle .tool-state { position: absolute; top: 6px; left: calc(50% + 4px); padding: 0; }
     #hint .badge, #notes-toggle .tool-state, .difficulty-label { height: 8.4px; line-height: 8.4px; }
-    .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
+    .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 5px; }
     .score-float {
       position: absolute;
       z-index: 4;
@@ -336,7 +336,7 @@
     .number-button {
       display: flex;
       flex-direction: column;
-      min-height: 50px;
+      min-height: 60px;
       align-items: center;
       justify-content: center;
       padding: 0;
@@ -345,11 +345,11 @@
       border-radius: 10px;
       color: #4569e8;
       background: #fff;
-      font-size: 30px;
+      font-size: 34px;
       font-weight: 500;
       transition: transform .12s ease, background .12s ease;
     }
-    .number-button .remaining-count { color: var(--muted); font-size: 9px; font-weight: 750; line-height: 1; }
+    .number-button .remaining-count { color: var(--muted); font-size: 10px; font-weight: 750; line-height: 1; }
     .number-button:hover { background: #eef2ff; }
     .number-button.digit-pop { animation: number-button-pop .28s cubic-bezier(.2, .8, .2, 1); }
     @keyframes number-button-pop {
@@ -442,19 +442,19 @@
       .timer-row svg { width: 16px; height: 16px; }
       .timer-row #timer { gap: 3px; font-size: 12px; }
       .toolbar { gap: 3px; }
-      .tool { height: 44px; gap: 2px; padding: 2px 1px; font-size: 8px; }
-      .tool .tool-icon { width: 16px; height: 16px; }
-      .number-pad { gap: 2px; }
-      .number-button { min-height: 48px; font-size: 23px; }
+      .tool { height: 52px; gap: 3px; padding: 2px 1px; font-size: 9px; }
+      .tool .tool-icon { width: 18px; height: 18px; }
+      .number-pad { gap: 3px; }
+      .number-button { min-height: 56px; font-size: 27px; }
     }
     @media (min-width: 600px) {
       .topbar { padding: 0 4px; }
       .icon-button { width: 32px; height: 32px; }
       .toolbar { gap: 7px; }
-      .tool { height: 54px; gap: 4px; font-size: 10px; }
-      .tool .tool-icon { width: 19px; height: 19px; }
-      .number-pad { gap: 6px; }
-      .number-button { min-height: 58px; font-size: clamp(27px, 3.4vw, 36px); }
+      .tool { height: 62px; gap: 5px; font-size: 11px; }
+      .tool .tool-icon { width: 22px; height: 22px; }
+      .number-pad { gap: 7px; }
+      .number-button { min-height: 66px; font-size: clamp(30px, 3.8vw, 40px); }
     }
     @media (min-width: 768px) {
       body {
@@ -483,8 +483,9 @@
       .app { gap: 4px; }
       .topbar { padding: 4px; }
       .toolbar { gap: 3px; }
-      .tool { height: 40px; }
-      .number-button { min-height: 42px; font-size: 22px; }
+      .tool { height: 48px; font-size: 9px; }
+      .tool .tool-icon { width: 18px; height: 18px; }
+      .number-button { min-height: 50px; font-size: 26px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
