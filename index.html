@@ -15,6 +15,7 @@
       text-rendering: optimizeLegibility;
       --blue: #4569e8;
       --blue-dark: #3455ce;
+      --stat-ink: #26344c;
       --line: #dce3ef;
       --muted: #7c879b;
     }
@@ -42,17 +43,17 @@
       gap: 6px;
       padding: 6px;
       border: 0;
-      border-radius: 0;
-      background: transparent;
+      border-radius: 14px;
+      background: #fff;
       box-shadow: none;
     }
     .topbar .stat { text-align: center; }
     .topbar .stat:first-child { margin-left: 3px; margin-right: 4px; }
     .topbar .stat:nth-child(2) { margin-left: 10px; }
     .stat { min-width: 0; text-align: left; }
-    .stat-label { display: block; color: #7c879b; font-size: 11px; font-weight: 400; letter-spacing: .06em; text-transform: uppercase; }
-    .stat-value { display: block; overflow: hidden; color: #26344c; font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 300; text-overflow: ellipsis; white-space: nowrap; }
-    .stat-value.bad { color: #000; }
+    .stat-label { display: block; color: var(--stat-ink); font-size: 11px; font-weight: 400; letter-spacing: .06em; text-transform: uppercase; }
+    .stat-value { display: block; overflow: hidden; color: var(--stat-ink); font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 300; text-overflow: ellipsis; white-space: nowrap; }
+    .stat-value.bad { color: var(--stat-ink); }
     .icon-button {
       display: grid;
       width: 40px;
@@ -152,7 +153,7 @@
       justify-self: center;
       gap: 5px;
       padding: 0 7px;
-      color: #586b91;
+      color: var(--stat-ink);
       background: transparent;
       font-size: 12px;
       font-weight: 400;
@@ -160,7 +161,7 @@
       letter-spacing: 0;
     }
     .timer-row #timer {
-      color: #26344c;
+      color: var(--stat-ink);
       font-size: clamp(16px, 4.5vw, 20px);
       font-weight: 300;
       letter-spacing: .035em;
