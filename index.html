@@ -371,6 +371,12 @@
     .action-button { min-height: 42px; padding: 9px 10px; border: 1px solid #e1e6ef; border-radius: 10px; color: #536078; background: #fff; font-size: 13px; font-weight: 700; }
     .action-button:hover { background: #f6f8fc; }
     .action-button.primary { grid-column: 1 / -1; border-color: var(--blue); color: #fff; background: var(--blue); }
+    .modal-card > p { margin: 0 0 16px; color: #65738c; font-size: 13px; line-height: 1.5; }
+    .pause-summary { display: grid; gap: 10px; margin: 0 0 18px; }
+    .pause-summary div { display: flex; justify-content: space-between; gap: 12px; color: #65738c; font-size: 13px; }
+    .pause-summary strong { color: var(--stat-ink); font-variant-numeric: tabular-nums; }
+    .pause-card .modal-actions { grid-template-columns: 1fr; }
+    .pause-card .action-button.primary { grid-column: auto; }
     .game-over-card { text-align: center; }
     .game-over-card p { margin: 0 0 18px; color: #65738c; font-size: 14px; line-height: 1.5; }
     .game-over-card .modal-actions { grid-template-columns: 1fr; }
@@ -424,8 +430,13 @@
     .ad-banner-cta { padding: 6px 12px; border-radius: 6px; background: #ee4d2d; color: #fff; font-size: 12px; font-weight: 700; }
 
     @media (max-width: 380px) {
-      .topbar { gap: 5px; padding: 6px; }
-      .icon-button { width: 34px; height: 34px; }
+      .topbar { padding: 0 1px; }
+      .topbar-button { width: 32px; height: 32px; }
+      .info-bar { gap: 3px; padding: 0 2px; }
+      .info-controls { gap: 2px; }
+      .icon-button { width: 29px; height: 29px; }
+      .timer-row { gap: 2px; }
+      .timer-row #timer { font-size: 12px; }
       .toolbar { gap: 3px; }
       .tool { height: 44px; gap: 2px; padding: 2px 1px; font-size: 8px; }
       .tool .tool-icon { width: 16px; height: 16px; }
@@ -433,9 +444,8 @@
       .number-button { min-height: 48px; font-size: 23px; }
     }
     @media (min-width: 600px) {
-      .topbar { gap: 9px; padding: 9px; }
-      .topbar .stat:first-child, .topbar .stat:nth-child(2) { margin-right: 0; margin-left: 0; }
-      .icon-button { width: 44px; height: 44px; }
+      .topbar { padding: 0 4px; }
+      .icon-button { width: 32px; height: 32px; }
       .toolbar { gap: 7px; }
       .tool { height: 54px; gap: 4px; font-size: 10px; }
       .tool .tool-icon { width: 19px; height: 19px; }
@@ -579,6 +589,31 @@
     </div>
   </div>
 
+  <div class="modal" id="change-game-modal" role="dialog" aria-modal="true" aria-labelledby="change-game-title" aria-describedby="change-game-message">
+    <div class="modal-card">
+      <h2 id="change-game-title">Đổi Bài</h2>
+      <p id="change-game-message">Bạn có muốn đổi sang một bàn Sudoku mới không?</p>
+      <div class="modal-actions">
+        <button class="action-button" id="cancel-change-game" type="button">Hủy</button>
+        <button class="action-button primary" id="confirm-change-game" type="button">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="pause-modal" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+    <div class="modal-card pause-card">
+      <h2 id="pause-title">Tạm dừng</h2>
+      <div class="pause-summary">
+        <div><span>Thời gian</span><strong id="pause-time">00:00</strong></div>
+        <div><span>Lỗi</span><strong id="pause-errors">0/3</strong></div>
+        <div><span>Độ khó</span><strong id="pause-difficulty">Vừa</strong></div>
+      </div>
+      <div class="modal-actions">
+        <button class="action-button primary" id="resume-game" type="button">Tiếp tục</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal" id="game-over-modal" role="dialog" aria-modal="true" aria-labelledby="game-over-title" aria-describedby="game-over-message">
     <div class="modal-card game-over-card">
       <h2 id="game-over-title">Trò chơi kết thúc</h2>
@@ -660,6 +695,8 @@
       const notesState = document.getElementById("notes-state");
       const pauseOverlay = document.getElementById("pause-overlay");
       const settingsModal = document.getElementById("settings-modal");
+      const pauseModal = document.getElementById("pause-modal");
+      const changeGameModal = document.getElementById("change-game-modal");
       const gameOverModal = document.getElementById("game-over-modal");
       const victoryModal = document.getElementById("victory-modal");
       const clueTargets = { easy: 42, medium: 37, hard: 32, harder: 27, expert: 22 };
@@ -889,6 +926,9 @@
         scoreElement.textContent = String(score);
         errorsElement.textContent = `${errors}/${MAX_ERRORS}`;
         errorsElement.classList.toggle("bad", errors > 0);
+        document.getElementById("pause-time").textContent = timerElement.textContent;
+        document.getElementById("pause-errors").textContent = errorsElement.textContent;
+        document.getElementById("pause-difficulty").textContent = difficultyLabel.textContent;
         hintCountElement.textContent = String(hintsLeft);
         document.getElementById("hint").disabled = hintsLeft === 0;
         document.getElementById("undo").disabled = undoUsed || history.length === 0;
@@ -1185,12 +1225,14 @@
         paused = on;
         pauseOverlay.classList.toggle("show", on);
         boardElement.classList.toggle("hidden", on);
+        pauseModal.classList.toggle("show", on);
         updateStats();
       }
 
       function resetState() {
         gameOverModal.classList.remove("show");
         victoryModal.classList.remove("show");
+        changeGameModal.classList.remove("show");
         values = puzzle.flat();
         notes = Array.from({ length: 81 }, () => new Set());
         history = [];
@@ -1269,27 +1311,18 @@
         setNotesMode(!notesMode);
         setMessage(notesMode ? "Chế độ ghi chú đang bật. Chọn ô trống rồi nhập số cần ghi chú." : "Chế độ ghi chú đã tắt.");
       });
-      const menuControl = document.getElementById("menu-control");
-      const menuToggle = document.getElementById("menu-toggle");
-      const gameMenu = document.getElementById("game-menu");
-      function closeGameMenu() {
-        gameMenu.classList.remove("show");
-        menuToggle.setAttribute("aria-expanded", "false");
-        gameMenu.setAttribute("aria-hidden", "true");
-      }
-      menuToggle.addEventListener("click", () => {
-        const isOpen = !gameMenu.classList.contains("show");
-        gameMenu.classList.toggle("show", isOpen);
-        menuToggle.setAttribute("aria-expanded", String(isOpen));
-        gameMenu.setAttribute("aria-hidden", String(!isOpen));
+      document.getElementById("go-back").addEventListener("click", () => window.history.back());
+      document.getElementById("change-game").addEventListener("click", () => changeGameModal.classList.add("show"));
+      document.getElementById("cancel-change-game").addEventListener("click", () => changeGameModal.classList.remove("show"));
+      document.getElementById("confirm-change-game").addEventListener("click", () => {
+        changeGameModal.classList.remove("show");
+        startNewGame();
       });
-      document.getElementById("menu-pause").addEventListener("click", () => { closeGameMenu(); setPaused(true); });
-      document.getElementById("menu-resume").addEventListener("click", () => { closeGameMenu(); setPaused(false); });
-      document.getElementById("menu-restart").addEventListener("click", () => { closeGameMenu(); restartGame(); });
-      document.getElementById("menu-new").addEventListener("click", () => { closeGameMenu(); startNewGame(); });
-      document.addEventListener("click", (event) => {
-        if (!menuControl.contains(event.target)) closeGameMenu();
+      changeGameModal.addEventListener("click", (event) => {
+        if (event.target === changeGameModal) changeGameModal.classList.remove("show");
       });
+      document.getElementById("pause-game").addEventListener("click", () => setPaused(true));
+      document.getElementById("resume-game").addEventListener("click", () => setPaused(false));
       document.getElementById("resume").addEventListener("click", () => setPaused(false));
 
       function openSettings() { settingsModal.classList.add("show"); }
@@ -1336,7 +1369,7 @@
 
       document.addEventListener("keydown", (event) => {
         if (event.target.matches("select, input, textarea, [contenteditable='true']")) return;
-        if (event.key === "Escape" && gameMenu.classList.contains("show")) { closeGameMenu(); return; }
+        if (event.key === "Escape" && changeGameModal.classList.contains("show")) { changeGameModal.classList.remove("show"); return; }
         if (event.key === "Escape" && difficultyElement.classList.contains("show")) { closeDifficultyPopover(); return; }
         if (event.key === "Escape" && settingsModal.classList.contains("show")) { closeSettings(); return; }
         if (paused) return;
