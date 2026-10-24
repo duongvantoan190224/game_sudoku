@@ -351,10 +351,13 @@
     }
     .number-button .remaining-count { color: var(--muted); font-size: 10px; font-weight: 750; line-height: 1; }
     .number-button:hover { background: #eef2ff; }
-    .number-button.digit-pop { animation: number-button-pop .28s cubic-bezier(.2, .8, .2, 1); }
+    .number-button.digit-pop { animation: number-button-pop .45s cubic-bezier(.34, 1.56, .64, 1); }
     @keyframes number-button-pop {
-      45% { transform: translateY(-4px) scale(1.08); }
-      100% { transform: translateY(0) scale(1); }
+      0% { transform: scale(1); }
+      30% { transform: translateY(-4px) scale(1.2); }
+      55% { transform: translateY(0) scale(.95); }
+      78% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
     .number-button.selected { border-color: var(--blue); color: #fff; background: var(--blue); box-shadow: 0 3px 10px #4569e84d; }
     .number-button.selected .remaining-count { color: #fff; }
@@ -362,7 +365,8 @@
     .number-button.note-highlight .remaining-count { color: #fff; }
     .number-pad.notes-mode .number-button:not(:disabled) { opacity: .55; }
     .number-pad.notes-mode .number-button.note-highlight:not(:disabled) { opacity: 1; }
-    .number-button:active, .tool:active { transform: scale(.96); }
+    .tool:active { transform: scale(.96); }
+    .number-button:active { transform: scale(1.15); transition-duration: .06s; }
     .number-button:disabled { opacity: .3; cursor: default; }
 
     .modal { position: fixed; z-index: 20; inset: 0; display: none; align-items: center; justify-content: center; padding: 18px; background: #1b263b66; }
