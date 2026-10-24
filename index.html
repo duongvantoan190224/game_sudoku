@@ -351,12 +351,13 @@
     }
     .number-button .remaining-count { color: var(--muted); font-size: 10px; font-weight: 750; line-height: 1; }
     .number-button:hover { background: #eef2ff; }
-    .number-button.digit-pop { animation: number-button-pop .45s cubic-bezier(.34, 1.56, .64, 1); }
+    .number-button.digit-pop { animation: number-button-pop .5s cubic-bezier(.28, 1.8, .48, 1); }
     @keyframes number-button-pop {
       0% { transform: scale(1); }
-      30% { transform: translateY(-4px) scale(1.2); }
-      55% { transform: translateY(0) scale(.95); }
-      78% { transform: scale(1.05); }
+      26% { transform: translateY(-7px) scale(1.35); }
+      50% { transform: translateY(1px) scale(.88); }
+      72% { transform: translateY(-2px) scale(1.12); }
+      88% { transform: scale(.98); }
       100% { transform: scale(1); }
     }
     .number-button.selected { border-color: var(--blue); color: #fff; background: var(--blue); box-shadow: 0 3px 10px #4569e84d; }
