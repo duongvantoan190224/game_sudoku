@@ -367,6 +367,7 @@
     .tool:focus-visible { outline: 2px solid var(--tool-active-bg); outline-offset: 2px; }
     .tool:disabled { opacity: .45; cursor: default; }
     .tool.active { box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--tool-border); }
+    #number-lock-toggle[aria-pressed="true"], #notes-toggle[aria-pressed="true"] { background: rgb(69 105 232 / 10%); }
     .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 3px; }
     #notes-toggle .tool-caption { flex-direction: column; gap: 1px; }
     .badge { display: inline-grid; min-width: 14px; height: 14px; place-items: center; padding: 0 3px; border-radius: 7px; color: #fff; background: var(--blue); font-size: 8px; font-weight: 800; line-height: 1; }
@@ -377,6 +378,7 @@
     #notes-toggle .tool-state { position: absolute; top: 6px; left: calc(50% + 4px); padding: 0; border-radius: 0; background: transparent; }
     #notes-toggle .tool-state.off { color: #dc3545; }
     #notes-toggle .tool-state.on { color: #18805d; }
+    #number-lock-toggle .tool-state.on, #notes-toggle .tool-state.on { color: #087f6a; font-size: 8px; font-weight: 900; }
     #number-lock-toggle .tool-state { position: absolute; top: 6px; left: calc(50% + 4px); padding: 0; }
     #hint .badge, #notes-toggle .tool-state, .difficulty-label { height: 8.4px; line-height: 8.4px; }
     .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
