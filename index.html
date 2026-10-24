@@ -49,7 +49,7 @@
       padding: 0;
       border: 0;
       border-radius: 10px;
-      color: #536078;
+      color: #7283cf;
       background: transparent;
       font-size: 24px;
     }
@@ -57,30 +57,33 @@
     .info-bar {
       display: grid;
       min-height: 44px;
-      grid-template-columns: 1fr 1fr auto;
+      grid-template-columns: 1fr 1fr 1fr;
       align-items: center;
       gap: 6px;
       padding: 0 6px;
     }
-    .stat { display: flex; min-width: 0; align-items: baseline; gap: 4px; white-space: nowrap; }
-    .info-bar .stat:nth-child(2) { justify-content: center; }
+    .stat { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: 1px; white-space: nowrap; }
+    .info-bar .stat:nth-child(2) { align-items: center; }
     .stat-label { color: var(--stat-ink); font-size: 10px; font-weight: 650; letter-spacing: .04em; }
     .stat-value { overflow: hidden; color: var(--stat-ink); font-size: 15px; font-variant-numeric: tabular-nums; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
     .stat-value.bad { color: var(--stat-ink); }
     .info-controls {
       display: flex;
       min-width: 0;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-end;
       justify-self: end;
     }
     .timer-row {
       display: flex;
-      align-items: center;
-      gap: 4px;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1px;
       color: var(--stat-ink);
       font-size: 12px;
       font-variant-numeric: tabular-nums;
     }
+    .timer-row svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
     .timer-row #timer { font-size: 14px; font-weight: 700; line-height: 1; }
     .icon-button {
       display: grid;
@@ -91,12 +94,11 @@
       padding: 0;
       border: 0;
       border-radius: 10px;
-      color: #536078;
+      color: #7283cf;
       background: transparent;
     }
     .icon-button:hover { background: #eef2ff; }
     .icon-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.9; }
-    .topbar-actions #pause-game svg { width: 20px; height: 20px; stroke-width: 2; }
 
     .board-wrap { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; width: 100%; container-type: size; }
     .board {
@@ -511,7 +513,7 @@
       <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
       <div class="stat"><span class="stat-label">Điểm số</span><span class="stat-value" id="score">0</span></div>
       <div class="info-controls">
-        <div class="timer-row"><span aria-hidden="true">⏱</span><span id="timer">00:00</span></div>
+        <div class="timer-row"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9 2h6m-3 0v3"/></svg><span id="timer">00:00</span></div>
       </div>
     </section>
 
