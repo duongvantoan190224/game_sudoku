@@ -386,6 +386,14 @@
     .pause-summary strong { color: var(--stat-ink); font-variant-numeric: tabular-nums; }
     .pause-card .modal-actions { grid-template-columns: 1fr; }
     .pause-card .action-button.primary { grid-column: auto; }
+    .history-card { width: min(100%, 460px); max-height: min(80vh, 620px); overflow: auto; }
+    .history-note { margin: -4px 0 14px; color: #65738c; font-size: 12px; line-height: 1.5; }
+    .game-history-list { display: grid; max-height: 52vh; gap: 8px; overflow: auto; margin-bottom: 14px; }
+    .game-history-item { display: grid; gap: 4px; padding: 10px 12px; border: 1px solid #e1e6ef; border-radius: 10px; color: #65738c; font-size: 12px; }
+    .game-history-heading, .game-history-details { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .game-history-heading { color: var(--stat-ink); font-size: 13px; font-weight: 750; }
+    .game-history-score { color: var(--blue-dark); font-variant-numeric: tabular-nums; }
+    .game-history-empty { margin: 0 0 14px; color: #65738c; font-size: 13px; text-align: center; }
     .game-over-card { text-align: center; }
     .game-over-card p { margin: 0 0 18px; color: #65738c; font-size: 14px; line-height: 1.5; }
     .game-over-card .modal-actions { grid-template-columns: 1fr; }
@@ -601,9 +609,19 @@
       <div class="modal-actions">
         <button class="action-button" id="restart" type="button">↺ Chơi lại</button>
         <button class="action-button" id="new-game" type="button">✦ Bàn mới</button>
+        <button class="action-button" id="show-game-history" type="button">Lịch sử ván chơi</button>
         <button class="action-button" id="check-board" type="button">Kiểm tra kết quả</button>
         <button class="action-button primary" id="close-settings" type="button">Đóng</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal" id="game-history-modal" role="dialog" aria-modal="true" aria-labelledby="game-history-title" aria-describedby="game-history-note">
+    <div class="modal-card history-card">
+      <h2 id="game-history-title">Lịch sử ván chơi gần đây</h2>
+      <p class="history-note" id="game-history-note">Điểm chỉ cộng khi điền đúng đáp án. Lỗi trùng, dùng gợi ý hoặc xóa đáp án đúng có thể làm giảm điểm.</p>
+      <div class="game-history-list" id="game-history-list"></div>
+      <div class="modal-actions"><button class="action-button primary" id="close-game-history" type="button">Đóng</button></div>
     </div>
   </div>
 
@@ -717,8 +735,15 @@
       const changeGameModal = document.getElementById("change-game-modal");
       const gameOverModal = document.getElementById("game-over-modal");
       const victoryModal = document.getElementById("victory-modal");
+      const gameHistoryModal = document.getElementById("game-history-modal");
+      const gameHistoryList = document.getElementById("game-history-list");
+      const GAME_HISTORY_KEY = "sudokuRecentGames";
+      const MAX_GAME_HISTORY = 20;
       const clueTargets = { easy: 42, medium: 37, hard: 32, harder: 27, expert: 22 };
       const correctEntryPoints = { easy: 50, medium: 100, hard: 150, harder: 200, expert: 250 };
+      const difficultyNames = { easy: "Dễ", medium: "Vừa", hard: "Khó", harder: "Khó hơn", expert: "Chuyên gia" };
+      const gameOutcomes = { won: "Chiến thắng", lost: "Thua", restarted: "Chơi lại", abandoned: "Chưa hoàn thành" };
+      let gameHistory = loadGameHistory();
 
       let solution = [];
       let puzzle = [];
@@ -740,8 +765,88 @@
       let score = 0;
       let errors = 0;
       let hintsLeft = MAX_HINTS;
+      let currentGameId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      let gameRecorded = false;
       let toastTimeout;
       const toolFeedbackTimeouts = new WeakMap();
+
+      function loadGameHistory() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(GAME_HISTORY_KEY) || "[]");
+          return Array.isArray(saved) ? saved.filter((game) =>
+            game && typeof game.date === "string" && Number.isFinite(game.score) &&
+            Number.isFinite(game.duration) && Number.isFinite(game.errors) &&
+            typeof game.difficulty === "string" &&
+            typeof game.outcome === "string"
+          ).slice(0, MAX_GAME_HISTORY) : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function saveGameHistory() {
+        try {
+          localStorage.setItem(GAME_HISTORY_KEY, JSON.stringify(gameHistory));
+        } catch {
+          setMessage("Không thể lưu lịch sử ván chơi trên thiết bị này.", "error");
+        }
+      }
+
+      function renderGameHistory() {
+        gameHistoryList.replaceChildren();
+        if (gameHistory.length === 0) {
+          const empty = document.createElement("p");
+          empty.className = "game-history-empty";
+          empty.textContent = "Chưa có ván chơi nào được lưu.";
+          gameHistoryList.appendChild(empty);
+          return;
+        }
+        gameHistory.forEach((game) => {
+          const item = document.createElement("article");
+          item.className = "game-history-item";
+          const heading = document.createElement("div");
+          heading.className = "game-history-heading";
+          const outcome = document.createElement("span");
+          outcome.textContent = gameOutcomes[game.outcome] || gameOutcomes.abandoned;
+          const points = document.createElement("span");
+          points.className = "game-history-score";
+          points.textContent = `${game.score} điểm`;
+          heading.append(outcome, points);
+          const details = document.createElement("div");
+          details.className = "game-history-details";
+          const date = document.createElement("span");
+          const parsedDate = new Date(game.date);
+          date.textContent = Number.isNaN(parsedDate.getTime()) ? "" : parsedDate.toLocaleString("vi-VN");
+          const duration = document.createElement("span");
+          const minutes = Math.floor(game.duration / 60);
+          const seconds = game.duration % 60;
+          duration.textContent = `${difficultyNames[game.difficulty] || "Vừa"} · ${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")} · ${game.errors} lỗi`;
+          details.append(date, duration);
+          item.append(heading, details);
+          gameHistoryList.appendChild(item);
+        });
+      }
+
+      function recordGame(outcome) {
+        if (gameRecorded || puzzle.length !== 9) return;
+        const elapsedSeconds = Math.floor(currentElapsed() / 1000);
+        const hasProgress = score > 0 || errors > 0 || history.length > 0 ||
+          values.some((value, index) => value !== puzzle.flat()[index]);
+        if (!hasProgress) return;
+        gameHistory = gameHistory.filter((game) => game.gameId !== currentGameId);
+        gameHistory.unshift({
+          gameId: currentGameId,
+          date: new Date().toISOString(),
+          difficulty: difficultyState.value,
+          duration: elapsedSeconds,
+          score,
+          errors,
+          outcome
+        });
+        gameHistory = gameHistory.slice(0, MAX_GAME_HISTORY);
+        gameRecorded = true;
+        saveGameHistory();
+      }
 
       function shuffled(items) {
         const result = items.slice();
@@ -1065,6 +1170,7 @@
         if (isComplete()) {
           elapsedMs = currentElapsed();
           finished = true;
+          recordGame("won");
           setMessage("Tuyệt vời! Bạn đã hoàn thành Sudoku.");
           updateStats();
           victoryModal.classList.add("show");
@@ -1129,6 +1235,7 @@
           if (errors >= MAX_ERRORS) {
             elapsedMs = currentElapsed();
             finished = true;
+            recordGame("lost");
             gameOverModal.classList.add("show");
             document.getElementById("game-over-restart").focus();
             setMessage("Bạn đã thua trò chơi vì bạn mắc 3 lỗi.", "error");
@@ -1285,15 +1392,21 @@
       }
 
       function startNewGame() {
+        recordGame("abandoned");
         const generated = createPuzzle(difficultyState.value);
         solution = generated.answer;
         puzzle = generated.grid;
         resetState();
+        currentGameId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        gameRecorded = false;
         setMessage("Chọn một ô trống rồi nhập số bạn muốn.");
       }
 
       function restartGame() {
+        recordGame("restarted");
         resetState();
+        currentGameId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        gameRecorded = false;
         setMessage("Ván chơi đã được đặt lại. Chúc bạn may mắn!");
       }
 
@@ -1361,6 +1474,16 @@
       document.getElementById("settings").addEventListener("click", openSettings);
       document.getElementById("close-settings").addEventListener("click", closeSettings);
       settingsModal.addEventListener("click", (event) => { if (event.target === settingsModal) closeSettings(); });
+      document.getElementById("show-game-history").addEventListener("click", () => {
+        closeSettings();
+        renderGameHistory();
+        gameHistoryModal.classList.add("show");
+        document.getElementById("close-game-history").focus();
+      });
+      document.getElementById("close-game-history").addEventListener("click", () => gameHistoryModal.classList.remove("show"));
+      gameHistoryModal.addEventListener("click", (event) => {
+        if (event.target === gameHistoryModal) gameHistoryModal.classList.remove("show");
+      });
 
       document.getElementById("restart").addEventListener("click", () => { closeSettings(); restartGame(); });
       document.getElementById("new-game").addEventListener("click", () => { closeSettings(); startNewGame(); });
@@ -1401,6 +1524,7 @@
       document.addEventListener("keydown", (event) => {
         if (event.target.matches("select, input, textarea, [contenteditable='true']")) return;
         if (event.key === "Escape" && changeGameModal.classList.contains("show")) { changeGameModal.classList.remove("show"); return; }
+        if (event.key === "Escape" && gameHistoryModal.classList.contains("show")) { gameHistoryModal.classList.remove("show"); return; }
         if (event.key === "Escape" && difficultyElement.classList.contains("show")) { closeDifficultyPopover(); return; }
         if (event.key === "Escape" && settingsModal.classList.contains("show")) { closeSettings(); return; }
         if (paused) return;
@@ -1449,6 +1573,10 @@
       });
 
       window.setInterval(updateStats, 1000);
+      window.addEventListener("pagehide", () => recordGame("abandoned"));
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted && !finished) gameRecorded = false;
+      });
       startNewGame();
     })();
   </script>
