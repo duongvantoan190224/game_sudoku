@@ -765,6 +765,7 @@
       let score = 0;
       let errors = 0;
       let hintsLeft = MAX_HINTS;
+      let currentGameId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       let gameRecorded = false;
       let toastTimeout;
       const toolFeedbackTimeouts = new WeakMap();
@@ -831,8 +832,10 @@
         const elapsedSeconds = Math.floor(currentElapsed() / 1000);
         const hasProgress = score > 0 || errors > 0 || history.length > 0 ||
           values.some((value, index) => value !== puzzle.flat()[index]);
-        if (!hasProgress && elapsedSeconds === 0) return;
+        if (!hasProgress) return;
+        gameHistory = gameHistory.filter((game) => game.gameId !== currentGameId);
         gameHistory.unshift({
+          gameId: currentGameId,
           date: new Date().toISOString(),
           difficulty: difficultyState.value,
           duration: elapsedSeconds,
@@ -1394,6 +1397,7 @@
         solution = generated.answer;
         puzzle = generated.grid;
         resetState();
+        currentGameId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
         gameRecorded = false;
         setMessage("Chọn một ô trống rồi nhập số bạn muốn.");
       }
@@ -1401,6 +1405,7 @@
       function restartGame() {
         recordGame("restarted");
         resetState();
+        currentGameId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
         gameRecorded = false;
         setMessage("Ván chơi đã được đặt lại. Chúc bạn may mắn!");
       }
@@ -1569,6 +1574,9 @@
 
       window.setInterval(updateStats, 1000);
       window.addEventListener("pagehide", () => recordGame("abandoned"));
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted && !finished) gameRecorded = false;
+      });
       startNewGame();
     })();
   </script>
