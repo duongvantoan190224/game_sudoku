@@ -301,8 +301,8 @@
     .tool:disabled { opacity: .45; cursor: default; }
     .tool.active { box-shadow: none; }
     #number-lock-toggle[aria-pressed="true"], #notes-toggle[aria-pressed="true"] { background: transparent; }
-    #number-lock-toggle[aria-pressed="true"] { color: #fff; background: #4569e8; box-shadow: 0 3px 10px #4569e84d; }
-    #notes-toggle[aria-pressed="true"] { color: #fff; background: #8157d9; box-shadow: 0 3px 10px #8157d94d; }
+    #number-lock-toggle[aria-pressed="true"] { color: #3455ce; background: #eaf0ff; }
+    #notes-toggle[aria-pressed="true"] { color: #7046b7; background: #f1eafe; }
     #number-lock-toggle[aria-pressed="true"] .tool-icon, #notes-toggle[aria-pressed="true"] .tool-icon { color: currentColor; }
     .tool-caption { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 3px; }
     #notes-toggle .tool-caption { flex-direction: column; gap: 1px; }
@@ -316,7 +316,7 @@
     #notes-toggle .tool-state.on { color: #18805d; }
     #number-lock-toggle .tool-state.on, #notes-toggle .tool-state.on { color: #087f6a; font-size: 8px; font-weight: 900; }
     #number-lock-toggle .tool-state { position: absolute; top: 6px; left: calc(50% + 4px); padding: 0; }
-    #number-lock-toggle[aria-pressed="true"] .tool-state.on, #notes-toggle[aria-pressed="true"] .tool-state.on { padding: 1px 4px; border-radius: 4px; color: #fff; background: #ffffff40; }
+    #number-lock-toggle[aria-pressed="true"] .tool-state.on, #notes-toggle[aria-pressed="true"] .tool-state.on { padding: 1px 4px; border-radius: 4px; color: inherit; background: #ffffffb3; }
     #hint .badge, #notes-toggle .tool-state, .difficulty-label { height: 8.4px; line-height: 8.4px; }
     .number-pad { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 5px; }
     .score-float {
