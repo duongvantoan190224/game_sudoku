@@ -601,9 +601,13 @@
     #lobby [data-ad],
     #lobby [data-ad-slot],
     #lobby ins.adsbygoogle { display: none !important; }
-    .ad-banner { display: flex; flex: none; min-height: 44px; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 12px; border-radius: 12px; color: #536078; background: #fff; box-shadow: 0 1px 3px rgba(31, 35, 40, .1); font-size: 12px; text-decoration: none; }
-    .ad-banner strong { color: #2b3a67; font-size: 13px; }
-    @media (max-height: 620px) { .ad-banner { min-height: 36px; padding: 3px 10px; } }
+    .ad-banner { display: flex; flex: none; min-height: 62px; align-items: center; gap: 12px; padding: 8px 14px; border: 1px solid #f0dfe1; border-radius: 14px; color: #536078; background: linear-gradient(110deg, #fff 0%, #fff8f8 100%); box-shadow: 0 2px 6px rgba(31, 35, 40, .08); text-decoration: none; }
+    .ad-banner-icon { display: grid; width: 44px; height: 44px; flex: 0 0 auto; place-items: center; border-radius: 12px; background: linear-gradient(145deg, #f26c72, #d94350); box-shadow: inset 0 1px 0 #ffffff55, 0 2px 4px #c8323a30; }
+    .ad-banner-icon svg { width: 29px; height: 29px; fill: none; stroke: #fff; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
+    .ad-banner-copy { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+    .ad-banner strong { color: #8f4650; font-size: 11px; font-weight: 750; letter-spacing: .035em; line-height: 1.2; }
+    .ad-banner-copy span { overflow: hidden; color: #2b3a67; font-size: 14px; font-weight: 750; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+    @media (max-height: 620px) { .ad-banner { min-height: 52px; padding: 5px 10px; } .ad-banner-icon { width: 38px; height: 38px; } }
     .lobby-header { display: flex; min-height: 52px; align-items: center; justify-content: flex-end; }
     .lobby-wallet { display: flex; align-items: center; gap: 8px; }
     .wallet-pill { display: inline-flex; min-height: 34px; align-items: center; gap: 5px; padding: 4px 10px; border: 1px solid #e7e9f0; border-radius: 999px; color: #34405b; background: #fff; box-shadow: 0 3px 10px #25324b0c; font-size: 13px; font-weight: 800; }
@@ -857,7 +861,12 @@
       <button class="number-button" type="button" data-value="9" aria-label="Điền số 9"><span>9</span><span class="remaining-count">9</span></button>
     </div>
 
-    <aside class="ad-banner" aria-label="Quảng cáo"><strong>Đồ chơi trí tuệ</strong><span>Sách Sudoku giảm giá</span></aside>
+    <aside class="ad-banner" aria-label="Quảng cáo">
+      <span class="ad-banner-icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M16 8.5c-2.8-2-6.1-2.4-10-1.2v16c3.9-1.2 7.2-.8 10 1.2 2.8-2 6.1-2.4 10-1.2v-16c-3.9-1.2-7.2-.8-10 1.2Z"/><path d="M16 8.5v16"/><path d="M8.5 12h3m-3 4h3m9-4h3m-3 4h3"/></svg>
+      </span>
+      <span class="ad-banner-copy"><strong>Đồ chơi trí tuệ</strong><span>Sách Sudoku giảm giá</span></span>
+    </aside>
   </main>
 
   <div class="toast" id="toast" role="alert" aria-live="assertive">
