@@ -709,34 +709,38 @@
 <body>
   <section class="lobby" id="lobby" aria-label="Sảnh chính">
     <header class="lobby-header">
-      <div class="lobby-brand"><span class="lobby-brand-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></span><span>Sảnh chính</span></div>
       <div class="lobby-wallet" aria-label="Tài nguyên">
         <span class="wallet-pill"><span class="wallet-icon" aria-hidden="true">🪙</span><span>2.450</span></span>
         <span class="wallet-pill"><span class="wallet-icon" aria-hidden="true">🔥</span><span>7</span></span>
       </div>
     </header>
     <div class="lobby-content">
-      <div class="event-cards" aria-label="Sự kiện">
+      <div class="event-cards" aria-label="Sự kiện nổi bật">
         <article class="event-card tournament">
           <div class="event-card-top"><span class="event-icon" aria-hidden="true">🏆</span><span class="event-tag">Đang mở</span></div>
           <div><h2>Giải đấu</h2><p>So tài cùng người chơi</p></div>
         </article>
         <article class="event-card event">
-          <div class="event-card-top"><span class="event-icon" aria-hidden="true">⚡</span><span class="event-tag">Sự kiện</span></div>
-          <div><h2>Biến cố</h2><p>Thử thách giới hạn</p></div>
+          <div class="event-card-top"><span class="event-icon" aria-hidden="true">🏹</span><span class="event-tag">Sự kiện</span></div>
+          <div><h2>Biến cố Mũi tên</h2><p>Thử thách giới hạn</p></div>
+        </article>
+        <article class="event-card festival">
+          <div class="event-card-top"><span class="event-icon" aria-hidden="true">🎉</span><span class="event-tag">Sắp tới</span></div>
+          <div><h2>Lễ hội</h2><p>Khám phá phần thưởng</p></div>
         </article>
       </div>
       <article class="daily-card">
-        <div class="daily-gift" aria-hidden="true">🎁</div>
+        <div class="daily-trophy" aria-hidden="true">🏆</div>
         <div class="daily-copy">
           <h2>Thử thách hàng ngày</h2>
+          <span class="daily-date"><time id="daily-date">thg 10 26</time><span class="daily-gift" aria-hidden="true">🎁</span></span>
           <p>Hoàn thành để nhận phần thưởng</p>
           <span class="daily-timer"><span aria-hidden="true">◷</span><span id="daily-countdown">08:42:16</span> còn lại</span>
         </div>
         <button class="daily-cta" type="button" aria-label="Xem thử thách hàng ngày">Chơi</button>
       </article>
       <section class="classic-section" aria-labelledby="classic-title">
-        <div class="classic-heading"><span class="mini-board" aria-hidden="true">▦</span><h2 id="classic-title">Sudoku cổ điển</h2></div>
+        <div class="classic-heading"><h2 id="classic-title">Sudoku cổ điển</h2></div>
         <button class="continue-game" id="lobby-continue" type="button">
           <span class="continue-copy"><span class="continue-title">Tiếp tục</span><span class="continue-meta"><span id="lobby-time">00:00</span> · <span id="lobby-difficulty">Vừa</span></span></span>
           <span class="continue-arrow" aria-hidden="true">›</span>
@@ -968,38 +972,6 @@
     </div>
   </div>
 
-  <div id="ad-banner-container" class="ad-banner-container">
-    <a class="ad-banner-link" id="ad-link" href="#" target="_blank" rel="noopener noreferrer sponsored">
-      <img id="ad-image" src="" alt="">
-      <span class="ad-banner-text"><span id="ad-title"></span><small id="ad-description"></small></span>
-      <span class="ad-banner-cta" id="ad-cta"></span>
-    </a>
-  </div>
-
-  <script>
-    // ================= CẤU HÌNH BANNER QUẢNG CÁO =================
-    // Chỉnh các giá trị dưới đây; banner dưới đáy game sẽ tự cập nhật.
-    const AD_CONFIG = {
-      affiliateUrl: "https://shopee.vn/",   // Dán link affiliate Shopee/Lazada của bạn
-      imageUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 42 42'%3E%3Crect width='42' height='42' fill='%23ee4d2d'/%3E%3Crect x='7' y='7' width='28' height='28' fill='white'/%3E%3Cpath d='M7 21h28M7 14h28M7 28h28M14 7v28M21 7v28M28 7v28' stroke='%23ee4d2d' stroke-width='1.5'/%3E%3C/svg%3E",   // Link ảnh sản phẩm
-      title: "Đồ chơi trí tuệ",             // Tên sản phẩm
-      description: "Sách Sudoku giảm giá",  // Mô tả
-      buttonText: "Mua ngay"                // Chữ trên nút
-    };
-    // =============================================================
-    (() => {
-      const link = document.getElementById("ad-link");
-      if (!/^https?:\/\//i.test(AD_CONFIG.affiliateUrl)) { document.getElementById("ad-banner-container").style.display = "none"; return; }
-      link.href = AD_CONFIG.affiliateUrl;
-      const img = document.getElementById("ad-image");
-      img.src = AD_CONFIG.imageUrl;
-      img.alt = AD_CONFIG.title;
-      document.getElementById("ad-title").textContent = AD_CONFIG.title;
-      document.getElementById("ad-description").textContent = AD_CONFIG.description;
-      document.getElementById("ad-cta").textContent = AD_CONFIG.buttonText;
-    })();
-  </script>
-
   <script>
     (() => {
       "use strict";
@@ -1014,6 +986,9 @@
       const lobbyTimeElement = document.getElementById("lobby-time");
       const lobbyDifficultyElement = document.getElementById("lobby-difficulty");
       const dailyCountdownElement = document.getElementById("daily-countdown");
+      const dailyDateElement = document.getElementById("daily-date");
+      const today = new Date();
+      dailyDateElement.textContent = `thg ${String(today.getMonth() + 1).padStart(2, "0")} ${String(today.getDate()).padStart(2, "0")}`;
       const toastElement = document.getElementById("toast");
       const toastTitleElement = document.getElementById("toast-title");
       const toastMessageElement = document.getElementById("toast-message");
