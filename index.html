@@ -506,8 +506,13 @@
     .action-button:hover { background: #f6f8fc; }
     .action-button.primary { grid-column: 1 / -1; border-color: var(--blue); color: #fff; background: var(--blue); }
     .modal-card > p { margin: 0 0 16px; color: #65738c; font-size: 13px; line-height: 1.5; }
-    .pause-summary { display: grid; gap: 10px; margin: 0 0 18px; }
-    .pause-summary div { display: flex; justify-content: space-between; gap: 12px; color: #65738c; font-size: 13px; }
+    .pause-card h2 { text-align: center; }
+    .pause-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 18px; text-align: center; }
+    .pause-summary div { display: grid; gap: 4px; color: #65738c; font-size: 13px; }
+    .pause-hint { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; padding: 14px; border-radius: 16px; background: #eef3fb; }
+    .pause-hint svg { flex: none; width: 32px; height: 32px; fill: none; stroke: var(--blue); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .pause-hint strong { display: block; margin-bottom: 4px; color: var(--stat-ink); font-size: 14px; }
+    .pause-hint span { color: #65738c; font-size: 12px; line-height: 1.4; }
     .pause-summary strong { color: var(--stat-ink); font-variant-numeric: tabular-nums; }
     .pause-card .modal-actions { grid-template-columns: 1fr; }
     .pause-card .action-button.primary { grid-column: auto; }
@@ -810,8 +815,12 @@
         <div><span>Lỗi</span><strong id="pause-errors">0/3</strong></div>
         <div><span>Độ khó</span><strong id="pause-difficulty">Vừa</strong></div>
       </div>
+      <div class="pause-hint">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/></svg>
+        <div><strong>Gợi ý</strong><span>Các gợi ý hướng dẫn sẽ giúp bạn biết cách giải đố sudoku</span></div>
+      </div>
       <div class="modal-actions">
-        <button class="action-button primary" id="resume-game" type="button">Tiếp tục</button>
+        <button class="action-button primary" id="resume-game" type="button">Tiếp tục trò chơi</button>
       </div>
     </div>
   </div>
@@ -1549,6 +1558,10 @@
         pauseOverlay.classList.toggle("show", on);
         boardElement.classList.toggle("hidden", on);
         pauseModal.classList.toggle("show", on);
+        document.querySelector("#pause-game svg").innerHTML = on
+          ? '<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5Z"/>'
+          : '<circle cx="12" cy="12" r="9"/><path d="M10 9v6m4-6v6"/>';
+        document.getElementById("pause-game").setAttribute("aria-label", on ? "Tiếp tục" : "Tạm dừng");
         updateStats();
       }
 
