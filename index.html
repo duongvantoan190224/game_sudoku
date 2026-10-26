@@ -543,16 +543,34 @@
     .game-over-card .action-button.primary { grid-column: auto; }
     .victory-modal { background: #1b263b99; }
     .victory-card {
+      position: relative;
       overflow: hidden;
-      border: 2px solid #ffd166;
-      background: radial-gradient(circle at 50% 0, #fff5c2, #fff 48%);
+      border: 1px solid #ffffffcc;
+      border-radius: 28px;
+      background: linear-gradient(180deg, #fff8dc 0, #fff 42%);
+      box-shadow: 0 24px 60px #0b132b66;
       text-align: center;
       animation: victory-pop .4s cubic-bezier(.2, .8, .2, 1) both;
     }
-    .victory-card h2 { color: #a45b00; font-size: 24px; }
-    .victory-card p { margin: 0 0 18px; color: #65738c; font-size: 14px; line-height: 1.5; }
-    .victory-card .modal-actions { grid-template-columns: 1fr 1fr; }
-    .victory-card .action-button.primary { grid-column: 1 / -1; border-color: #e9a400; background: linear-gradient(135deg, #ffb703, #fb8500); }
+    .victory-card > *:not(.confetti) { position: relative; z-index: 1; }
+    .victory-trophy { font-size: 64px; line-height: 1; filter: drop-shadow(0 6px 10px #fb850066); animation: trophy-bounce 1.8s ease-in-out infinite; }
+    .victory-sparkle { position: absolute; z-index: 1; color: #ffb703; font-size: 18px; animation: sparkle 1.6s ease-in-out infinite; }
+    .victory-card h2 { margin: 8px 0 4px; color: #a45b00; font-size: 28px; font-weight: 800; }
+    .victory-card p { margin: 0 0 16px; color: #65738c; font-size: 14px; line-height: 1.5; }
+    .victory-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; padding: 12px 6px; border-radius: 18px; background: #f2f5fb; box-shadow: inset 0 1px 3px #1b263b14; }
+    .victory-summary div { display: grid; gap: 4px; }
+    .victory-summary span { color: #65738c; font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .04em; }
+    .victory-summary strong { color: #1b263b; font-size: 20px; font-variant-numeric: tabular-nums; }
+    .victory-card .modal-actions { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .victory-card .action-button { min-height: 48px; border-radius: 999px; font-weight: 750; }
+    .victory-card .action-button.primary { grid-column: auto; order: 2; border: 0; color: #fff; background: linear-gradient(135deg, #4dabff, #1766e0); box-shadow: 0 8px 18px #1766e059; }
+    #victory-restart { order: 1; border: 1px solid #cfd8e6; background: #fff; color: #1766e0; box-shadow: 0 3px 8px #1b263b14; }
+    .confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    .confetti i { position: absolute; top: -12px; width: 8px; height: 14px; border-radius: 2px; opacity: .9; animation: confetti-fall 3.2s linear infinite; }
+    @keyframes confetti-fall { to { transform: translateY(420px) rotate(540deg); } }
+    @keyframes trophy-bounce { 50% { transform: translateY(-6px) scale(1.06); } }
+    @keyframes sparkle { 50% { opacity: .2; transform: scale(.6) rotate(30deg); } }
+    @media (prefers-reduced-motion: reduce) { .confetti i, .victory-trophy, .victory-sparkle { animation: none; } }
     @keyframes victory-pop {
       from { opacity: 0; transform: translateY(12px) scale(.9); }
       to { opacity: 1; transform: translateY(0) scale(1); }
@@ -851,8 +869,17 @@
 
   <div class="modal victory-modal" id="victory-modal" role="dialog" aria-modal="true" aria-labelledby="victory-title" aria-describedby="victory-message">
     <div class="modal-card victory-card">
-      <h2 id="victory-title">🎉 Chiến thắng! 🎉</h2>
+      <div class="confetti" aria-hidden="true"><i style="left:5%;background:#ff595e;animation-delay:-0.00s;animation-duration:2.6s"></i><i style="left:42%;background:#ffca3a;animation-delay:-0.27s;animation-duration:3.0s"></i><i style="left:79%;background:#8ac926;animation-delay:-0.54s;animation-duration:3.4000000000000004s"></i><i style="left:20%;background:#1982c4;animation-delay:-0.81s;animation-duration:3.8000000000000003s"></i><i style="left:57%;background:#6a4c93;animation-delay:-1.08s;animation-duration:2.6s"></i><i style="left:94%;background:#ff595e;animation-delay:-1.35s;animation-duration:3.0s"></i><i style="left:35%;background:#ffca3a;animation-delay:-1.62s;animation-duration:3.4000000000000004s"></i><i style="left:72%;background:#8ac926;animation-delay:-1.89s;animation-duration:3.8000000000000003s"></i><i style="left:13%;background:#1982c4;animation-delay:-2.16s;animation-duration:2.6s"></i><i style="left:50%;background:#6a4c93;animation-delay:-2.43s;animation-duration:3.0s"></i><i style="left:87%;background:#ff595e;animation-delay:-2.70s;animation-duration:3.4000000000000004s"></i><i style="left:28%;background:#ffca3a;animation-delay:-2.97s;animation-duration:3.8000000000000003s"></i><i style="left:65%;background:#8ac926;animation-delay:-3.24s;animation-duration:2.6s"></i><i style="left:6%;background:#1982c4;animation-delay:-3.51s;animation-duration:3.0s"></i><i style="left:43%;background:#6a4c93;animation-delay:-3.78s;animation-duration:3.4000000000000004s"></i><i style="left:80%;background:#ff595e;animation-delay:-4.05s;animation-duration:3.8000000000000003s"></i><i style="left:21%;background:#ffca3a;animation-delay:-4.32s;animation-duration:2.6s"></i><i style="left:58%;background:#8ac926;animation-delay:-4.59s;animation-duration:3.0s"></i><i style="left:95%;background:#1982c4;animation-delay:-4.86s;animation-duration:3.4000000000000004s"></i><i style="left:36%;background:#6a4c93;animation-delay:-5.13s;animation-duration:3.8000000000000003s"></i><i style="left:73%;background:#ff595e;animation-delay:-5.40s;animation-duration:2.6s"></i><i style="left:14%;background:#ffca3a;animation-delay:-5.67s;animation-duration:3.0s"></i></div>
+      <span class="victory-sparkle" style="top:18px;left:26px" aria-hidden="true">✦</span>
+      <span class="victory-sparkle" style="top:40px;right:30px;animation-delay:.6s" aria-hidden="true">✦</span>
+      <div class="victory-trophy" aria-hidden="true">🏆</div>
+      <h2 id="victory-title">Chiến thắng!</h2>
       <p id="victory-message">Tuyệt vời! Bạn đã hoàn thành Sudoku.</p>
+      <div class="victory-summary">
+        <div><span>Thời gian</span><strong id="victory-time">00:00</strong></div>
+        <div><span>Điểm số</span><strong id="victory-score">0</strong></div>
+        <div><span>Lỗi</span><strong id="victory-errors">0</strong></div>
+      </div>
       <div class="modal-actions">
         <button class="action-button primary" id="victory-new" type="button">✦ Chơi tiếp</button>
         <button class="action-button" id="victory-restart" type="button">↻ Chơi lại</button>
@@ -1371,6 +1398,9 @@
           recordGame("won");
           setMessage("Tuyệt vời! Bạn đã hoàn thành Sudoku.");
           updateStats();
+          document.getElementById("victory-time").textContent = `${document.getElementById("timer-minutes").textContent}:${document.getElementById("timer-seconds").textContent}`;
+          document.getElementById("victory-score").textContent = String(score);
+          document.getElementById("victory-errors").textContent = errorsElement.textContent;
           victoryModal.classList.add("show");
           document.getElementById("victory-new").focus();
         }
