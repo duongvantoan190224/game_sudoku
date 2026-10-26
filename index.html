@@ -739,24 +739,24 @@
         <section class="settings-group" aria-label="Tài khoản và nâng cấp">
           <h3 class="settings-group-title">Tài khoản &amp; nâng cấp</h3>
           <div class="settings-list">
-            <button class="settings-row" type="button"><span class="settings-icon premium" aria-hidden="true">♛</span><span class="settings-label">Nâng cấp trò chơi</span><span class="settings-chevron" aria-hidden="true">›</span></button>
-            <button class="settings-row" type="button"><span class="settings-icon history" aria-hidden="true">◷</span><span class="settings-label">Lịch sử mua</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon premium" aria-hidden="true">👑</span><span class="settings-label">Nâng cấp trò chơi</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon history" aria-hidden="true">🕘</span><span class="settings-label">Lịch sử mua</span><span class="settings-chevron" aria-hidden="true">›</span></button>
           </div>
         </section>
         <section class="settings-group" aria-label="Thống kê và hướng dẫn">
           <h3 class="settings-group-title">Thống kê &amp; hướng dẫn</h3>
           <div class="settings-list">
-            <button class="settings-row" type="button"><span class="settings-icon stats" aria-hidden="true">▥</span><span class="settings-label">Thống kê</span><span class="settings-chevron" aria-hidden="true">›</span></button>
-            <button class="settings-row" type="button"><span class="settings-icon guide" aria-hidden="true">▤</span><span class="settings-label">Hướng dẫn trò chơi / Kỹ thuật Sudoku</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon stats" aria-hidden="true">📊</span><span class="settings-label">Thống kê</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon guide" aria-hidden="true">📖</span><span class="settings-label">Hướng dẫn trò chơi / Kỹ thuật Sudoku</span><span class="settings-chevron" aria-hidden="true">›</span></button>
           </div>
         </section>
         <section class="settings-group" aria-label="Tùy chỉnh hệ thống và trải nghiệm">
           <h3 class="settings-group-title">Tùy chỉnh &amp; trải nghiệm</h3>
           <div class="settings-list">
-            <button class="settings-row" type="button"><span class="settings-icon language" aria-hidden="true">◎</span><span class="settings-label">Ngôn ngữ</span><span class="settings-value">Tự động</span><span class="settings-chevron" aria-hidden="true">›</span></button>
-            <button class="settings-row" type="button"><span class="settings-icon display" aria-hidden="true">☼</span><span class="settings-label">Chế độ màn hình</span><span class="settings-value">Sáng</span><span class="settings-chevron" aria-hidden="true">›</span></button>
-            <div class="settings-row"><span class="settings-icon sound" aria-hidden="true">◖))</span><span class="settings-label">Hiệu ứng âm thanh</span><button class="settings-toggle" type="button" aria-label="Hiệu ứng âm thanh" aria-pressed="true"></button></div>
-            <div class="settings-row"><span class="settings-icon notifications" aria-hidden="true">♧</span><span class="settings-label">Thông báo</span><button class="settings-toggle" type="button" aria-label="Thông báo" aria-pressed="true"></button></div>
+            <button class="settings-row" type="button"><span class="settings-icon language" aria-hidden="true">🌐</span><span class="settings-label">Ngôn ngữ</span><span class="settings-value">Tự động</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon display" aria-hidden="true">☀</span><span class="settings-label">Chế độ màn hình</span><span class="settings-value">Sáng</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <div class="settings-row"><span class="settings-icon sound" aria-hidden="true">🔊</span><span class="settings-label">Hiệu ứng âm thanh</span><button class="settings-toggle" type="button" aria-label="Hiệu ứng âm thanh" aria-pressed="true"></button></div>
+            <div class="settings-row"><span class="settings-icon notifications" aria-hidden="true">🔔</span><span class="settings-label">Thông báo</span><button class="settings-toggle" type="button" aria-label="Thông báo" aria-pressed="true"></button></div>
           </div>
         </section>
         <section class="settings-group" aria-label="Hỗ trợ và cộng đồng">
@@ -766,7 +766,7 @@
             <button class="settings-row" type="button"><span class="settings-icon about" aria-hidden="true">ⓘ</span><span class="settings-label">Giới thiệu về game</span><span class="settings-chevron" aria-hidden="true">›</span></button>
             <button class="settings-row" type="button"><span class="settings-icon share" aria-hidden="true">↗</span><span class="settings-label">Chia sẻ</span><span class="settings-chevron" aria-hidden="true">›</span></button>
             <button class="settings-row" type="button"><span class="settings-icon facebook" aria-hidden="true">f</span><span class="settings-label">Theo dõi trang Facebook</span><span class="settings-chevron" aria-hidden="true">›</span></button>
-            <button class="settings-row" type="button"><span class="settings-icon community" aria-hidden="true">♧</span><span class="settings-label">Tham gia nhóm Facebook</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon community" aria-hidden="true">👥</span><span class="settings-label">Tham gia nhóm Facebook</span><span class="settings-chevron" aria-hidden="true">›</span></button>
           </div>
         </section>
         <details class="settings-extra">
@@ -1659,6 +1659,11 @@
       document.getElementById("settings").addEventListener("click", openSettings);
       document.getElementById("close-settings").addEventListener("click", closeSettings);
       settingsModal.addEventListener("click", (event) => { if (event.target === settingsModal) closeSettings(); });
+      settingsModal.querySelectorAll(".settings-toggle").forEach((toggle) => {
+        toggle.addEventListener("click", () => {
+          toggle.setAttribute("aria-pressed", String(toggle.getAttribute("aria-pressed") !== "true"));
+        });
+      });
       document.getElementById("show-game-history").addEventListener("click", () => {
         closeSettings();
         renderGameHistory();
