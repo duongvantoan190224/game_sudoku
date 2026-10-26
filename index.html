@@ -506,6 +506,17 @@
     .action-button:hover { background: #f6f8fc; }
     .action-button.primary { grid-column: 1 / -1; border-color: var(--blue); color: #fff; background: var(--blue); }
     .modal-card > p { margin: 0 0 16px; color: #65738c; font-size: 13px; line-height: 1.5; }
+    #change-game-modal { background: #1b263b73; animation: changeGameFade .2s ease-out; }
+    .change-game-card { text-align: center; padding: 24px 20px 14px; animation: changeGamePop .22s ease-out; }
+    .change-game-card h2 { margin: 0 0 10px; font-size: 19px; font-weight: 800; text-align: center; }
+    .change-game-card > p { margin: 0 0 20px; color: #4a5670; font-size: 14px; text-align: center; }
+    .change-game-card .modal-actions { grid-template-columns: 1fr; gap: 4px; }
+    .change-game-card .action-button { min-height: 46px; border: 0; border-radius: 999px; background: transparent; color: var(--blue); font-size: 16px; }
+    .change-game-card .action-button:hover { background: #f1f5fc; }
+    .change-game-card .action-button.primary { grid-column: auto; color: #fff; background: var(--blue); box-shadow: 0 6px 14px #1b6cff40; }
+    .change-game-card .action-button.primary:hover { background: var(--blue); filter: brightness(.95); }
+    @keyframes changeGameFade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes changeGamePop { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
     .pause-card h2 { text-align: center; }
     .pause-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 18px; text-align: center; }
     .pause-summary div { display: grid; gap: 4px; color: #65738c; font-size: 13px; }
@@ -797,12 +808,12 @@
   </div>
 
   <div class="modal" id="change-game-modal" role="dialog" aria-modal="true" aria-labelledby="change-game-title" aria-describedby="change-game-message">
-    <div class="modal-card">
+    <div class="modal-card change-game-card">
       <h2 id="change-game-title">Đổi Bài</h2>
-      <p id="change-game-message">Bạn có muốn đổi sang một bàn Sudoku mới không?</p>
+      <p id="change-game-message">Một màn chơi mới sẽ được bắt đầu. Bạn có muốn tiếp tục?</p>
       <div class="modal-actions">
-        <button class="action-button" id="cancel-change-game" type="button">Hủy</button>
         <button class="action-button primary" id="confirm-change-game" type="button">OK</button>
+        <button class="action-button" id="cancel-change-game" type="button">Hủy</button>
       </div>
     </div>
   </div>
