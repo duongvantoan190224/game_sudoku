@@ -121,7 +121,7 @@
       container-type: inline-size;
       touch-action: manipulation;
     }
-    .board.hidden { visibility: hidden; }
+    .board.hidden { filter: blur(8px); pointer-events: none; user-select: none; }
     .cell {
       display: grid;
       position: relative;
@@ -196,7 +196,7 @@
       justify-content: center;
       gap: 12px;
       border-radius: 9px;
-      color: #3455ce;
+      background: rgba(255, 255, 255, 0.35);
       background: #fff;
       border: 2px solid #65738c;
       font-weight: 800;
