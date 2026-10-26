@@ -331,6 +331,7 @@
       transform: translateX(-50%);
       animation: score-float-up 1.35s cubic-bezier(.22, .61, .36, 1) forwards;
     }
+    .score-float.negative { color: #dc3545; }
     #score-effects { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
     @keyframes score-float-up {
       from { opacity: 0; transform: translate(-50%, 4px) scale(.88); }
@@ -1146,21 +1147,21 @@
         if (history.length > 200) history.shift();
       }
 
-      function showScoreEffect(index, points) {
+      function showScoreEffect(index, points, isPenalty = false) {
         const cell = boardElement.querySelector(`[data-index="${index}"]`);
         if (!cell) return;
         const cellRect = cell.getBoundingClientRect();
         const effectsRect = scoreEffectsElement.getBoundingClientRect();
         const effect = document.createElement("span");
-        effect.className = "score-float";
-        effect.textContent = `+${points}`;
+        effect.className = isPenalty ? "score-float negative" : "score-float";
+        effect.textContent = `${isPenalty ? "−" : "+"}${points}`;
         effect.style.left = `${cellRect.left - effectsRect.left + cellRect.width / 2}px`;
         effect.style.top = `${cellRect.top - effectsRect.top + cellRect.height / 2}px`;
         effect.addEventListener("animationend", () => effect.remove(), { once: true });
         scoreEffectsElement.appendChild(effect);
       }
 
-      function updateCorrectEntryScore(index, value, previousValue) {
+      function updateCorrectEntryScore(index, value, previousValue, showPenaltyEffect = true) {
         const expectedValue = solution[Math.floor(index / 9)][index % 9];
         const wasCorrect = previousValue === expectedValue;
         const isCorrect = value === expectedValue;
@@ -1170,7 +1171,11 @@
             score += points;
             showScoreEffect(index, points);
           } else {
+            const previousScore = score;
             score = Math.max(0, score - points);
+            if (showPenaltyEffect && previousScore > score) {
+              showScoreEffect(index, previousScore - score, true);
+            }
           }
         }
         scoreElement.textContent = String(score);
@@ -1240,8 +1245,12 @@
           notes[selectedCell].clear();
           invalidCells.add(selectedCell);
           errors += 1;
+          const previousScore = score;
           score = Math.max(0, score - 50);
-          updateCorrectEntryScore(selectedCell, value, previousValue);
+          updateCorrectEntryScore(selectedCell, value, previousValue, false);
+          if (previousScore > score) {
+            showScoreEffect(selectedCell, previousScore - score, true);
+          }
           if (errors >= MAX_ERRORS) {
             elapsedMs = currentElapsed();
             finished = true;
@@ -1326,7 +1335,11 @@
         removePeerNotes(target, values[target]);
         selectedCell = target;
         hintsLeft -= 1;
+        const previousScore = score;
         score = Math.max(0, score - 20);
+        if (previousScore > score) {
+          showScoreEffect(target, previousScore - score, true);
+        }
         setMessage("Đã điền một ô gợi ý cho bạn.", "hint");
         updateStats();
         renderBoard();
