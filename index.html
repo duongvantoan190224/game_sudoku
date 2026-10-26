@@ -379,6 +379,126 @@
     .modal.show { display: flex; }
     .modal-card { width: min(100%, 360px); padding: 20px; border-radius: 18px; background: #fff; box-shadow: 0 24px 60px #1b263b40; }
     .modal-card h2 { margin: 0 0 14px; font-size: 18px; }
+    .settings-modal { padding: 12px; background: #1b263b66; }
+    .settings-card {
+      display: flex;
+      width: min(100%, 460px);
+      max-height: min(92vh, 860px);
+      max-height: min(92dvh, 860px);
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0;
+      border-radius: 26px;
+      background: #f2f3f7;
+    }
+    .settings-header {
+      display: grid;
+      min-height: 64px;
+      grid-template-columns: 44px 1fr 44px;
+      align-items: center;
+      padding: 8px 14px;
+      border-bottom: 1px solid #e6e7eb;
+      background: #fff;
+    }
+    .settings-header h2 { margin: 0; color: #202b40; font-size: 18px; font-weight: 750; text-align: center; }
+    .settings-back {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 14px;
+      color: #4569e8;
+      background: #f2f5ff;
+      font-size: 26px;
+      line-height: 1;
+    }
+    .settings-back:focus-visible, .settings-row:focus-visible, .settings-toggle:focus-visible, .settings-extra summary:focus-visible, .settings-extra .action-button:focus-visible { outline: 2px solid #8da3ff; outline-offset: 2px; }
+    .settings-content { overflow: auto; padding: 16px 18px 20px; overscroll-behavior: contain; }
+    .settings-group { margin: 0 0 16px; }
+    .settings-group:last-of-type { margin-bottom: 14px; }
+    .settings-group-title { margin: 0 0 7px 4px; color: #778197; font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .settings-list { overflow: hidden; border-radius: 17px; background: #fff; box-shadow: 0 2px 8px #24324a0a; }
+    .settings-row {
+      display: flex;
+      width: 100%;
+      min-height: 58px;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 14px;
+      border: 0;
+      color: #253149;
+      background: #fff;
+      text-align: left;
+    }
+    .settings-row + .settings-row { position: relative; }
+    .settings-row + .settings-row::before { position: absolute; top: 0; right: 0; left: 58px; height: 1px; background: #edf0f4; content: ""; }
+    .settings-row:active { background: #f8f9fb; }
+    .settings-icon {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      place-items: center;
+      border-radius: 11px;
+      color: #4569e8;
+      background: #eef2ff;
+      font-size: 19px;
+      font-weight: 750;
+      line-height: 1;
+    }
+    .settings-icon.premium { color: #a87511; background: #fff4d9; }
+    .settings-icon.history { color: #6374c7; background: #eef0ff; }
+    .settings-icon.stats { color: #238867; background: #e6f7ef; }
+    .settings-icon.guide { color: #995ec0; background: #f5ebfb; }
+    .settings-icon.language { color: #347fc0; background: #e8f4ff; }
+    .settings-icon.display { color: #c2821b; background: #fff3dc; }
+    .settings-icon.sound { color: #4988cc; background: #e9f4ff; }
+    .settings-icon.notifications { color: #c16f35; background: #fff0e5; }
+    .settings-icon.help { color: #348b77; background: #e7f6f1; }
+    .settings-icon.about { color: #62728b; background: #edf1f6; }
+    .settings-icon.share { color: #4585bb; background: #eaf4fb; }
+    .settings-icon.facebook { color: #fff; background: #3975d5; }
+    .settings-icon.community { color: #755bb4; background: #f0ebfb; }
+    .settings-label { min-width: 0; flex: 1; font-size: 14px; font-weight: 650; }
+    .settings-value { color: #8a93a4; font-size: 13px; font-weight: 500; }
+    .settings-chevron { margin-left: 2px; color: #aab1bd; font-size: 25px; font-weight: 400; line-height: 1; }
+    .settings-toggle {
+      position: relative;
+      width: 48px;
+      height: 29px;
+      flex: 0 0 48px;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      background: #d5d9e0;
+      transition: background-color .18s ease;
+    }
+    .settings-toggle::after {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 23px;
+      height: 23px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px #1b263b40;
+      content: "";
+      transition: transform .18s ease;
+    }
+    .settings-toggle[aria-pressed="true"] { background: #34c759; }
+    .settings-toggle[aria-pressed="true"]::after { transform: translateX(19px); }
+    .settings-extra { margin-top: 2px; border-radius: 14px; background: #fff; }
+    .settings-extra summary { padding: 13px 14px; color: #68758b; font-size: 13px; font-weight: 650; cursor: pointer; }
+    .settings-extra .modal-actions { padding: 0 12px 12px; }
+    .settings-extra .action-button { min-height: 38px; font-size: 12px; }
+    @media (max-width: 380px) {
+      .settings-modal { padding: 8px; }
+      .settings-content { padding: 14px 12px 16px; }
+      .settings-row { gap: 9px; padding-right: 11px; padding-left: 11px; }
+      .settings-label { font-size: 13px; }
+    }
     .field { display: grid; gap: 6px; margin-bottom: 12px; color: #707c91; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
     .field select { padding: 10px 12px; border: 1px solid #e1e6ef; border-radius: 10px; color: #2d3950; background: #fbfcfe; font-size: 14px; font-weight: 650; }
     .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -608,15 +728,56 @@
     <span class="toast-content"><strong class="toast-title" id="toast-title">Thông báo</strong><span class="toast-message" id="toast-message"></span></span>
   </div>
 
-  <div class="modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-    <div class="modal-card">
-      <h2 id="settings-title">Cài đặt</h2>
-      <div class="modal-actions">
-        <button class="action-button" id="restart" type="button">↺ Chơi lại</button>
-        <button class="action-button" id="new-game" type="button">✦ Bàn mới</button>
-        <button class="action-button" id="show-game-history" type="button">Lịch sử ván chơi</button>
-        <button class="action-button" id="check-board" type="button">Kiểm tra kết quả</button>
-        <button class="action-button primary" id="close-settings" type="button">Đóng</button>
+  <div class="modal settings-modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="modal-card settings-card">
+      <header class="settings-header">
+        <button class="settings-back" id="close-settings" type="button" aria-label="Quay lại">←</button>
+        <h2 id="settings-title">Cài đặt</h2>
+        <span aria-hidden="true"></span>
+      </header>
+      <div class="settings-content">
+        <section class="settings-group" aria-label="Tài khoản và nâng cấp">
+          <h3 class="settings-group-title">Tài khoản &amp; nâng cấp</h3>
+          <div class="settings-list">
+            <button class="settings-row" type="button"><span class="settings-icon premium" aria-hidden="true">👑</span><span class="settings-label">Nâng cấp trò chơi</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon history" aria-hidden="true">🕘</span><span class="settings-label">Lịch sử mua</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+          </div>
+        </section>
+        <section class="settings-group" aria-label="Thống kê và hướng dẫn">
+          <h3 class="settings-group-title">Thống kê &amp; hướng dẫn</h3>
+          <div class="settings-list">
+            <button class="settings-row" type="button"><span class="settings-icon stats" aria-hidden="true">📊</span><span class="settings-label">Thống kê</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon guide" aria-hidden="true">📖</span><span class="settings-label">Hướng dẫn trò chơi / Kỹ thuật Sudoku</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+          </div>
+        </section>
+        <section class="settings-group" aria-label="Tùy chỉnh hệ thống và trải nghiệm">
+          <h3 class="settings-group-title">Tùy chỉnh &amp; trải nghiệm</h3>
+          <div class="settings-list">
+            <button class="settings-row" type="button"><span class="settings-icon language" aria-hidden="true">🌐</span><span class="settings-label">Ngôn ngữ</span><span class="settings-value">Tự động</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon display" aria-hidden="true">☀</span><span class="settings-label">Chế độ màn hình</span><span class="settings-value">Sáng</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <div class="settings-row"><span class="settings-icon sound" aria-hidden="true">🔊</span><span class="settings-label">Hiệu ứng âm thanh</span><button class="settings-toggle" type="button" aria-label="Hiệu ứng âm thanh" aria-pressed="true"></button></div>
+            <div class="settings-row"><span class="settings-icon notifications" aria-hidden="true">🔔</span><span class="settings-label">Thông báo</span><button class="settings-toggle" type="button" aria-label="Thông báo" aria-pressed="true"></button></div>
+          </div>
+        </section>
+        <section class="settings-group" aria-label="Hỗ trợ và cộng đồng">
+          <h3 class="settings-group-title">Hỗ trợ &amp; cộng đồng</h3>
+          <div class="settings-list">
+            <button class="settings-row" type="button"><span class="settings-icon help" aria-hidden="true">?</span><span class="settings-label">Trung tâm trợ giúp</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon about" aria-hidden="true">ⓘ</span><span class="settings-label">Giới thiệu về game</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon share" aria-hidden="true">↗</span><span class="settings-label">Chia sẻ</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon facebook" aria-hidden="true">f</span><span class="settings-label">Theo dõi trang Facebook</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" type="button"><span class="settings-icon community" aria-hidden="true">👥</span><span class="settings-label">Tham gia nhóm Facebook</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+          </div>
+        </section>
+        <details class="settings-extra">
+          <summary>Tùy chọn ván chơi</summary>
+          <div class="modal-actions">
+            <button class="action-button" id="restart" type="button">↺ Chơi lại</button>
+            <button class="action-button" id="new-game" type="button">✦ Bàn mới</button>
+            <button class="action-button" id="show-game-history" type="button">Lịch sử ván chơi</button>
+            <button class="action-button" id="check-board" type="button">Kiểm tra kết quả</button>
+          </div>
+        </details>
       </div>
     </div>
   </div>
@@ -1498,6 +1659,11 @@
       document.getElementById("settings").addEventListener("click", openSettings);
       document.getElementById("close-settings").addEventListener("click", closeSettings);
       settingsModal.addEventListener("click", (event) => { if (event.target === settingsModal) closeSettings(); });
+      settingsModal.querySelectorAll(".settings-toggle").forEach((toggle) => {
+        toggle.addEventListener("click", () => {
+          toggle.setAttribute("aria-pressed", String(toggle.getAttribute("aria-pressed") !== "true"));
+        });
+      });
       document.getElementById("show-game-history").addEventListener("click", () => {
         closeSettings();
         renderGameHistory();
