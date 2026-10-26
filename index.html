@@ -1103,6 +1103,12 @@
         return "khối 3x3";
       }
 
+      function wrongEntryMessage(index, value) {
+        return violatesRules(index, value)
+          ? `Trùng ở ${conflictLocation(index, value)}!`
+          : "Số này không đúng với đáp án!";
+      }
+
       function flashConflictingCells(index, value) {
         const row = Math.floor(index / 9);
         const column = index % 9;
@@ -1228,7 +1234,7 @@
           return;
         }
 
-        if (value && value !== solution[row][column] && violatesRules(selectedCell, value)) {
+        if (value && value !== solution[row][column]) {
           pushHistory();
           values[selectedCell] = value;
           notes[selectedCell].clear();
@@ -1244,11 +1250,11 @@
             document.getElementById("game-over-restart").focus();
             setMessage("Bạn đã thua trò chơi vì bạn mắc 3 lỗi.", "error");
           } else if (errors === 1) {
-            setMessage(`Trùng ở ${conflictLocation(selectedCell, value)}!`, "error");
+            setMessage(wrongEntryMessage(selectedCell, value), "error");
           } else if (errors === 2) {
             setMessage("Bạn đã mắc lỗi lần thứ hai. Hãy thử dùng Gợi ý để được trợ giúp nhé!", "error");
           } else {
-            setMessage(`Trùng ở ${conflictLocation(selectedCell, value)}!`, "error");
+            setMessage(wrongEntryMessage(selectedCell, value), "error");
           }
           updateStats();
           activePadDigit = 0;
