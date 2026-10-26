@@ -601,6 +601,9 @@
     #lobby [data-ad],
     #lobby [data-ad-slot],
     #lobby ins.adsbygoogle { display: none !important; }
+    .ad-banner { display: flex; flex: none; min-height: 44px; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 12px; border-radius: 12px; color: #536078; background: #fff; box-shadow: 0 1px 3px rgba(31, 35, 40, .1); font-size: 12px; text-decoration: none; }
+    .ad-banner strong { color: #2b3a67; font-size: 13px; }
+    @media (max-height: 620px) { .ad-banner { min-height: 36px; padding: 3px 10px; } }
     .lobby-header { display: flex; min-height: 52px; align-items: center; justify-content: flex-end; }
     .lobby-wallet { display: flex; align-items: center; gap: 8px; }
     .wallet-pill { display: inline-flex; min-height: 34px; align-items: center; gap: 5px; padding: 4px 10px; border: 1px solid #e7e9f0; border-radius: 999px; color: #34405b; background: #fff; box-shadow: 0 3px 10px #25324b0c; font-size: 13px; font-weight: 800; }
@@ -853,6 +856,8 @@
       <button class="number-button" type="button" data-value="8" aria-label="Điền số 8"><span>8</span><span class="remaining-count">9</span></button>
       <button class="number-button" type="button" data-value="9" aria-label="Điền số 9"><span>9</span><span class="remaining-count">9</span></button>
     </div>
+
+    <aside class="ad-banner" aria-label="Quảng cáo"><strong>Đồ chơi trí tuệ</strong><span>Sách Sudoku giảm giá</span></aside>
   </main>
 
   <div class="toast" id="toast" role="alert" aria-live="assertive">
