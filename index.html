@@ -104,7 +104,7 @@
       box-shadow: 0 1px 2px rgba(31, 35, 40, .08);
       transition: color .16s ease, background-color .16s ease, border-color .16s ease, box-shadow .16s ease, transform .16s ease;
     }
-    .board-wrap { position: relative; flex: 1; min-height: 0; display: flex; align-items: flex-start; justify-content: center; width: 100%; container-type: size; }
+    .board-wrap { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; width: 100%; container-type: size; }
     .board {
       display: grid;
       grid-template-columns: repeat(9, minmax(0, 1fr));
@@ -602,6 +602,8 @@
     #lobby [data-ad-slot],
     #lobby ins.adsbygoogle { display: none !important; }
     .ad-banner { display: flex; flex: none; min-height: 62px; align-items: center; gap: 12px; padding: 8px 14px; border: 1px solid #f0dfe1; border-radius: 14px; color: #536078; background: linear-gradient(110deg, #fff 0%, #fff8f8 100%); box-shadow: 0 2px 6px rgba(31, 35, 40, .08); text-decoration: none; }
+    .ad-banner:hover { border-color: #e7c8cc; box-shadow: 0 3px 9px rgba(31, 35, 40, .12); }
+    .ad-banner:focus-visible { outline: 2px solid #9aafff; outline-offset: 2px; }
     .ad-banner-icon { display: grid; width: 44px; height: 44px; flex: 0 0 auto; place-items: center; border-radius: 12px; background: linear-gradient(145deg, #f26c72, #d94350); box-shadow: inset 0 1px 0 #ffffff55, 0 2px 4px #c8323a30; }
     .ad-banner-icon svg { width: 29px; height: 29px; fill: none; stroke: #fff; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
     .ad-banner-copy { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
@@ -861,12 +863,12 @@
       <button class="number-button" type="button" data-value="9" aria-label="Điền số 9"><span>9</span><span class="remaining-count">9</span></button>
     </div>
 
-    <aside class="ad-banner" aria-label="Quảng cáo">
+    <a class="ad-banner" href="https://tiki.vn/search?q=s%C3%A1ch+sudoku" target="_blank" rel="noopener noreferrer" aria-label="Xem sách Sudoku trên Tiki">
       <span class="ad-banner-icon" aria-hidden="true">
         <svg viewBox="0 0 32 32"><path d="M16 8.5c-2.8-2-6.1-2.4-10-1.2v16c3.9-1.2 7.2-.8 10 1.2 2.8-2 6.1-2.4 10-1.2v-16c-3.9-1.2-7.2-.8-10 1.2Z"/><path d="M16 8.5v16"/><path d="M8.5 12h3m-3 4h3m9-4h3m-3 4h3"/></svg>
       </span>
       <span class="ad-banner-copy"><strong>Đồ chơi trí tuệ</strong><span>Sách Sudoku giảm giá</span></span>
-    </aside>
+    </a>
   </main>
 
   <div class="toast" id="toast" role="alert" aria-live="assertive">
