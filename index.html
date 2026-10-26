@@ -653,8 +653,9 @@
     .daily-cta { position: relative; z-index: 1; padding: 8px 11px; border: 0; border-radius: 999px; color: #fff; background: linear-gradient(135deg, #e6a92b, #c78312); box-shadow: 0 4px 10px #bd811b45; font-size: 11px; font-weight: 800; }
     .classic-section { display: flex; flex: 1; flex-direction: column; justify-content: center; min-height: 190px; padding: 4px 3px 10px; }
     .classic-heading { display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-    .classic-heading h2 { margin: 0; color: #28344d; font-size: 18px; font-weight: 850; }
+    .classic-heading h2 { margin: 0; color: #28344d; font-size: 24px; font-weight: 850; }
     .continue-game { display: flex; width: 100%; min-height: 62px; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border: 0; border-radius: 17px; color: #fff; background: linear-gradient(110deg, #4c70e9, #3658d3); box-shadow: 0 7px 16px #4569e83d; text-align: left; }
+    .continue-game, .new-game-button { position: relative; top: 8px; }
     .continue-game:hover { filter: brightness(1.04); }
     .continue-copy { display: flex; flex-direction: column; gap: 5px; }
     .continue-title { font-size: 16px; font-weight: 850; }
@@ -739,7 +740,7 @@
   </style>
 </head>
 <body>
-  <section class="lobby" id="lobby" aria-label="Sảnh chính">
+  <section class="lobby show" id="lobby" aria-label="Sảnh chính">
     <header class="lobby-header">
       <div class="lobby-wallet" aria-label="Tài nguyên">
         <span class="wallet-pill"><span class="wallet-icon" aria-hidden="true">🪙</span><span>2.450</span></span>
@@ -787,7 +788,7 @@
       <button class="lobby-tab" type="button"><span class="lobby-tab-icon" aria-hidden="true">●</span><span>Cá nhân</span></button>
     </nav>
   </section>
-  <main class="app">
+  <main class="app hidden">
     <header class="topbar">
       <div class="topbar-leading">
         <button class="topbar-button" id="go-back" type="button" aria-label="Quay lại">
@@ -1955,6 +1956,7 @@
         if (event.persisted && !finished) gameRecorded = false;
       });
       startNewGame();
+      setPaused(true);
     })();
   </script>
 </body>
