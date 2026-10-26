@@ -607,6 +607,65 @@
     .ad-banner-text small { display: block; color: #ee4d2d; font-weight: 600; }
     .ad-banner-cta { padding: 6px 12px; border-radius: 6px; background: #ee4d2d; color: #fff; font-size: 12px; font-weight: 700; }
 
+    .app.hidden { display: none; }
+    .lobby {
+      position: fixed;
+      z-index: 5;
+      inset: 0 0 calc(50px + env(safe-area-inset-bottom));
+      display: none;
+      flex-direction: column;
+      width: min(100%, 720px);
+      margin: 0 auto;
+      padding: max(14px, env(safe-area-inset-top)) 16px 0;
+      overflow: hidden;
+      background: linear-gradient(180deg, #f7f8ff 0%, #f4f7fb 100%);
+    }
+    .lobby.show { display: flex; }
+    .lobby-header { display: flex; min-height: 52px; align-items: center; justify-content: space-between; }
+    .lobby-brand { display: flex; align-items: center; gap: 9px; color: #27334c; font-size: 19px; font-weight: 850; }
+    .lobby-brand-icon { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 12px; color: #fff; background: linear-gradient(145deg, #5979f2, #3856cf); box-shadow: 0 5px 12px #4569e84a; }
+    .lobby-brand-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
+    .lobby-wallet { display: flex; align-items: center; gap: 8px; }
+    .wallet-pill { display: inline-flex; min-height: 34px; align-items: center; gap: 5px; padding: 4px 10px; border: 1px solid #e7e9f0; border-radius: 999px; color: #34405b; background: #fff; box-shadow: 0 3px 10px #25324b0c; font-size: 13px; font-weight: 800; }
+    .wallet-pill .wallet-icon { font-size: 16px; }
+    .lobby-content { display: flex; min-height: 0; flex: 1; flex-direction: column; gap: 17px; padding: 12px 0 16px; overflow-y: auto; scrollbar-width: none; }
+    .lobby-content::-webkit-scrollbar { display: none; }
+    .event-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .event-card { position: relative; display: flex; min-height: 120px; flex-direction: column; justify-content: space-between; padding: 12px; overflow: hidden; border: 1px solid #ffffff80; border-radius: 20px; box-shadow: 0 8px 20px #30446614; }
+    .event-card::after { position: absolute; right: -14px; bottom: -20px; width: 86px; height: 86px; border: 12px solid #ffffff2b; border-radius: 50%; content: ""; }
+    .event-card.tournament { color: #fff; background: linear-gradient(135deg, #526fe7, #344fc4); }
+    .event-card.event { color: #573e2c; background: linear-gradient(135deg, #ffe6b5, #ffc87b); }
+    .event-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; }
+    .event-icon { font-size: 27px; line-height: 1; filter: drop-shadow(0 2px 2px #182a4033); }
+    .event-tag { padding: 4px 7px; border-radius: 999px; color: #fff; background: #ffffff35; font-size: 9px; font-weight: 850; letter-spacing: .04em; text-transform: uppercase; }
+    .event-card.event .event-tag { color: #694115; background: #fff8e7a8; }
+    .event-card h2 { position: relative; z-index: 1; margin: 6px 0 2px; font-size: 15px; font-weight: 850; }
+    .event-card p { position: relative; z-index: 1; margin: 0; opacity: .84; font-size: 11px; font-weight: 650; }
+    .daily-card { position: relative; display: flex; min-height: 112px; align-items: center; gap: 13px; padding: 15px; overflow: hidden; border: 1px solid #e9e4ff; border-radius: 22px; background: linear-gradient(115deg, #fff 4%, #f4f0ff 100%); box-shadow: 0 8px 20px #47358c12; }
+    .daily-card::after { position: absolute; top: -45px; right: -32px; width: 130px; height: 130px; border-radius: 50%; background: #8e72ed0d; content: ""; }
+    .daily-gift { display: grid; width: 54px; height: 54px; flex: 0 0 auto; place-items: center; border-radius: 18px; background: #eee8ff; font-size: 30px; }
+    .daily-copy { position: relative; z-index: 1; min-width: 0; flex: 1; }
+    .daily-copy h2 { margin: 0 0 4px; color: #322b51; font-size: 16px; font-weight: 850; }
+    .daily-copy p { margin: 0; color: #7b7592; font-size: 11px; font-weight: 600; }
+    .daily-timer { display: inline-flex; align-items: center; gap: 4px; margin-top: 9px; color: #7356ce; font-size: 12px; font-variant-numeric: tabular-nums; font-weight: 850; }
+    .daily-cta { position: relative; z-index: 1; padding: 8px 11px; border: 0; border-radius: 999px; color: #fff; background: #7656d8; font-size: 11px; font-weight: 800; }
+    .classic-section { display: flex; flex: 1; flex-direction: column; justify-content: center; min-height: 190px; padding: 4px 3px 10px; }
+    .classic-heading { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+    .classic-heading .mini-board { display: grid; width: 35px; height: 35px; place-items: center; border: 1px solid #dce4fa; border-radius: 11px; color: #4665df; background: #edf1ff; font-size: 19px; }
+    .classic-heading h2 { margin: 0; color: #28344d; font-size: 18px; font-weight: 850; }
+    .continue-game { display: flex; min-height: 82px; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border: 0; border-radius: 20px; color: #fff; background: linear-gradient(110deg, #4c70e9, #3658d3); box-shadow: 0 9px 20px #4569e84a; text-align: left; }
+    .continue-game:hover { filter: brightness(1.04); }
+    .continue-copy { display: flex; flex-direction: column; gap: 5px; }
+    .continue-title { font-size: 19px; font-weight: 850; }
+    .continue-meta { color: #e3e9ff; font-size: 12px; font-weight: 650; }
+    .continue-arrow { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%; color: #4163df; background: #fff; font-size: 23px; font-weight: 700; }
+    .new-game-button { min-height: 50px; margin-top: 10px; border: 1.5px solid #cbd5f3; border-radius: 17px; color: #4562ce; background: #ffffffb8; font-size: 15px; font-weight: 800; }
+    .new-game-button:hover { background: #fff; }
+    .lobby-bottom-bar { display: grid; min-height: 67px; grid-template-columns: repeat(4, 1fr); align-items: center; margin: 0 -16px; padding: 4px 8px 6px; border-top: 1px solid #e9edf5; background: #fff; }
+    .lobby-tab { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 3px; border: 0; color: #98a1b2; background: transparent; font-size: 10px; font-weight: 700; }
+    .lobby-tab-icon { font-size: 20px; line-height: 1; }
+    .lobby-tab.active { color: #4569e8; }
+
     @media (max-width: 380px) {
       .topbar { padding: 0 1px; }
       .topbar-button { width: 32px; height: 32px; }
@@ -620,6 +679,12 @@
       .tool .tool-icon { width: 18px; height: 18px; }
       .number-pad { gap: 3px; }
       .number-button { min-height: 56px; font-size: 27px; }
+      .lobby { padding-right: 12px; padding-left: 12px; }
+      .lobby-content { gap: 12px; }
+      .event-card { min-height: 108px; padding: 10px; }
+      .daily-card { gap: 9px; padding: 12px; }
+      .daily-gift { width: 46px; height: 46px; font-size: 26px; }
+      .daily-cta { padding: 7px 9px; }
     }
     @media (min-width: 600px) {
       .topbar { padding: 0 4px; }
@@ -670,6 +735,50 @@
   </style>
 </head>
 <body>
+  <section class="lobby" id="lobby" aria-label="Sảnh chính">
+    <header class="lobby-header">
+      <div class="lobby-brand"><span class="lobby-brand-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg></span><span>Sảnh chính</span></div>
+      <div class="lobby-wallet" aria-label="Tài nguyên">
+        <span class="wallet-pill"><span class="wallet-icon" aria-hidden="true">🪙</span><span>2.450</span></span>
+        <span class="wallet-pill"><span class="wallet-icon" aria-hidden="true">🔥</span><span>7</span></span>
+      </div>
+    </header>
+    <div class="lobby-content">
+      <div class="event-cards" aria-label="Sự kiện">
+        <article class="event-card tournament">
+          <div class="event-card-top"><span class="event-icon" aria-hidden="true">🏆</span><span class="event-tag">Đang mở</span></div>
+          <div><h2>Giải đấu</h2><p>So tài cùng người chơi</p></div>
+        </article>
+        <article class="event-card event">
+          <div class="event-card-top"><span class="event-icon" aria-hidden="true">⚡</span><span class="event-tag">Sự kiện</span></div>
+          <div><h2>Biến cố</h2><p>Thử thách giới hạn</p></div>
+        </article>
+      </div>
+      <article class="daily-card">
+        <div class="daily-gift" aria-hidden="true">🎁</div>
+        <div class="daily-copy">
+          <h2>Thử thách hàng ngày</h2>
+          <p>Hoàn thành để nhận phần thưởng</p>
+          <span class="daily-timer"><span aria-hidden="true">◷</span><span id="daily-countdown">08:42:16</span> còn lại</span>
+        </div>
+        <button class="daily-cta" type="button" aria-label="Xem thử thách hàng ngày">Chơi</button>
+      </article>
+      <section class="classic-section" aria-labelledby="classic-title">
+        <div class="classic-heading"><span class="mini-board" aria-hidden="true">▦</span><h2 id="classic-title">Sudoku cổ điển</h2></div>
+        <button class="continue-game" id="lobby-continue" type="button">
+          <span class="continue-copy"><span class="continue-title">Tiếp tục</span><span class="continue-meta"><span id="lobby-time">00:00</span> · <span id="lobby-difficulty">Vừa</span></span></span>
+          <span class="continue-arrow" aria-hidden="true">›</span>
+        </button>
+        <button class="new-game-button" id="lobby-new-game" type="button">Trò chơi mới</button>
+      </section>
+    </div>
+    <nav class="lobby-bottom-bar" aria-label="Điều hướng chính">
+      <button class="lobby-tab active" type="button" aria-current="page"><span class="lobby-tab-icon" aria-hidden="true">⌂</span><span>Trang chủ</span></button>
+      <button class="lobby-tab" type="button"><span class="lobby-tab-icon" aria-hidden="true">⚔</span><span>Trận chiến</span></button>
+      <button class="lobby-tab" type="button"><span class="lobby-tab-icon" aria-hidden="true">◈</span><span>Khám phá</span></button>
+      <button class="lobby-tab" type="button"><span class="lobby-tab-icon" aria-hidden="true">●</span><span>Cá nhân</span></button>
+    </nav>
+  </section>
   <main class="app">
     <header class="topbar">
       <div class="topbar-leading">
@@ -926,8 +1035,13 @@
       const MAX_ERRORS = 3;
       const MAX_HINTS = 3;
       const boardElement = document.getElementById("board");
+      const appElement = document.querySelector(".app");
+      const lobbyElement = document.getElementById("lobby");
       const scoreEffectsElement = document.getElementById("score-effects");
       const timerElement = document.getElementById("timer");
+      const lobbyTimeElement = document.getElementById("lobby-time");
+      const lobbyDifficultyElement = document.getElementById("lobby-difficulty");
+      const dailyCountdownElement = document.getElementById("daily-countdown");
       const toastElement = document.getElementById("toast");
       const toastTitleElement = document.getElementById("toast-title");
       const toastMessageElement = document.getElementById("toast-message");
@@ -983,7 +1097,16 @@
       let currentGameId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       let gameRecorded = false;
       let toastTimeout;
+      let dailyChallengeSeconds = 8 * 60 * 60 + 42 * 60 + 16;
       const toolFeedbackTimeouts = new WeakMap();
+
+      function updateDailyCountdown() {
+        const hours = String(Math.floor(dailyChallengeSeconds / 3600)).padStart(2, "0");
+        const minutes = String(Math.floor((dailyChallengeSeconds % 3600) / 60)).padStart(2, "0");
+        const seconds = String(dailyChallengeSeconds % 60).padStart(2, "0");
+        dailyCountdownElement.textContent = `${hours}:${minutes}:${seconds}`;
+        dailyChallengeSeconds = Math.max(0, dailyChallengeSeconds - 1);
+      }
 
       function loadGameHistory() {
         try {
@@ -1696,7 +1819,27 @@
         setNotesMode(!notesMode);
         setMessage(notesMode ? "Chế độ ghi chú đang bật. Chọn ô trống rồi nhập số cần ghi chú." : "Chế độ ghi chú đã tắt.");
       });
-      document.getElementById("go-back").addEventListener("click", () => window.history.back());
+      document.getElementById("go-back").addEventListener("click", () => {
+        if (!paused && !finished) {
+          elapsedMs = currentElapsed();
+          paused = true;
+          updateStats();
+        }
+        lobbyTimeElement.textContent = `${timerElement.querySelector("#timer-minutes").textContent}:${timerElement.querySelector("#timer-seconds").textContent}`;
+        lobbyDifficultyElement.textContent = difficultyLabel.textContent;
+        appElement.classList.add("hidden");
+        lobbyElement.classList.add("show");
+      });
+      document.getElementById("lobby-continue").addEventListener("click", () => {
+        lobbyElement.classList.remove("show");
+        appElement.classList.remove("hidden");
+        if (paused && !finished) setPaused(false);
+      });
+      document.getElementById("lobby-new-game").addEventListener("click", () => {
+        lobbyElement.classList.remove("show");
+        appElement.classList.remove("hidden");
+        startNewGame();
+      });
       document.getElementById("change-game").addEventListener("click", () => changeGameModal.classList.add("show"));
       document.getElementById("cancel-change-game").addEventListener("click", () => changeGameModal.classList.remove("show"));
       document.getElementById("confirm-change-game").addEventListener("click", () => {
@@ -1818,7 +1961,9 @@
         if (!difficultyControl.contains(event.target)) closeDifficultyPopover();
       });
 
+      updateDailyCountdown();
       window.setInterval(updateStats, 1000);
+      window.setInterval(updateDailyCountdown, 1000);
       window.addEventListener("pagehide", () => recordGame("abandoned"));
       window.addEventListener("pageshow", (event) => {
         if (event.persisted && !finished) gameRecorded = false;
