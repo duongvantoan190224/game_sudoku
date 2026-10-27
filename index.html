@@ -2152,14 +2152,37 @@
       }
 
       let audioCtx = null;
+      function unlockAudio() {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        try {
+          audioCtx = audioCtx || new Ctx();
+          if (audioCtx.state === "suspended" || audioCtx.state === "interrupted") {
+            const p = audioCtx.resume();
+            if (p && p.catch) p.catch(() => {});
+          }
+          const buffer = audioCtx.createBuffer(1, 1, 22050);
+          const source = audioCtx.createBufferSource();
+          source.buffer = buffer;
+          source.connect(audioCtx.destination);
+          source.start(0);
+        } catch (e) { /* audio unavailable */ }
+      }
+      ["touchstart", "touchend", "pointerdown", "click", "keydown"].forEach((name) => {
+        document.addEventListener(name, unlockAudio, { passive: true });
+      });
       function playSound(type) {
         const toggle = document.getElementById("sound-toggle");
         if (!toggle || toggle.getAttribute("aria-pressed") !== "true") return;
         const Ctx = window.AudioContext || window.webkitAudioContext;
         if (!Ctx) return;
         try {
-          audioCtx = audioCtx || new Ctx();
-          if (audioCtx.state === "suspended") audioCtx.resume();
+          if (!audioCtx) unlockAudio();
+          if (!audioCtx) return;
+          if (audioCtx.state === "suspended" || audioCtx.state === "interrupted") {
+            const p = audioCtx.resume();
+            if (p && p.catch) p.catch(() => {});
+          }
           const notes = {
             click: [[700, 0, .05, "sine"]],
             correct: [[660, 0, .1, "sine"], [880, .09, .14, "sine"]],
