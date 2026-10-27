@@ -812,6 +812,38 @@
       .cell.completion-celebration { animation-duration: .01ms; animation-delay: 0ms; }
       .cell.value-entry-pop { animation-duration: .01ms; }
     }
+  
+    html[data-theme="dark"] { color-scheme: dark; color: #e6ebf5; background: #0f1523; --line: #2f3a52; --muted: #94a0b8; --stat-ink: #dbe3f2; }
+    [data-theme="dark"] body, [data-theme="dark"] .lobby { background: #0f1523; color: #e6ebf5; }
+    [data-theme="dark"] .board { background: #1a2236; border-color: #8c9ab5; }
+    [data-theme="dark"] .cell { color: #8fa8ff; background: #1a2236; }
+    [data-theme="dark"] .cell.box-right { border-right-color: #8c9ab5; }
+    [data-theme="dark"] .cell.box-bottom { border-bottom-color: #8c9ab5; }
+    [data-theme="dark"] .cell.given { color: #e6ebf5; }
+    [data-theme="dark"] .cell.peer { background: #222c45; }
+    [data-theme="dark"] .cell.same { color: #5fe0b0; background: #1c3b36; }
+    [data-theme="dark"] .cell.user-entry { color: #9bb4ff; }
+    [data-theme="dark"] .cell.selected { background: #2e407a; }
+    [data-theme="dark"] .cell.invalid, [data-theme="dark"] .cell.invalid.selected { color: #ff8a93; background: #4a2229; }
+    [data-theme="dark"] .number-button { border-color: #2f3a52; color: #8fa8ff; background: #1a2236; }
+    [data-theme="dark"] .number-button:hover { background: #252f4a; }
+    [data-theme="dark"] .number-button.selected { color: #fff; background: var(--blue); }
+    [data-theme="dark"] .tool { --tool-color: #9bb4ff; --tool-bg: #1a2236; --tool-border: #2f3a52; }
+    [data-theme="dark"] #number-lock-toggle[aria-pressed="true"] { color: #9bb4ff; background: #25325e; }
+    [data-theme="dark"] #notes-toggle[aria-pressed="true"] { color: #c8a8ff; background: #3a2c5e; }
+    [data-theme="dark"] .modal { background: #000a; }
+    [data-theme="dark"] .modal-card, [data-theme="dark"] .difficulty-popover, [data-theme="dark"] .victory-card, [data-theme="dark"] .lobby-bottom-bar, [data-theme="dark"] .wallet-pill { color: #e6ebf5; background: #1a2236; border-color: #2f3a52; }
+    [data-theme="dark"] .settings-card, [data-theme="dark"] .settings-header { color: #e6ebf5; background: #121a2b; }
+    [data-theme="dark"] .settings-header h2, [data-theme="dark"] .guide-section h3, [data-theme="dark"] .statistics-tile strong, [data-theme="dark"] .modal-card h2 { color: #e6ebf5; }
+    [data-theme="dark"] .settings-list { background: #1a2236; box-shadow: none; }
+    [data-theme="dark"] .settings-row { color: #e6ebf5; }
+    [data-theme="dark"] .settings-row:active { background: #222c45; }
+    [data-theme="dark"] .settings-row + .settings-row::before { background: #2f3a52; }
+    [data-theme="dark"] .language-card .settings-list, [data-theme="dark"] .difficulty-option, [data-theme="dark"] .best-time, [data-theme="dark"] .victory-summary, [data-theme="dark"] .pause-hint { color: #c3ccdd; background: #222c45; }
+    [data-theme="dark"] .modal-card > p, [data-theme="dark"] .victory-card p, [data-theme="dark"] .game-history-item, [data-theme="dark"] .pause-summary div { color: #a9b4c9; border-color: #2f3a52; }
+    [data-theme="dark"] .toast, [data-theme="dark"] .ad-banner, [data-theme="dark"] .event-card, [data-theme="dark"] .daily-card { color: #e6ebf5; background: #1a2236; border-color: #2f3a52; }
+    [data-theme="dark"] .ad-banner-text, [data-theme="dark"] .settings-group-title { color: #a9b4c9; }
+    [data-theme="dark"] .statistics-tile { background: #222c45; }
   </style>
 </head>
 <body>
@@ -990,8 +1022,8 @@
           <h3 class="settings-group-title">Tùy chỉnh &amp; trải nghiệm</h3>
           <div class="settings-list">
             <button class="settings-row" id="open-language" type="button"><span class="settings-icon language" aria-hidden="true">🌐</span><span class="settings-label">Ngôn ngữ</span><span class="settings-value" id="language-value">Tiếng Việt</span><span class="settings-chevron" aria-hidden="true">›</span></button>
-            <button class="settings-row" type="button"><span class="settings-icon display" aria-hidden="true">☀</span><span class="settings-label">Chế độ màn hình</span><span class="settings-value">Sáng</span><span class="settings-chevron" aria-hidden="true">›</span></button>
-            <div class="settings-row"><span class="settings-icon sound" aria-hidden="true">🔊</span><span class="settings-label">Hiệu ứng âm thanh</span><button class="settings-toggle" type="button" aria-label="Hiệu ứng âm thanh" aria-pressed="true"></button></div>
+            <button class="settings-row" id="toggle-theme" type="button"><span class="settings-icon display" id="theme-icon" aria-hidden="true">☀</span><span class="settings-label">Chế độ màn hình</span><span class="settings-value" id="theme-value">Sáng</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <div class="settings-row"><span class="settings-icon sound" aria-hidden="true">🔊</span><span class="settings-label">Hiệu ứng âm thanh</span><button class="settings-toggle" id="sound-toggle" type="button" aria-label="Hiệu ứng âm thanh" aria-pressed="true"></button></div>
             <div class="settings-row"><span class="settings-icon notifications" aria-hidden="true">🔔</span><span class="settings-label">Thông báo</span><button class="settings-toggle" type="button" aria-label="Thông báo" aria-pressed="true"></button></div>
           </div>
         </section>
@@ -2061,6 +2093,7 @@
           document.getElementById("victory-score").textContent = String(score);
           document.getElementById("victory-errors").textContent = errorsElement.textContent;
           victoryModal.classList.add("show");
+          playSound("win");
           document.getElementById("victory-new").focus();
         }
       }
@@ -2071,6 +2104,42 @@
         cell.classList.add("value-entry-pop");
         cell.addEventListener("animationend", () => cell.classList.remove("value-entry-pop"), { once: true });
       }
+
+      let audioCtx = null;
+      function playSound(type) {
+        const toggle = document.getElementById("sound-toggle");
+        if (!toggle || toggle.getAttribute("aria-pressed") !== "true") return;
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        try {
+          audioCtx = audioCtx || new Ctx();
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          const notes = {
+            click: [[700, 0, .05, "sine"]],
+            correct: [[660, 0, .1, "sine"], [880, .09, .14, "sine"]],
+            error: [[220, 0, .15, "square"], [165, .13, .22, "square"]],
+            win: [[523, 0, .14, "triangle"], [659, .14, .14, "triangle"], [784, .28, .14, "triangle"], [1047, .42, .3, "triangle"]],
+            lose: [[330, 0, .2, "sawtooth"], [262, .2, .2, "sawtooth"], [196, .4, .35, "sawtooth"]]
+          }[type] || [];
+          const now = audioCtx.currentTime;
+          notes.forEach(([freq, start, dur, wave]) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = wave;
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(.0001, now + start);
+            gain.gain.exponentialRampToValueAtTime(.15, now + start + .01);
+            gain.gain.exponentialRampToValueAtTime(.0001, now + start + dur);
+            osc.connect(gain).connect(audioCtx.destination);
+            osc.start(now + start);
+            osc.stop(now + start + dur + .02);
+          });
+        } catch (e) { /* audio unavailable */ }
+      }
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest && event.target.closest("button");
+        if (button && !button.classList.contains("cell") && !button.classList.contains("number-button")) playSound("click");
+      });
 
       function enterValue(value, fromBoard = false) {
         if (finished || paused) return;
@@ -2133,13 +2202,17 @@
             finished = true;
             recordGame("lost");
             gameOverModal.classList.add("show");
+            playSound("lose");
             document.getElementById("game-over-restart").focus();
             setMessage("Bạn đã thua trò chơi vì bạn mắc 3 lỗi.", "error");
           } else if (errors === 1) {
+            playSound("error");
             setMessage(wrongEntryMessage(selectedCell, value), "error");
           } else if (errors === 2) {
+            playSound("error");
             setMessage("Bạn đã mắc lỗi lần thứ hai. Hãy thử dùng Gợi ý để được trợ giúp nhé!", "error");
           } else {
+            playSound("error");
             setMessage(wrongEntryMessage(selectedCell, value), "error");
           }
           updateStats();
@@ -2172,6 +2245,7 @@
         activePadDigit = 0;
         renderBoard();
         if (value) {
+          playSound(value === solution[row][column] ? "correct" : "click");
           showValueEntryEffect();
           showCompletionEffects(previousValues);
         }
@@ -2335,6 +2409,7 @@
       });
 
       document.getElementById("number-pad").addEventListener("click", (event) => {
+        if (event.target.closest(".number-button")) playSound("click");
         const button = event.target.closest("[data-value]");
         if (button) {
           button.classList.remove("digit-pop");
@@ -2419,6 +2494,28 @@
         toggle.addEventListener("click", () => {
           toggle.setAttribute("aria-pressed", String(toggle.getAttribute("aria-pressed") !== "true"));
         });
+      });
+      const soundToggle = document.getElementById("sound-toggle");
+      const themeValue = document.getElementById("theme-value");
+      const themeIcon = document.getElementById("theme-icon");
+      const readSetting = (key, fallback) => { try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; } };
+      const saveSetting = (key, value) => { try { localStorage.setItem(key, value); } catch (e) { /* ignore */ } };
+      function applyTheme(theme) {
+        document.documentElement.dataset.theme = theme;
+        themeValue.textContent = theme === "dark" ? "Tối" : "Sáng";
+        themeIcon.textContent = theme === "dark" ? "☾" : "☀";
+      }
+      applyTheme(readSetting("sudoku-theme", "light") === "dark" ? "dark" : "light");
+      document.getElementById("toggle-theme").addEventListener("click", () => {
+        const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        applyTheme(next);
+        saveSetting("sudoku-theme", next);
+      });
+      soundToggle.setAttribute("aria-pressed", String(readSetting("sudoku-sound", "on") !== "off"));
+      soundToggle.addEventListener("click", () => {
+        const on = soundToggle.getAttribute("aria-pressed") === "true";
+        saveSetting("sudoku-sound", on ? "on" : "off");
+        if (on) playSound("click");
       });
       document.getElementById("open-statistics").addEventListener("click", () => {
         closeSettings();
