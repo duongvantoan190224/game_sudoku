@@ -980,6 +980,20 @@
     .battle-progress-heading { display: flex; justify-content: space-between; gap: 6px; color: var(--text-secondary); font-size: 10px; font-weight: 750; }
     .battle-progress-heading span:last-child { color: var(--text-primary); font-variant-numeric: tabular-nums; }
     .app.battle .info-bar { display: none; }
+    .app.battle { gap: 3px; }
+    .battle-header { grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px; padding: 0 3px; }
+    .battle-header .battle-score { flex-direction: column; gap: 0; line-height: 1.1; text-align: center; font-size: 9px; }
+    .battle-header .battle-score-value { font-size: 12px; }
+    .battle-avatar-wrap { width: 28px; height: 28px; flex-basis: 28px; font-size: 16px; }
+    .battle-flag { width: 15px; height: 15px; font-size: 9px; }
+    .battle-player { gap: 5px; }
+    .battle-player-caption { display: none; }
+    .battle-vs { width: 26px; height: 26px; font-size: 9px; }
+    .battle-progress { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px; }
+    .battle-progress-side { gap: 2px; }
+    .battle-progress-heading { font-size: 9px; }
+    .battle-track { height: 3px; }
+    .battle-clock { min-width: 44px; padding: 2px 6px; font-size: 11px; }
     .battle-track { height: 5px; overflow: hidden; border-radius: 999px; background: #d8dfef; }
     .battle-fill { height: 100%; width: 0; border-radius: 999px; transition: width 0.4s; }
     .battle-fill.me { background: #2f6df0; } .battle-fill.bot { background: #e5484d; }
@@ -1070,8 +1084,8 @@
       </div>
     </header>
 
-    <div class="battle-score" aria-label="Điểm số">Điểm số: <span class="battle-score-value" id="battle-score">0</span></div>
     <section class="battle-header" aria-label="Người chơi trận đấu">
+      <div class="battle-score" aria-label="Điểm số">Điểm số: <span class="battle-score-value" id="battle-score">0</span></div>
       <div class="battle-player battle-player-me">
         <span class="battle-avatar-wrap"><span id="battle-me-avatar" aria-hidden="true">🧑</span><span class="battle-flag" id="battle-me-flag" aria-label="Việt Nam">🇻🇳</span></span>
         <span class="battle-player-copy"><span class="battle-player-name">Bạn</span><span class="battle-player-caption">Người chơi</span></span>
