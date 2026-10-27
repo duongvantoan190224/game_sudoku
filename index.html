@@ -374,6 +374,8 @@
     .number-pad.notes-mode .number-button:not(:disabled) { opacity: .55; }
     .number-pad.notes-mode .number-button.note-highlight:not(:disabled) { opacity: 1; }
     .tool:active { transform: scale(.96); }
+    .number-pad.lock-mode .number-button:not(:disabled) { opacity: .45; }
+    .number-pad.lock-mode .number-button.selected:not(:disabled) { opacity: 1; font-weight: 900; }
     .number-button:active { transform: scale(1.15); transition-duration: .06s; }
     .number-button:disabled { opacity: .3; cursor: default; }
 
@@ -1300,7 +1302,7 @@
       }
 
       function renderBoard() {
-        const selectedValue = selectedCell >= 0 ? values[selectedCell] : 0;
+        const selectedValue = numberLock && selectedDigit ? selectedDigit : (selectedCell >= 0 ? values[selectedCell] : 0);
         const fragment = document.createDocumentFragment();
 
         values.forEach((value, index) => {
@@ -1355,6 +1357,7 @@
             !(canEnterCorrectValue && selectedDigit === selectedCellValue && !notesMode)) {
           selectedDigit = 0;
         }
+        document.getElementById("number-pad").classList.toggle("lock-mode", numberLock);
         document.querySelectorAll(".number-button").forEach((button) => {
           const digit = Number(button.dataset.value);
           const remaining = Math.max(0, 9 - digitCounts[digit]);
