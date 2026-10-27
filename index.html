@@ -1524,9 +1524,14 @@
         cell.addEventListener("animationend", () => cell.classList.remove("value-entry-pop"), { once: true });
       }
 
-      function enterValue(value) {
+      function enterValue(value, fromBoard = false) {
         if (finished || paused) return;
         if (value || !numberLock) selectedDigit = value || 0;
+        if (numberLock && value && !fromBoard) {
+          setMessage("Đã giữ số. Chạm vào một ô trống để điền.");
+          renderBoard();
+          return;
+        }
         if (selectedCell < 0) {
           setMessage("Hãy chọn một ô trống trước nhé.");
           renderBoard();
@@ -1769,7 +1774,7 @@
         activePadDigit = 0;
         if (numberLock && selectedDigit) {
           setMessage("Ô đã chọn. Đang điền số đã giữ.");
-          enterValue(selectedDigit);
+          enterValue(selectedDigit, true);
           return;
         }
         if (!numberLock) selectedDigit = values[selectedCell] || 0;
