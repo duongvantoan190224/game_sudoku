@@ -469,6 +469,10 @@
     .settings-icon.facebook { color: #fff; background: #3975d5; }
     .settings-icon.community { color: #755bb4; background: #f0ebfb; }
     .settings-label { min-width: 0; flex: 1; font-size: 14px; font-weight: 650; }
+    .language-card .settings-list { margin-bottom: 14px; overflow: hidden; border-radius: 14px; background: #f4f6fa; }
+    .language-check { color: #1766e0; font-weight: 800; visibility: hidden; }
+    .language-option[aria-checked="true"] .language-check { visibility: visible; }
+    .language-option[aria-checked="true"] .settings-label { color: #1766e0; font-weight: 700; }
     .settings-value { color: #8a93a4; font-size: 13px; font-weight: 500; }
     .settings-chevron { margin-left: 2px; color: #aab1bd; font-size: 25px; font-weight: 400; line-height: 1; }
     .settings-toggle {
@@ -989,7 +993,7 @@
         <section class="settings-group" aria-label="Tùy chỉnh hệ thống và trải nghiệm">
           <h3 class="settings-group-title">Tùy chỉnh &amp; trải nghiệm</h3>
           <div class="settings-list">
-            <button class="settings-row" type="button"><span class="settings-icon language" aria-hidden="true">🌐</span><span class="settings-label">Ngôn ngữ</span><span class="settings-value">Tự động</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" id="open-language" type="button"><span class="settings-icon language" aria-hidden="true">🌐</span><span class="settings-label">Ngôn ngữ</span><span class="settings-value" id="language-value">Tiếng Việt</span><span class="settings-chevron" aria-hidden="true">›</span></button>
             <button class="settings-row" type="button"><span class="settings-icon display" aria-hidden="true">☀</span><span class="settings-label">Chế độ màn hình</span><span class="settings-value">Sáng</span><span class="settings-chevron" aria-hidden="true">›</span></button>
             <div class="settings-row"><span class="settings-icon sound" aria-hidden="true">🔊</span><span class="settings-label">Hiệu ứng âm thanh</span><button class="settings-toggle" type="button" aria-label="Hiệu ứng âm thanh" aria-pressed="true"></button></div>
             <div class="settings-row"><span class="settings-icon notifications" aria-hidden="true">🔔</span><span class="settings-label">Thông báo</span><button class="settings-toggle" type="button" aria-label="Thông báo" aria-pressed="true"></button></div>
@@ -1015,6 +1019,20 @@
           </div>
         </details>
       </div>
+    </div>
+  </div>
+
+  <div class="modal" id="language-modal" role="dialog" aria-modal="true" aria-labelledby="language-title">
+    <div class="modal-card language-card">
+      <h2 id="language-title">Chọn ngôn ngữ</h2>
+      <div class="settings-list" id="language-list">
+        <button class="settings-row language-option" type="button" data-lang="vi" lang="vi"><span class="settings-label">Tiếng Việt</span><span class="language-check" aria-hidden="true">✓</span></button>
+        <button class="settings-row language-option" type="button" data-lang="en" lang="en"><span class="settings-label">English</span><span class="language-check" aria-hidden="true">✓</span></button>
+        <button class="settings-row language-option" type="button" data-lang="zh" lang="zh"><span class="settings-label">中文</span><span class="language-check" aria-hidden="true">✓</span></button>
+        <button class="settings-row language-option" type="button" data-lang="ko" lang="ko"><span class="settings-label">한국어</span><span class="language-check" aria-hidden="true">✓</span></button>
+        <button class="settings-row language-option" type="button" data-lang="ja" lang="ja"><span class="settings-label">日本語</span><span class="language-check" aria-hidden="true">✓</span></button>
+      </div>
+      <div class="modal-actions"><button class="action-button primary" id="close-language" type="button">Đóng</button></div>
     </div>
   </div>
 
@@ -1051,11 +1069,11 @@
           <div class="guide-card-list">
             <div class="guide-item">
               <h4>Gợi ý</h4>
-              <p>Chọn một ô trống rồi nhấn <strong>Gợi ý</strong> để điền đáp án đúng vào ô đó. Nếu chưa chọn ô phù hợp, trò chơi sẽ chọn một ô còn cần giải. Mỗi ván có 3 lượt gợi ý; mỗi lượt bị trừ 20 điểm.</p>
+              <p data-i18n-html="guide-hint">Chọn một ô trống rồi nhấn <strong>Gợi ý</strong> để điền đáp án đúng vào ô đó. Nếu chưa chọn ô phù hợp, trò chơi sẽ chọn một ô còn cần giải. Mỗi ván có 3 lượt gợi ý; mỗi lượt bị trừ 20 điểm.</p>
             </div>
             <div class="guide-item">
               <h4>Giữ số</h4>
-              <p>Bật <strong>Giữ số</strong>, chọn một số trên bàn phím rồi chạm lần lượt các ô muốn điền số đó. Tắt chế độ này khi muốn chọn số khác hoặc nhập theo cách thông thường.</p>
+              <p data-i18n-html="guide-lock">Bật <strong>Giữ số</strong>, chọn một số trên bàn phím rồi chạm lần lượt các ô muốn điền số đó. Tắt chế độ này khi muốn chọn số khác hoặc nhập theo cách thông thường.</p>
             </div>
             <div class="guide-item">
               <h4>Ghi chú ứng viên</h4>
@@ -1070,12 +1088,12 @@
             <div class="guide-item">
               <h4>1. Naked Single — Ô chỉ còn một ứng viên</h4>
               <p>Liệt kê các số chưa có trong hàng, cột và khối của một ô. Nếu chỉ còn đúng một số hợp lệ, điền số đó ngay.</p>
-              <p class="guide-example"><strong>Ví dụ:</strong> Ô chưa thể là 1, 2, 3, 4, 5, 6, 8 hoặc 9; vậy ứng viên duy nhất là 7.</p>
+              <p class="guide-example" data-i18n-html="guide-naked-single-ex"><strong>Ví dụ:</strong> Ô chưa thể là 1, 2, 3, 4, 5, 6, 8 hoặc 9; vậy ứng viên duy nhất là 7.</p>
             </div>
             <div class="guide-item">
               <h4>2. Hidden Single — Số chỉ có một vị trí</h4>
               <p>Xét từng số còn thiếu trong một hàng, cột hoặc khối. Nếu số đó chỉ có thể đặt ở một ô trong vùng, hãy điền nó — dù ô ấy còn có ứng viên khác.</p>
-              <p class="guide-example"><strong>Ví dụ:</strong> Trong một khối 3×3, chỉ ô này có thể chứa số 5 theo các hàng và cột đang bị chặn, nên ô này phải là 5.</p>
+              <p class="guide-example" data-i18n-html="guide-hidden-single-ex"><strong>Ví dụ:</strong> Trong một khối 3×3, chỉ ô này có thể chứa số 5 theo các hàng và cột đang bị chặn, nên ô này phải là 5.</p>
             </div>
             <div class="guide-item">
               <h4>3. Locked Candidates — Ứng viên bị khóa</h4>
@@ -1096,7 +1114,7 @@
           </div>
         </section>
 
-        <aside class="guide-callout"><strong>Mẹo nhỏ:</strong> Sau mỗi lần điền số, cập nhật lại các ứng viên và tiếp tục tìm Naked Single, Hidden Single trước. Nếu chưa chắc chắn, đừng đoán — hãy kiểm tra lại hàng, cột và khối.</aside>
+        <aside class="guide-callout" data-i18n-html="guide-callout"><strong>Mẹo nhỏ:</strong> Sau mỗi lần điền số, cập nhật lại các ứng viên và tiếp tục tìm Naked Single, Hidden Single trước. Nếu chưa chắc chắn, đừng đoán — hãy kiểm tra lại hàng, cột và khối.</aside>
       </div>
     </article>
   </div>
@@ -1195,6 +1213,269 @@
       const MAX_HINTS = 3;
       const MAX_UNDO_USES = 3;
       const MAX_ERASE_USES = 3;
+      const LANGUAGES = { vi: "Tiếng Việt", en: "English", zh: "中文", ko: "한국어", ja: "日本語" };
+      const LANGUAGE_LOCALES = { vi: "vi-VN", en: "en-US", zh: "zh-CN", ko: "ko-KR", ja: "ja-JP" };
+      const LANGUAGE_KEY = "sudokuLanguage";
+      // Mỗi dòng: [tiếng Việt (khóa), English, 中文, 한국어, 日本語]. Thiếu bản dịch sẽ dùng English rồi tiếng Việt.
+      const TRANSLATION_ROWS = [
+        ["Sảnh chính", "Main lobby", "主大厅", "메인 로비", "メインロビー"],
+        ["Tài nguyên", "Resources", "资源", "자원", "リソース"],
+        ["Sự kiện nổi bật", "Featured events", "精选活动", "추천 이벤트", "注目のイベント"],
+        ["Xem thử thách hàng ngày", "View daily challenge", "查看每日挑战", "일일 챌린지 보기", "デイリーチャレンジを見る"],
+        ["Điều hướng chính", "Main navigation", "主导航", "메인 내비게이션", "メインナビゲーション"],
+        ["Quay lại", "Back", "返回", "뒤로", "戻る"],
+        ["Đổi bài", "Change puzzle", "换题", "퍼즐 바꾸기", "パズルを変更"],
+        ["Tạm dừng", "Pause", "暂停", "일시정지", "一時停止"],
+        ["Cài đặt", "Settings", "设置", "설정", "設定"],
+        ["Thông tin ván chơi", "Game info", "游戏信息", "게임 정보", "ゲーム情報"],
+        ["Bảng Sudoku 9 nhân 9", "9 by 9 Sudoku board", "9×9 数独棋盘", "9×9 스도쿠 보드", "9×9 数独ボード"],
+        ["Công cụ", "Tools", "工具", "도구", "ツール"],
+        ["Hoàn tác", "Undo", "撤销", "실행 취소", "元に戻す"],
+        ["Xóa ô đã chọn", "Erase selected cell", "清除所选格子", "선택한 칸 지우기", "選択したマスを消去"],
+        ["Xóa", "Erase", "清除", "지우기", "消去"],
+        ["Bật Giữ số", "Turn on Number lock", "开启锁定数字", "숫자 고정 켜기", "数字ロックをオン"],
+        ["Tắt Giữ số", "Turn off Number lock", "关闭锁定数字", "숫자 고정 끄기", "数字ロックをオフ"],
+        ["Bật chế độ ghi chú", "Turn on notes mode", "开启笔记模式", "메모 모드 켜기", "メモモードをオン"],
+        ["Tắt chế độ ghi chú", "Turn off notes mode", "关闭笔记模式", "메모 모드 끄기", "メモモードをオフ"],
+        ["Gợi ý", "Hint", "提示", "힌트", "ヒント"],
+        ["Độ khó: {d}", "Difficulty: {d}", "难度：{d}", "난이도: {d}", "難易度：{d}"],
+        ["Chọn mức độ", "Choose difficulty", "选择难度", "난이도 선택", "難易度を選択"],
+        ["Ít số cho sẵn hơn, cần suy luận nâng cao", "Fewer givens, needs advanced reasoning", "给定数字更少，需要高级推理", "주어진 숫자가 적어 고급 추리가 필요합니다", "ヒントの数字が少なく、高度な推理が必要です"],
+        ["Rất ít số khởi tạo, cần các chiến thuật nâng cao như X-Wing và Swordfish", "Very few givens, needs advanced techniques like X-Wing and Swordfish", "初始数字极少，需要 X-Wing、Swordfish 等高级技巧", "초기 숫자가 매우 적어 X-Wing, Swordfish 같은 고급 기술이 필요합니다", "初期の数字が非常に少なく、X-WingやSwordfishなどの高度な手筋が必要です"],
+        ["Bàn phím số", "Number pad", "数字键盘", "숫자 패드", "数字パッド"],
+        ["Xem sách Sudoku trên Tiki", "View Sudoku books on Tiki", "在 Tiki 查看数独书籍", "Tiki에서 스도쿠 책 보기", "Tikiで数独の本を見る"],
+        ["Tài khoản và nâng cấp", "Account and upgrade", "账户与升级", "계정 및 업그레이드", "アカウントとアップグレード"],
+        ["Thống kê và hướng dẫn", "Statistics and guide", "统计与指南", "통계 및 가이드", "統計とガイド"],
+        ["Tùy chỉnh hệ thống và trải nghiệm", "System and experience options", "系统与体验设置", "시스템 및 환경 설정", "システムと操作性の設定"],
+        ["Hiệu ứng âm thanh", "Sound effects", "音效", "효과음", "効果音"],
+        ["Thông báo", "Notifications", "通知", "알림", "通知"],
+        ["Hỗ trợ và cộng đồng", "Support and community", "支持与社区", "지원 및 커뮤니티", "サポートとコミュニティ"],
+        ["Đóng hướng dẫn", "Close guide", "关闭指南", "가이드 닫기", "ガイドを閉じる"],
+        ["Đang mở", "Open now", "进行中", "진행 중", "開催中"],
+        ["Giải đấu", "Tournament", "锦标赛", "토너먼트", "トーナメント"],
+        ["So tài cùng người chơi", "Compete with other players", "与其他玩家一较高下", "다른 플레이어와 겨루세요", "他のプレイヤーと競おう"],
+        ["Sự kiện", "Event", "活动", "이벤트", "イベント"],
+        ["Biến cố Mũi tên", "Arrow Twist", "箭头变奏", "화살표 변수", "アロー・ツイスト"],
+        ["Thử thách giới hạn", "Push your limits", "挑战极限", "한계에 도전하세요", "限界に挑戦"],
+        ["Sắp tới", "Coming soon", "即将开始", "곧 시작", "まもなく"],
+        ["Lễ hội", "Festival", "节日", "페스티벌", "フェスティバル"],
+        ["Khám phá phần thưởng", "Discover rewards", "探索奖励", "보상 둘러보기", "報酬を探そう"],
+        ["Thử thách hàng ngày", "Daily challenge", "每日挑战", "일일 챌린지", "デイリーチャレンジ"],
+        ["thg {m} {d}", "{m}/{d}", "{m}月{d}日", "{m}월 {d}일", "{m}月{d}日"],
+        ["Hoàn thành để nhận phần thưởng", "Complete to earn rewards", "完成即可获得奖励", "완료하고 보상을 받으세요", "クリアして報酬を獲得"],
+        ["còn lại", "left", "剩余", "남음", "残り"],
+        ["Chơi", "Play", "开始", "플레이", "プレイ"],
+        ["Sudoku cổ điển", "Classic Sudoku", "经典数独", "클래식 스도쿠", "クラシック数独"],
+        ["Tiếp tục", "Continue", "继续", "계속하기", "続ける"],
+        ["Trò chơi mới", "New game", "新游戏", "새 게임", "新しいゲーム"],
+        ["Trang chủ", "Home", "首页", "홈", "ホーム"],
+        ["Trận chiến", "Battle", "对战", "대전", "バトル"],
+        ["Khám phá", "Explore", "探索", "탐색", "探索"],
+        ["Cá nhân", "Profile", "个人", "내 정보", "プロフィール"],
+        ["Lỗi", "Errors", "错误", "실수", "ミス"],
+        ["Điểm số", "Score", "得分", "점수", "スコア"],
+        ["Đã tạm dừng", "Paused", "已暂停", "일시정지됨", "一時停止中"],
+        ["Giữ số", "Number lock", "锁定数字", "숫자 고정", "数字ロック"],
+        ["Viết chì", "Pencil", "铅笔", "메모", "メモ"],
+        ["Độ khó", "Difficulty", "难度", "난이도", "難易度"],
+        ["Dễ", "Easy", "简单", "쉬움", "易しい"],
+        ["Vừa", "Medium", "中等", "보통", "普通"],
+        ["Khó", "Hard", "困难", "어려움", "難しい"],
+        ["Khó hơn", "Harder", "更难", "더 어려움", "より難しい"],
+        ["Chuyên gia", "Expert", "专家", "전문가", "エキスパート"],
+        ["Đồ chơi trí tuệ", "Brain games", "益智玩具", "두뇌 게임", "頭脳ゲーム"],
+        ["Sách Sudoku giảm giá", "Discounted Sudoku books", "数独书籍特价", "스도쿠 책 할인", "数独の本がお買い得"],
+        ["Xem ngay trên Tiki", "See it now on Tiki", "立即在 Tiki 查看", "지금 Tiki에서 보기", "今すぐTikiで見る"],
+        ["Tài khoản & nâng cấp", "Account & upgrade", "账户与升级", "계정 및 업그레이드", "アカウントとアップグレード"],
+        ["Nâng cấp trò chơi", "Upgrade game", "升级游戏", "게임 업그레이드", "ゲームをアップグレード"],
+        ["Lịch sử mua", "Purchase history", "购买记录", "구매 내역", "購入履歴"],
+        ["Thống kê & hướng dẫn", "Statistics & guide", "统计与指南", "통계 및 가이드", "統計とガイド"],
+        ["Thống kê", "Statistics", "统计", "통계", "統計"],
+        ["Hướng dẫn trò chơi / Kỹ thuật Sudoku", "Game guide / Sudoku techniques", "游戏指南 / 数独技巧", "게임 가이드 / 스도쿠 기술", "ゲームガイド／数独のテクニック"],
+        ["Tùy chỉnh & trải nghiệm", "Preferences & experience", "自定义与体验", "맞춤 설정 및 환경", "カスタマイズと操作性"],
+        ["Ngôn ngữ", "Language", "语言", "언어", "言語"],
+        ["Chọn ngôn ngữ", "Choose language", "选择语言", "언어 선택", "言語を選択"],
+        ["Chế độ màn hình", "Display mode", "显示模式", "화면 모드", "表示モード"],
+        ["Sáng", "Light", "浅色", "밝게", "ライト"],
+        ["Hỗ trợ & cộng đồng", "Support & community", "支持与社区", "지원 및 커뮤니티", "サポートとコミュニティ"],
+        ["Trung tâm trợ giúp", "Help center", "帮助中心", "도움말 센터", "ヘルプセンター"],
+        ["Giới thiệu về game", "About the game", "关于游戏", "게임 소개", "ゲームについて"],
+        ["Chia sẻ", "Share", "分享", "공유", "シェア"],
+        ["Theo dõi trang Facebook", "Follow our Facebook page", "关注 Facebook 主页", "Facebook 페이지 팔로우", "Facebookページをフォロー"],
+        ["Tham gia nhóm Facebook", "Join our Facebook group", "加入 Facebook 群组", "Facebook 그룹 참여", "Facebookグループに参加"],
+        ["Tùy chọn ván chơi", "Game options", "游戏选项", "게임 옵션", "ゲームオプション"],
+        ["↺ Chơi lại", "↺ Restart", "↺ 重玩", "↺ 다시 시작", "↺ やり直す"],
+        ["✦ Bàn mới", "✦ New board", "✦ 新棋盘", "✦ 새 판", "✦ 新しい盤面"],
+        ["Lịch sử ván chơi", "Game history", "游戏记录", "게임 기록", "プレイ履歴"],
+        ["Kiểm tra kết quả", "Check result", "检查结果", "결과 확인", "結果を確認"],
+        ["Hướng dẫn Sudoku", "Sudoku guide", "数独指南", "스도쿠 가이드", "数独ガイド"],
+        ["Sudoku là trò chơi suy luận: hãy dùng các con số đã có để tìm số phù hợp cho từng ô trống. Bạn không cần tính toán — chỉ cần quan sát và loại trừ.", "Sudoku is a logic game: use the numbers already on the board to find the right number for each empty cell. No math needed — just observe and eliminate.", "数独是一种推理游戏：利用已有的数字为每个空格找出合适的数字。无需计算，只需观察和排除。", "스도쿠는 추리 게임입니다. 이미 있는 숫자를 이용해 각 빈 칸에 맞는 숫자를 찾으세요. 계산은 필요 없고 관찰과 소거만 하면 됩니다.", "数独は推理ゲームです。盤面にある数字を手がかりに、空きマスに入る数字を見つけます。計算は不要で、観察と消去だけで解けます。"],
+        ["Luật chơi cơ bản", "Basic rules", "基本规则", "기본 규칙", "基本ルール"],
+        ["Mỗi hàng, cột và khối có đủ số 1–9", "Every row, column and box contains 1–9", "每行、每列、每宫都包含 1–9", "모든 행, 열, 블록에 1–9가 들어갑니다", "各行・各列・各ブロックに1〜9が入ります"],
+        ["Bàn cờ gồm 9 hàng, 9 cột và 9 khối nhỏ 3×3. Mỗi số từ 1 đến 9 chỉ xuất hiện một lần trong từng hàng, từng cột và từng khối.", "The board has 9 rows, 9 columns and nine 3×3 boxes. Each number from 1 to 9 appears exactly once in every row, column and box.", "棋盘由 9 行、9 列和 9 个 3×3 小宫组成。1 到 9 的每个数字在每行、每列、每宫中只出现一次。", "보드는 9개의 행, 9개의 열, 9개의 3×3 블록으로 이루어져 있으며, 1부터 9까지의 숫자는 각 행·열·블록에 한 번씩만 나옵니다.", "盤面は9行・9列・9個の3×3ブロックでできています。1〜9の数字は各行・各列・各ブロックに1回ずつ入ります。"],
+        ["Tìm số hợp lệ bằng cách loại trừ", "Find valid numbers by elimination", "通过排除找出合法数字", "소거법으로 가능한 숫자 찾기", "消去法で入れられる数字を探す"],
+        ["Trước khi điền một số, kiểm tra cả hàng, cột và khối của ô đó. Nếu số đã xuất hiện ở một trong ba nơi, ô đó không thể nhận số ấy.", "Before placing a number, check the cell's row, column and box. If the number already appears in any of them, the cell cannot take it.", "填数字前，请检查该格所在的行、列和宫。如果该数字已在其中之一出现，这个格子就不能填它。", "숫자를 넣기 전에 해당 칸의 행, 열, 블록을 확인하세요. 이미 그중 한 곳에 있는 숫자는 넣을 수 없습니다.", "数字を入れる前に、そのマスの行・列・ブロックを確認します。すでにどれかにある数字は入れられません。"],
+        ["Số có sẵn là manh mối cố định", "Given numbers are fixed clues", "给定数字是固定线索", "주어진 숫자는 고정된 단서입니다", "最初から入っている数字は固定のヒントです"],
+        ["Hãy giữ nguyên các số đề bài đã cho và dùng chúng làm điểm bắt đầu để suy luận các ô còn trống.", "Leave the given numbers as they are and use them as a starting point to deduce the empty cells.", "保持题目给定的数字不变，并以它们为起点推理其余空格。", "주어진 숫자는 그대로 두고, 이를 출발점으로 빈 칸을 추리하세요.", "与えられた数字はそのままにして、それを出発点に空きマスを推理しましょう。"],
+        ["Mẹo nhập số", "Entry tips", "输入技巧", "입력 요령", "入力のコツ"],
+        ["Ghi chú ứng viên", "Candidate notes", "候选数笔记", "후보 숫자 메모", "候補数字のメモ"],
+        ["Bật chế độ ghi chú để lưu tạm các số có thể điền vào ô. Khi một số đã được xác định ở hàng, cột hoặc khối, hãy loại số đó khỏi các ghi chú liên quan.", "Turn on notes mode to jot down the numbers a cell could hold. Once a number is settled in a row, column or box, remove it from the related notes.", "开启笔记模式可暂存格子可能填的数字。当某个数字在行、列或宫中确定后，请从相关笔记中删除它。", "메모 모드를 켜면 칸에 들어갈 수 있는 숫자를 임시로 적어 둘 수 있습니다. 행, 열, 블록에서 숫자가 확정되면 관련 메모에서 지우세요.", "メモモードをオンにすると、マスに入りうる数字を仮置きできます。行・列・ブロックで数字が確定したら、関連するメモから消しましょう。"],
+        ["Kỹ thuật giải Sudoku", "Sudoku solving techniques", "数独解题技巧", "스도쿠 해법 기술", "数独の解法テクニック"],
+        ["1. Naked Single — Ô chỉ còn một ứng viên", "1. Naked Single — a cell with one candidate", "1. 唯一候选数（Naked Single）", "1. 네이키드 싱글 — 후보가 하나뿐인 칸", "1. ネイキッドシングル — 候補が1つだけのマス"],
+        ["2. Hidden Single — Số chỉ có một vị trí", "2. Hidden Single — a number with one place", "2. 隐性唯一数（Hidden Single）", "2. 히든 싱글 — 들어갈 자리가 하나뿐인 숫자", "2. ヒドゥンシングル — 入る場所が1か所だけの数字"],
+        ["3. Locked Candidates — Ứng viên bị khóa", "3. Locked Candidates", "3. 区块摒除（Locked Candidates）", "3. 락드 캔디데이트", "3. ロックト・キャンディデイト"],
+        ["4. Naked Pair / Triple — Cặp hoặc bộ ba trần", "4. Naked Pair / Triple", "4. 显性数对 / 三数组（Naked Pair / Triple）", "4. 네이키드 페어 / 트리플", "4. ネイキッドペア／トリプル"],
+        ["5. X-Wing — Mẫu chữ nhật", "5. X-Wing — the rectangle pattern", "5. X-Wing（矩形模式）", "5. X-Wing — 직사각형 패턴", "5. X-Wing — 長方形パターン"],
+        ["6. Swordfish — Mẫu ba hàng, ba cột", "6. Swordfish — the three-row, three-column pattern", "6. Swordfish（三行三列模式）", "6. Swordfish — 3행 3열 패턴", "6. Swordfish — 3行3列パターン"],
+        ["Ví dụ:", "Example:", "示例：", "예시:", "例："],
+        ["Mẹo nhỏ:", "Tip:", "小提示：", "팁:", "ヒント："],
+        ["Lịch sử ván chơi gần đây", "Recent games", "最近的游戏", "최근 게임 기록", "最近のプレイ履歴"],
+        ["Điểm chỉ cộng khi điền đúng đáp án. Lỗi trùng, dùng gợi ý hoặc xóa đáp án đúng có thể làm giảm điểm.", "Points are only awarded for correct answers. Duplicate errors, using hints or erasing correct answers can reduce your score.", "只有填对答案才加分。重复错误、使用提示或清除正确答案可能会扣分。", "정답을 입력할 때만 점수가 올라갑니다. 중복 실수, 힌트 사용, 정답 삭제는 점수가 깎일 수 있습니다.", "正解を入力したときだけ得点が加算されます。重複ミス、ヒントの使用、正解の消去は減点になることがあります。"],
+        ["Đóng", "Close", "关闭", "닫기", "閉じる"],
+        ["Thành tích Sudoku của bạn", "Your Sudoku achievements", "你的数独成绩", "나의 스도쿠 기록", "あなたの数独の成績"],
+        ["Ván đã chơi", "Games played", "已玩局数", "플레이한 게임", "プレイ数"],
+        ["Ván đã thắng", "Games won", "获胜局数", "승리한 게임", "勝利数"],
+        ["Tỷ lệ thắng", "Win rate", "胜率", "승률", "勝率"],
+        ["Chuỗi hiện tại", "Current streak", "当前连胜", "현재 연승", "現在の連勝"],
+        ["Chuỗi dài nhất", "Best streak", "最长连胜", "최장 연승", "最長連勝"],
+        ["Thời gian tốt nhất theo độ khó", "Best time by difficulty", "各难度最佳用时", "난이도별 최고 기록", "難易度別ベストタイム"],
+        ["Đổi Bài", "Change puzzle", "换题", "퍼즐 바꾸기", "パズルを変更"],
+        ["Một màn chơi mới sẽ được bắt đầu. Bạn có muốn tiếp tục?", "A new game will be started. Do you want to continue?", "将开始新的一局。是否继续？", "새 게임이 시작됩니다. 계속하시겠습니까?", "新しいゲームが始まります。続けますか？"],
+        ["OK", "OK", "确定", "확인", "OK"],
+        ["Hủy", "Cancel", "取消", "취소", "キャンセル"],
+        ["Thời gian", "Time", "时间", "시간", "タイム"],
+        ["Các gợi ý hướng dẫn sẽ giúp bạn biết cách giải đố sudoku", "Hints will show you how to solve the Sudoku puzzle", "提示会教你如何解开数独", "힌트를 사용하면 스도쿠를 푸는 방법을 알 수 있습니다", "ヒントを使うと数独の解き方がわかります"],
+        ["Tiếp tục trò chơi", "Resume game", "继续游戏", "게임 계속하기", "ゲームを再開"],
+        ["Trò chơi kết thúc", "Game over", "游戏结束", "게임 오버", "ゲームオーバー"],
+        ["Bạn đã thua trò chơi vì bạn mắc 3 lỗi.", "You lost the game because you made 3 errors.", "你犯了 3 次错误，游戏失败。", "실수 3번으로 게임에서 졌습니다.", "3回ミスしたため、ゲームに負けました。"],
+        ["Khởi động lại", "Restart", "重新开始", "다시 시작", "リスタート"],
+        ["Chiến thắng!", "Victory!", "胜利！", "승리!", "勝利！"],
+        ["Tuyệt vời! Bạn đã hoàn thành Sudoku.", "Awesome! You completed the Sudoku.", "太棒了！你已完成数独。", "훌륭해요! 스도쿠를 완성했습니다.", "お見事！数独をクリアしました。"],
+        ["✦ Chơi tiếp", "✦ Play again", "✦ 继续玩", "✦ 계속 플레이", "✦ 続けてプレイ"],
+        ["↻ Chơi lại", "↻ Replay", "↻ 重玩", "↻ 다시 하기", "↻ もう一度"],
+        ["Chiến thắng", "Won", "胜利", "승리", "勝利"],
+        ["Thua", "Lost", "失败", "패배", "敗北"],
+        ["Chơi lại", "Restarted", "重玩", "다시 시작함", "やり直し"],
+        ["Chưa hoàn thành", "Unfinished", "未完成", "미완료", "未完了"],
+        ["Chưa có ván chơi nào được lưu.", "No games saved yet.", "还没有保存的游戏。", "저장된 게임이 없습니다.", "保存されたゲームはまだありません。"],
+        ["{n} điểm", "{n} pts", "{n} 分", "{n}점", "{n}点"],
+        ["{d} · {t} · {e} lỗi", "{d} · {t} · {e} errors", "{d} · {t} · {e} 个错误", "{d} · {t} · 실수 {e}회", "{d} · {t} · ミス{e}回"],
+        ["Không thể lưu lịch sử ván chơi trên thiết bị này.", "Unable to save game history on this device.", "无法在此设备上保存游戏记录。", "이 기기에 게임 기록을 저장할 수 없습니다.", "この端末にプレイ履歴を保存できません。"],
+        ["Không thể lưu thống kê trên thiết bị này.", "Unable to save statistics on this device.", "无法在此设备上保存统计数据。", "이 기기에 통계를 저장할 수 없습니다.", "この端末に統計を保存できません。"],
+        ["Có lỗi xảy ra", "Something went wrong", "出错了", "오류가 발생했습니다", "エラーが発生しました"],
+        ["Gợi ý quan trọng", "Important tip", "重要提示", "중요한 힌트", "重要なヒント"],
+        ["Hàng {r}, cột {c}", "Row {r}, column {c}", "第 {r} 行，第 {c} 列", "{r}행 {c}열", "{r}行{c}列"],
+        [", số {v}", ", number {v}", "，数字 {v}", ", 숫자 {v}", "、数字{v}"],
+        [", ô trống", ", empty cell", "，空格", ", 빈 칸", "、空きマス"],
+        [", ghi chú {n}", ", notes {n}", "，笔记 {n}", ", 메모 {n}", "、メモ {n}"],
+        [", số cho sẵn", ", given number", "，给定数字", ", 주어진 숫자", "、最初から入っている数字"],
+        [", số vừa nhập không hợp lệ", ", the number just entered is invalid", "，刚输入的数字不合法", ", 방금 입력한 숫자가 올바르지 않습니다", "、入力した数字は無効です"],
+        ["Điền số {d}, còn {n} ô", "Fill {d}, {n} left", "填入 {d}，还剩 {n} 个", "{d} 입력, {n}칸 남음", "{d}を入力、残り{n}マス"],
+        [", đã đủ 9 số, không thể chọn", ", all 9 placed, cannot select", "，9 个已填满，无法选择", ", 9개를 모두 채워 선택할 수 없습니다", "、9個すべて入っているため選択できません"],
+        [", đây là đáp án đúng cho ô đang chọn", ", this is the correct answer for the selected cell", "，这是所选格子的正确答案", ", 선택한 칸의 정답입니다", "、選択中のマスの正解です"],
+        [", đã có trong hàng, cột hoặc khối 3x3 của ô đang chọn, không thể ghi chú", ", already in the selected cell's row, column or 3x3 box, cannot add as a note", "，已在所选格子的行、列或 3x3 宫中，无法添加笔记", ", 선택한 칸의 행, 열 또는 3x3 블록에 이미 있어 메모할 수 없습니다", "、選択中のマスの行・列・3x3ブロックにすでにあるためメモできません"],
+        ["hàng", "row", "行", "행", "行"],
+        ["cột", "column", "列", "열", "列"],
+        ["khối 3x3", "3x3 box", "3x3 宫", "3x3 블록", "3x3ブロック"],
+        ["Trùng ở {u}!", "Duplicate in the {u}!", "{u}中有重复！", "{u}에 중복이 있습니다!", "{u}に重複があります！"],
+        ["Số này không đúng với đáp án!", "This number does not match the answer!", "这个数字与答案不符！", "이 숫자는 정답과 다릅니다!", "この数字は正解と違います！"],
+        ["Đã giữ số. Chạm vào một ô trống để điền.", "Number locked. Tap an empty cell to fill it.", "已锁定数字。点按空格即可填入。", "숫자를 고정했습니다. 빈 칸을 눌러 입력하세요.", "数字を固定しました。空きマスをタップして入力します。"],
+        ["Hãy chọn một ô trống trước nhé.", "Please select an empty cell first.", "请先选择一个空格。", "먼저 빈 칸을 선택하세요.", "先に空きマスを選んでください。"],
+        ["Xóa số chính thức trong ô trước khi thêm ghi chú.", "Erase the number in the cell before adding notes.", "添加笔记前请先清除格子中的数字。", "메모를 추가하기 전에 칸의 숫자를 지우세요.", "メモを追加する前にマスの数字を消してください。"],
+        ["Số này đã có trong hàng, cột hoặc khối 3x3 nên không thể ghi chú.", "This number is already in the row, column or 3x3 box, so it can't be noted.", "该数字已在行、列或 3x3 宫中，无法添加笔记。", "이 숫자는 행, 열 또는 3x3 블록에 이미 있어 메모할 수 없습니다.", "この数字は行・列・3x3ブロックにすでにあるため、メモできません。"],
+        ["Đã cập nhật ghi chú cho ô.", "Cell notes updated.", "已更新格子笔记。", "칸의 메모를 업데이트했습니다.", "マスのメモを更新しました。"],
+        ["Bạn đã mắc lỗi lần thứ hai. Hãy thử dùng Gợi ý để được trợ giúp nhé!", "That's your second error. Try using a Hint for help!", "这是你的第二次错误。试试用提示来帮忙吧！", "두 번째 실수입니다. 힌트를 사용해 보세요!", "2回目のミスです。ヒントを使ってみましょう！"],
+        ["Bạn đã dùng hết lượt xóa trong bàn chơi này.", "You have used all your erases on this board.", "本局的清除次数已用完。", "이 판의 지우기 횟수를 모두 사용했습니다.", "この盤面の消去回数を使い切りました。"],
+        ["Chính xác! Tiếp tục thôi.", "Correct! Keep going.", "正确！继续加油。", "정답입니다! 계속하세요.", "正解！その調子です。"],
+        ["Đã điền số. Hãy kiểm tra lời giải.", "Number placed. Check your solution.", "已填入数字。请检查你的解答。", "숫자를 입력했습니다. 풀이를 확인하세요.", "数字を入力しました。解答を確認してください。"],
+        ["Đã xóa số trong ô.", "Cell cleared.", "已清除格子中的数字。", "칸의 숫자를 지웠습니다.", "マスの数字を消しました。"],
+        ["Đã hoàn tác.", "Undone.", "已撤销。", "실행 취소했습니다.", "元に戻しました。"],
+        ["Bạn đã dùng hết lượt gợi ý.", "You have used all your hints.", "提示次数已用完。", "힌트를 모두 사용했습니다.", "ヒントを使い切りました。"],
+        ["Đã điền một ô gợi ý cho bạn.", "A hint cell has been filled in for you.", "已为你填入一个提示格。", "힌트 칸을 채워 드렸습니다.", "ヒントのマスを1つ入力しました。"],
+        ["Chọn một ô trống rồi nhập số bạn muốn.", "Select an empty cell, then enter the number you want.", "选择一个空格，然后输入想填的数字。", "빈 칸을 선택한 뒤 원하는 숫자를 입력하세요.", "空きマスを選んで、入れたい数字を入力してください。"],
+        ["Ván chơi đã được đặt lại. Chúc bạn may mắn!", "The game has been reset. Good luck!", "游戏已重置。祝你好运！", "게임이 초기화되었습니다. 행운을 빕니다!", "ゲームをリセットしました。頑張って！"],
+        ["Ô đã chọn. Đang điền số đã giữ.", "Cell selected. Filling in the locked number.", "已选择格子，正在填入锁定的数字。", "칸을 선택했습니다. 고정한 숫자를 입력합니다.", "マスを選択しました。固定した数字を入力中です。"],
+        ["Ô đã chọn. Nhập số từ 1 đến 9.", "Cell selected. Enter a number from 1 to 9.", "已选择格子。请输入 1 到 9 的数字。", "칸을 선택했습니다. 1~9 숫자를 입력하세요.", "マスを選択しました。1〜9の数字を入力してください。"],
+        ["Chế độ ghi chú đang bật. Chọn ô trống rồi nhập số cần ghi chú.", "Notes mode is on. Select an empty cell and enter the numbers to note.", "笔记模式已开启。选择空格并输入要记录的数字。", "메모 모드가 켜져 있습니다. 빈 칸을 선택하고 메모할 숫자를 입력하세요.", "メモモードがオンです。空きマスを選んでメモする数字を入力してください。"],
+        ["Chế độ ghi chú đã tắt.", "Notes mode is off.", "笔记模式已关闭。", "메모 모드가 꺼졌습니다.", "メモモードがオフです。"],
+        ["Bảng vẫn còn ô trống hoặc số chưa chính xác.", "The board still has empty cells or incorrect numbers.", "棋盘上仍有空格或不正确的数字。", "보드에 아직 빈 칸이나 틀린 숫자가 있습니다.", "盤面にまだ空きマスや間違った数字があります。"],
+        ["Tiếp tục trò chơi", "Resume game", "继续游戏", "게임 계속하기", "ゲームを再開"]
+      ];
+      const GUIDE_HTML = {
+        "guide-hint": ["Chọn một ô trống rồi nhấn <strong>Gợi ý</strong> để điền đáp án đúng vào ô đó. Nếu chưa chọn ô phù hợp, trò chơi sẽ chọn một ô còn cần giải. Mỗi ván có 3 lượt gợi ý; mỗi lượt bị trừ 20 điểm.", "Select an empty cell and tap <strong>Hint</strong> to fill in the correct answer. If no suitable cell is selected, the game picks one that still needs solving. Each game has 3 hints; each hint costs 20 points.", "选择一个空格并点按<strong>提示</strong>，即可填入正确答案。如果未选择合适的格子，游戏会挑选一个尚未解出的格子。每局有 3 次提示，每次扣 20 分。", "빈 칸을 선택하고 <strong>힌트</strong>를 누르면 정답이 입력됩니다. 적절한 칸을 선택하지 않으면 아직 풀지 않은 칸이 자동으로 선택됩니다. 한 판에 힌트는 3번이며 한 번당 20점이 차감됩니다.", "空きマスを選んで<strong>ヒント</strong>を押すと正解が入力されます。適切なマスが未選択の場合は、未解決のマスが自動で選ばれます。1ゲームにつきヒントは3回で、1回ごとに20点減点されます。"],
+        "guide-lock": ["Bật <strong>Giữ số</strong>, chọn một số trên bàn phím rồi chạm lần lượt các ô muốn điền số đó. Tắt chế độ này khi muốn chọn số khác hoặc nhập theo cách thông thường.", "Turn on <strong>Number lock</strong>, pick a number on the pad, then tap the cells where you want it. Turn it off to choose another number or enter numbers the usual way.", "开启<strong>锁定数字</strong>，在键盘上选择一个数字，然后依次点按想填入该数字的格子。想换数字或按常规方式输入时请关闭此模式。", "<strong>숫자 고정</strong>을 켜고 패드에서 숫자를 고른 뒤, 그 숫자를 넣을 칸을 차례로 누르세요. 다른 숫자를 고르거나 일반 방식으로 입력하려면 끄세요.", "<strong>数字ロック</strong>をオンにして、パッドで数字を選び、入れたいマスを順にタップします。別の数字を選ぶときや通常の入力に戻すときはオフにしてください。"],
+        "guide-naked-single-ex": ["<strong>Ví dụ:</strong> Ô chưa thể là 1, 2, 3, 4, 5, 6, 8 hoặc 9; vậy ứng viên duy nhất là 7.", "<strong>Example:</strong> The cell can't be 1, 2, 3, 4, 5, 6, 8 or 9, so the only candidate is 7.", "<strong>示例：</strong>该格不可能是 1、2、3、4、5、6、8 或 9，因此唯一的候选数是 7。", "<strong>예시:</strong> 이 칸은 1, 2, 3, 4, 5, 6, 8, 9가 될 수 없으므로 유일한 후보는 7입니다.", "<strong>例：</strong>このマスは1、2、3、4、5、6、8、9になれないため、唯一の候補は7です。"],
+        "guide-hidden-single-ex": ["<strong>Ví dụ:</strong> Trong một khối 3×3, chỉ ô này có thể chứa số 5 theo các hàng và cột đang bị chặn, nên ô này phải là 5.", "<strong>Example:</strong> In a 3×3 box, only this cell can hold a 5 given the blocked rows and columns, so this cell must be 5.", "<strong>示例：</strong>在某个 3×3 宫中，根据被封锁的行和列，只有这个格子能填 5，所以它必须是 5。", "<strong>예시:</strong> 한 3×3 블록에서 막힌 행과 열을 고려하면 이 칸만 5가 들어갈 수 있으므로 이 칸은 5입니다.", "<strong>例：</strong>3×3ブロック内で、ふさがれた行と列を考えると5が入るのはこのマスだけなので、このマスは5です。"],
+        "guide-callout": ["<strong>Mẹo nhỏ:</strong> Sau mỗi lần điền số, cập nhật lại các ứng viên và tiếp tục tìm Naked Single, Hidden Single trước. Nếu chưa chắc chắn, đừng đoán — hãy kiểm tra lại hàng, cột và khối.", "<strong>Tip:</strong> After each number you place, update the candidates and look for Naked Singles and Hidden Singles first. If you're unsure, don't guess — recheck the row, column and box.", "<strong>小提示：</strong>每填一个数字后，更新候选数，并优先寻找唯一候选数和隐性唯一数。如果不确定，不要猜测，请重新检查行、列和宫。", "<strong>팁:</strong> 숫자를 넣을 때마다 후보를 갱신하고 네이키드 싱글과 히든 싱글을 먼저 찾으세요. 확신이 없으면 추측하지 말고 행, 열, 블록을 다시 확인하세요.", "<strong>ヒント：</strong>数字を入れるたびに候補を更新し、まずネイキッドシングルとヒドゥンシングルを探しましょう。自信がないときは推測せず、行・列・ブロックを再確認してください。"]
+      };
+      const GUIDE_BODIES = [
+        ["Liệt kê các số chưa có trong hàng, cột và khối của một ô. Nếu chỉ còn đúng một số hợp lệ, điền số đó ngay.", "List the numbers missing from a cell's row, column and box. If only one valid number remains, place it right away."],
+        ["Xét từng số còn thiếu trong một hàng, cột hoặc khối. Nếu số đó chỉ có thể đặt ở một ô trong vùng, hãy điền nó — dù ô ấy còn có ứng viên khác.", "Look at each missing number in a row, column or box. If it can only go in one cell of that region, place it — even if that cell has other candidates."],
+        ["Nếu mọi vị trí có thể đặt một số trong khối 3×3 đều nằm trên cùng một hàng (hoặc cột), số đó không thể xuất hiện ở phần còn lại của hàng (hoặc cột) bên ngoài khối. Chiều ngược lại cũng áp dụng khi các vị trí của một hàng hoặc cột nằm gọn trong một khối.", "If every place a number can go in a 3×3 box lies in the same row (or column), that number cannot appear in the rest of that row (or column) outside the box. The reverse also applies when a row's or column's positions lie within a single box."],
+        ["Nếu hai ô trong cùng một hàng, cột hoặc khối có cùng đúng hai ứng viên — chẳng hạn cả hai chỉ có {2, 8} — hai số ấy phải thuộc về hai ô đó. Hãy loại chúng khỏi các ô khác trong vùng. Với Naked Triple, ba ô có ứng viên thuộc chung một nhóm ba số; loại các số đó khỏi những ô còn lại trong vùng.", "If two cells in the same row, column or box share exactly the same two candidates — say both only have {2, 8} — those numbers belong to those two cells. Remove them from the other cells in the region. For a Naked Triple, three cells whose candidates come from one group of three numbers; remove those numbers from the remaining cells in the region."],
+        ["Tìm hai hàng mà trong mỗi hàng, một số chỉ có thể nằm ở cùng hai cột. Bốn vị trí tạo thành hình chữ nhật; số đó phải nằm trên một trong hai góc ở mỗi hàng, nên có thể loại nó khỏi các ô khác trong hai cột ấy.", "Find two rows in which a number can only go in the same two columns. The four positions form a rectangle; the number must occupy one of the two corners in each row, so it can be removed from other cells in those two columns."],
+        ["Mở rộng ý tưởng X-Wing: nếu ứng viên trong ba hàng chỉ nằm ở cùng ba cột, số đó đã được dành cho ba cột ấy. Loại ứng viên đó khỏi các ô khác trong ba cột. Kỹ thuật này hiếm hơn; hãy ghi chú ứng viên cẩn thận trước khi áp dụng.", "An extension of X-Wing: if a candidate in three rows only appears in the same three columns, the number is reserved for those columns. Remove it from other cells in the three columns. This is rarer; note candidates carefully before applying it."]
+      ];
+
+      const translations = { en: {}, zh: {}, ko: {}, ja: {} };
+      const TRANSLATED_LANGUAGES = ["en", "zh", "ko", "ja"];
+      TRANSLATION_ROWS.forEach((row) => TRANSLATED_LANGUAGES.forEach((lang, i) => { translations[lang][row[0]] = row[i + 1]; }));
+      GUIDE_BODIES.forEach(([vi, en]) => { translations.en[vi] = en; });
+      Object.entries(GUIDE_HTML).forEach(([id, row]) => TRANSLATED_LANGUAGES.forEach((lang, i) => { translations[lang][id] = row[i + 1]; }));
+      const i18nNodeState = new WeakMap();
+
+      function loadLanguage() {
+        try {
+          const saved = localStorage.getItem(LANGUAGE_KEY);
+          if (saved && Object.prototype.hasOwnProperty.call(LANGUAGES, saved)) return saved;
+        } catch {
+          /* localStorage không khả dụng: dùng ngôn ngữ mặc định */
+        }
+        return "vi";
+      }
+
+      let currentLanguage = loadLanguage();
+
+      function t(key, params) {
+        let text = GUIDE_HTML[key] ? GUIDE_HTML[key][0] : key;
+        if (currentLanguage !== "vi") {
+          const dictionary = translations[currentLanguage] || {};
+          text = dictionary[key] ?? translations.en[key] ?? key;
+        }
+        return params ? text.replace(/\{(\w+)\}/g, (match, name) => (name in params ? String(params[name]) : match)) : text;
+      }
+
+      function translateNodeValue(node, key, read, write) {
+        let state = i18nNodeState.get(node);
+        if (!state) { state = {}; i18nNodeState.set(node, state); }
+        const current = read();
+        if (!state[key] || state[key].applied !== current) state[key] = { orig: current, applied: current };
+        const trimmed = state[key].orig.trim();
+        if (!trimmed) return;
+        const next = state[key].orig.replace(trimmed, () => t(trimmed));
+        state[key].applied = next;
+        if (next !== current) write(next);
+      }
+
+      function applyStaticTranslations() {
+        document.body.querySelectorAll("*").forEach((element) => {
+          if (element.tagName === "SCRIPT") return;
+          ["aria-label", "title"].forEach((attribute) => {
+            if (element.hasAttribute(attribute)) {
+              translateNodeValue(element, attribute, () => element.getAttribute(attribute), (value) => element.setAttribute(attribute, value));
+            }
+          });
+          if (element.dataset.i18nHtml) element.innerHTML = t(element.dataset.i18nHtml);
+        });
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        const textNodes = [];
+        while (walker.nextNode()) textNodes.push(walker.currentNode);
+        textNodes.forEach((node) => {
+          const parent = node.parentElement;
+          if (!parent || parent.tagName === "SCRIPT" || parent.closest("[data-i18n-html]")) return;
+          translateNodeValue(node, "text", () => node.data, (value) => { node.data = value; });
+        });
+      }
       const boardElement = document.getElementById("board");
       const appElement = document.querySelector(".app");
       const lobbyElement = document.getElementById("lobby");
@@ -1205,8 +1486,7 @@
       const dailyCountdownElement = document.getElementById("daily-countdown");
       const dailyDateElement = document.getElementById("daily-date");
       const today = new Date();
-      dailyDateElement.textContent = `thg ${String(today.getMonth() + 1).padStart(2, "0")} ${String(today.getDate()).padStart(2, "0")}`;
-      const toastElement = document.getElementById("toast");
+            const toastElement = document.getElementById("toast");
       const toastTitleElement = document.getElementById("toast-title");
       const toastMessageElement = document.getElementById("toast-message");
       const difficultyState = { value: "medium" };
@@ -1238,6 +1518,9 @@
       const correctEntryPoints = { easy: 50, medium: 100, hard: 150, harder: 200, expert: 250 };
       const difficultyNames = { easy: "Dễ", medium: "Vừa", hard: "Khó", harder: "Khó hơn", expert: "Chuyên gia" };
       const gameOutcomes = { won: "Chiến thắng", lost: "Thua", restarted: "Chơi lại", abandoned: "Chưa hoàn thành" };
+      function difficultyText(difficulty = difficultyState.value) {
+        return t(difficultyNames[difficulty] || difficultyNames.medium);
+      }
       let gameHistory = loadGameHistory();
       let gameStatistics = loadGameStatistics();
 
@@ -1371,7 +1654,7 @@
           const item = document.createElement("div");
           item.className = "best-time";
           const label = document.createElement("span");
-          label.textContent = name;
+          label.textContent = t(name);
           const time = document.createElement("strong");
           const bestTime = gameStatistics.bestTimes[difficulty];
           time.textContent = bestTime === undefined ? "—" : formatDuration(bestTime);
@@ -1385,7 +1668,7 @@
         if (gameHistory.length === 0) {
           const empty = document.createElement("p");
           empty.className = "game-history-empty";
-          empty.textContent = "Chưa có ván chơi nào được lưu.";
+          empty.textContent = t("Chưa có ván chơi nào được lưu.");
           gameHistoryList.appendChild(empty);
           return;
         }
@@ -1395,20 +1678,20 @@
           const heading = document.createElement("div");
           heading.className = "game-history-heading";
           const outcome = document.createElement("span");
-          outcome.textContent = gameOutcomes[game.outcome] || gameOutcomes.abandoned;
+          outcome.textContent = t(gameOutcomes[game.outcome] || gameOutcomes.abandoned);
           const points = document.createElement("span");
           points.className = "game-history-score";
-          points.textContent = `${game.score} điểm`;
+          points.textContent = t("{n} điểm", { n: game.score });
           heading.append(outcome, points);
           const details = document.createElement("div");
           details.className = "game-history-details";
           const date = document.createElement("span");
           const parsedDate = new Date(game.date);
-          date.textContent = Number.isNaN(parsedDate.getTime()) ? "" : parsedDate.toLocaleString("vi-VN");
+          date.textContent = Number.isNaN(parsedDate.getTime()) ? "" : parsedDate.toLocaleString(LANGUAGE_LOCALES[currentLanguage]);
           const duration = document.createElement("span");
           const minutes = Math.floor(game.duration / 60);
           const seconds = game.duration % 60;
-          duration.textContent = `${difficultyNames[game.difficulty] || "Vừa"} · ${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")} · ${game.errors} lỗi`;
+          duration.textContent = t("{d} · {t} · {e} lỗi", { d: difficultyText(game.difficulty), t: `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`, e: game.errors });
           details.append(date, duration);
           item.append(heading, details);
           gameHistoryList.appendChild(item);
@@ -1534,8 +1817,8 @@
       function setMessage(text, kind = "") {
         if (kind !== "error" && kind !== "hint") return;
         window.clearTimeout(toastTimeout);
-        toastTitleElement.textContent = kind === "error" ? "Có lỗi xảy ra" : "Gợi ý quan trọng";
-        toastMessageElement.textContent = text;
+        toastTitleElement.textContent = t(kind === "error" ? "Có lỗi xảy ra" : "Gợi ý quan trọng");
+        toastMessageElement.textContent = t(text);
         toastElement.className = kind === "error" ? "toast show error" : "toast show success";
         toastTimeout = window.setTimeout(() => toastElement.classList.remove("show"), 3200);
       }
@@ -1594,8 +1877,8 @@
           cell.dataset.index = String(index);
           cell.setAttribute("role", "gridcell");
           const cellNotes = notes[index];
-          const notesLabel = cellNotes.size ? `, ghi chú ${Array.from(cellNotes).sort().join(", ")}` : "";
-          cell.setAttribute("aria-label", `Hàng ${row + 1}, cột ${column + 1}${value ? `, số ${value}` : ", ô trống"}${notesLabel}${given ? ", số cho sẵn" : ""}${invalidCells.has(index) ? ", số vừa nhập không hợp lệ" : ""}`);
+          const notesLabel = cellNotes.size ? t(", ghi chú {n}", { n: Array.from(cellNotes).sort().join(", ") }) : "";
+          cell.setAttribute("aria-label", `${t("Hàng {r}, cột {c}", { r: row + 1, c: column + 1 })}${value ? t(", số {v}", { v: value }) : t(", ô trống")}${notesLabel}${given ? t(", số cho sẵn") : ""}${invalidCells.has(index) ? t(", số vừa nhập không hợp lệ") : ""}`);
           if (given) {
             cell.classList.add("given");
             cell.disabled = true;
@@ -1648,7 +1931,7 @@
           const noteConflict = notesMode && selectedCell >= 0 && !values[selectedCell] &&
             !notes[selectedCell].has(digit) && violatesRules(selectedCell, digit);
           button.querySelector(".remaining-count").textContent = String(remaining);
-          button.setAttribute("aria-label", `Điền số ${digit}, còn ${remaining} ô${exhausted && !correctEntryAvailable ? ", đã đủ 9 số, không thể chọn" : correctEntryAvailable && exhausted ? ", đây là đáp án đúng cho ô đang chọn" : noteConflict ? ", đã có trong hàng, cột hoặc khối 3x3 của ô đang chọn, không thể ghi chú" : ""}`);
+          button.setAttribute("aria-label", `${t("Điền số {d}, còn {n} ô", { d: digit, n: remaining })}${exhausted && !correctEntryAvailable ? t(", đã đủ 9 số, không thể chọn") : correctEntryAvailable && exhausted ? t(", đây là đáp án đúng cho ô đang chọn") : noteConflict ? t(", đã có trong hàng, cột hoặc khối 3x3 của ô đang chọn, không thể ghi chú") : ""}`);
         });
       }
 
@@ -1668,7 +1951,7 @@
         errorsElement.classList.toggle("bad", errors > 0);
         document.getElementById("pause-time").textContent = `${minutesText}:${secondsText}`;
         document.getElementById("pause-errors").textContent = errorsElement.textContent;
-        document.getElementById("pause-difficulty").textContent = difficultyLabel.textContent;
+        document.getElementById("pause-difficulty").textContent = difficultyText();
         hintCountElement.textContent = String(hintsLeft);
         document.getElementById("hint").disabled = hintsLeft === 0;
         document.getElementById("undo").disabled = undoUses >= MAX_UNDO_USES || history.length === 0;
@@ -1706,7 +1989,7 @@
 
       function wrongEntryMessage(index, value) {
         return violatesRules(index, value)
-          ? `Trùng ở ${conflictLocation(index, value)}!`
+          ? t("Trùng ở {u}!", { u: t(conflictLocation(index, value)) })
           : "Số này không đúng với đáp án!";
       }
 
@@ -1960,7 +2243,7 @@
         document.getElementById("number-pad").classList.toggle("notes-mode", on);
         notesToggle.classList.toggle("active", on);
         notesToggle.setAttribute("aria-pressed", String(on));
-        notesToggle.setAttribute("aria-label", `${on ? "Tắt" : "Bật"} chế độ ghi chú`);
+        notesToggle.setAttribute("aria-label", t(on ? "Tắt chế độ ghi chú" : "Bật chế độ ghi chú"));
         notesState.textContent = on ? "ON" : "OFF";
         notesState.classList.toggle("off", !on);
         notesState.classList.toggle("on", on);
@@ -1976,7 +2259,7 @@
         numberLockState.textContent = on ? "ON" : "OFF";
         numberLockState.classList.toggle("off", !on);
         numberLockState.classList.toggle("on", on);
-        numberLockToggle.setAttribute("aria-label", `${on ? "Tắt" : "Bật"} Giữ số`);
+        numberLockToggle.setAttribute("aria-label", t(on ? "Tắt Giữ số" : "Bật Giữ số"));
         renderBoard();
       }
 
@@ -2003,7 +2286,7 @@
         document.querySelector("#pause-game svg").innerHTML = on
           ? '<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5Z"/>'
           : '<circle cx="12" cy="12" r="9"/><path d="M10 9v6m4-6v6"/>';
-        document.getElementById("pause-game").setAttribute("aria-label", on ? "Tiếp tục" : "Tạm dừng");
+        document.getElementById("pause-game").setAttribute("aria-label", t(on ? "Tiếp tục" : "Tạm dừng"));
         updateStats();
       }
 
@@ -2102,7 +2385,7 @@
           updateStats();
         }
         lobbyTimeElement.textContent = `${timerElement.querySelector("#timer-minutes").textContent}:${timerElement.querySelector("#timer-seconds").textContent}`;
-        lobbyDifficultyElement.textContent = difficultyLabel.textContent;
+        lobbyDifficultyElement.textContent = difficultyText();
         appElement.classList.add("hidden");
         lobbyElement.classList.add("show");
       });
@@ -2193,9 +2476,9 @@
         closeDifficultyPopover();
         if (option.dataset.value === difficultyState.value) return;
         difficultyState.value = option.dataset.value;
-        difficultyLabel.textContent = option.textContent.trim();
+        difficultyLabel.textContent = difficultyText(option.dataset.value);
         difficultyLabel.dataset.value = option.dataset.value;
-        difficultyToggle.setAttribute("aria-label", `Độ khó: ${difficultyLabel.textContent}`);
+        difficultyToggle.setAttribute("aria-label", t("Độ khó: {d}", { d: difficultyText() }));
         difficultyOptions.forEach((item) => item.setAttribute("aria-selected", String(item === option)));
         startNewGame();
       }));
@@ -2268,9 +2551,61 @@
       window.addEventListener("pageshow", (event) => {
         if (event.persisted && !finished) gameRecorded = false;
       });
+      function updateLanguageUI() {
+        document.documentElement.lang = currentLanguage === "zh" ? "zh-CN" : currentLanguage;
+        document.getElementById("language-value").textContent = LANGUAGES[currentLanguage];
+        document.querySelectorAll(".language-option").forEach((option) => {
+          option.setAttribute("aria-checked", String(option.dataset.lang === currentLanguage));
+          option.setAttribute("role", "radio");
+        });
+      }
+
+      function applyLanguage() {
+        updateLanguageUI();
+        applyStaticTranslations();
+        dailyDateElement.textContent = t("thg {m} {d}", { m: String(today.getMonth() + 1).padStart(2, "0"), d: String(today.getDate()).padStart(2, "0") });
+        difficultyLabel.textContent = difficultyText();
+        difficultyToggle.setAttribute("aria-label", t("Độ khó: {d}", { d: difficultyText() }));
+        notesToggle.setAttribute("aria-label", t(notesMode ? "Tắt chế độ ghi chú" : "Bật chế độ ghi chú"));
+        numberLockToggle.setAttribute("aria-label", t(numberLock ? "Tắt Giữ số" : "Bật Giữ số"));
+        document.getElementById("pause-game").setAttribute("aria-label", t(paused ? "Tiếp tục" : "Tạm dừng"));
+        lobbyDifficultyElement.textContent = difficultyText();
+        renderGameStatistics();
+        renderGameHistory();
+        updateStats();
+        renderBoard();
+      }
+
+      function setLanguage(lang) {
+        if (!Object.prototype.hasOwnProperty.call(LANGUAGES, lang)) return;
+        currentLanguage = lang;
+        try {
+          localStorage.setItem(LANGUAGE_KEY, lang);
+        } catch {
+          /* không lưu được: vẫn áp dụng cho phiên hiện tại */
+        }
+        applyLanguage();
+      }
+
+      const languageModal = document.getElementById("language-modal");
+      document.getElementById("open-language").addEventListener("click", () => {
+        closeSettings();
+        languageModal.classList.add("show");
+      });
+      function closeLanguage() {
+        languageModal.classList.remove("show");
+        settingsModal.classList.add("show");
+      }
+      document.getElementById("close-language").addEventListener("click", closeLanguage);
+      languageModal.addEventListener("click", (event) => { if (event.target === languageModal) closeLanguage(); });
+      document.querySelectorAll(".language-option").forEach((option) => {
+        option.addEventListener("click", () => setLanguage(option.dataset.lang));
+      });
+
       startNewGame();
       elapsedMs = currentElapsed();
       paused = true;
+      applyLanguage();
     })();
   </script>
 </body>
