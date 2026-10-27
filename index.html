@@ -1070,7 +1070,7 @@
             <button class="settings-row" id="open-language" type="button"><span class="settings-icon language" aria-hidden="true">🌐</span><span class="settings-label">Ngôn ngữ</span><span class="settings-value" id="language-value">Tiếng Việt</span><span class="settings-chevron" aria-hidden="true">›</span></button>
             <button class="settings-row" id="toggle-theme" type="button"><span class="settings-icon display" id="theme-icon" aria-hidden="true">☀</span><span class="settings-label">Chế độ màn hình</span><span class="settings-value" id="theme-value">Sáng</span><span class="settings-chevron" aria-hidden="true">›</span></button>
             <div class="settings-row"><span class="settings-icon sound" aria-hidden="true">🔊</span><span class="settings-label">Hiệu ứng âm thanh</span><button class="settings-toggle" id="sound-toggle" type="button" aria-label="Hiệu ứng âm thanh" aria-pressed="true"></button></div>
-            <div class="settings-row"><span class="settings-icon notifications" aria-hidden="true">🔔</span><span class="settings-label">Thông báo</span><button class="settings-toggle" type="button" aria-label="Thông báo" aria-pressed="true"></button></div>
+            <div class="settings-row"><span class="settings-icon notifications" aria-hidden="true">🔔</span><span class="settings-label">Thông báo</span><button class="settings-toggle" id="notification-toggle" type="button" aria-label="Thông báo" aria-pressed="true"></button></div>
           </div>
         </section>
         <section class="settings-group" aria-label="Hỗ trợ và cộng đồng">
@@ -1611,6 +1611,7 @@
       let currentGameId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       let gameRecorded = false;
       let toastTimeout;
+      let notificationsEnabled = true;
       let dailyChallengeSeconds = 8 * 60 * 60 + 42 * 60 + 16;
       const toolFeedbackTimeouts = new WeakMap();
 
@@ -1880,6 +1881,7 @@
 
       function setMessage(text, kind = "") {
         if (kind !== "error" && kind !== "hint") return;
+        if (!notificationsEnabled) return;
         window.clearTimeout(toastTimeout);
         toastTitleElement.textContent = t(kind === "error" ? "Có lỗi xảy ra" : "Gợi ý quan trọng");
         toastMessageElement.textContent = t(text);
@@ -2585,6 +2587,14 @@
         const on = soundToggle.getAttribute("aria-pressed") === "true";
         saveSetting("sudoku-sound", on ? "on" : "off");
         if (on) playSound("click");
+      });
+      const notificationToggle = document.getElementById("notification-toggle");
+      notificationsEnabled = readSetting("sudoku-notifications", "on") !== "off";
+      notificationToggle.setAttribute("aria-pressed", String(notificationsEnabled));
+      notificationToggle.addEventListener("click", () => {
+        notificationsEnabled = notificationToggle.getAttribute("aria-pressed") === "true";
+        saveSetting("sudoku-notifications", notificationsEnabled ? "on" : "off");
+        if (!notificationsEnabled) toastElement.classList.remove("show");
       });
       document.getElementById("open-statistics").addEventListener("click", () => {
         closeSettings();
