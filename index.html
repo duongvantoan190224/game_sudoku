@@ -1064,7 +1064,13 @@
     @media (orientation: portrait) and (max-width: 599px) {
       .app { flex-direction: column; align-items: stretch; }
       .board-wrap { flex: 1 1 0; width: 100%; align-self: stretch; }
-      .board { flex: 0 0 auto; width: min(94vw, 100cqh); max-width: 94vw; height: auto; max-height: 100%; aspect-ratio: 1; }
+      .board { flex: 0 0 auto; width: min(94vw, 450px, 100cqh); max-width: 450px; height: auto; max-height: 100%; aspect-ratio: 1; }
+      .board-wrap { min-height: 0; }
+      .app { gap: 3px; }
+      .topbar { min-height: 0; margin: 0; padding: 0 1px; }
+      .info-bar { min-height: 32px; margin: 0; padding-top: 0; padding-bottom: 0; }
+      .ad-banner { min-height: 44px; margin: 0; padding: 4px 8px; }
+      .ad-banner-icon { width: 32px; height: 32px; }
       .tool-row, .number-pad { flex: 0 0 auto; width: 100%; }
     }
     @media (orientation: portrait) and (min-width: 600px) and (max-width: 1024px) {
