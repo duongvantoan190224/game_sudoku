@@ -374,8 +374,8 @@
     .number-pad.notes-mode .number-button:not(:disabled) { opacity: .55; }
     .number-pad.notes-mode .number-button.note-highlight:not(:disabled) { opacity: 1; }
     .tool:active { transform: scale(.96); }
-    .number-pad.lock-mode .number-button:not(:disabled) { opacity: .45; }
-    .number-pad.lock-mode .number-button.selected:not(:disabled) { opacity: 1; font-weight: 900; }
+    .number-pad.lock-mode .number-button:not(:disabled),
+    .number-pad.lock-mode .number-button.note-highlight:not(:disabled) { opacity: .45; }
     .number-button:active { transform: scale(1.15); transition-duration: .06s; }
     .number-button:disabled { opacity: .3; cursor: default; }
 
