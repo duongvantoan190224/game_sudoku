@@ -279,6 +279,8 @@
 
     .tool-row { flex: 0 0 auto; min-width: 0; }
     .toolbar { display: grid; min-width: 0; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: stretch; gap: 5px; }
+    .toolbar.daily-mode { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .difficulty-control[hidden] { display: none; }
     .tool {
       --tool-color: #4569e8;
       --tool-bg: #fff;
@@ -2548,7 +2550,7 @@
       }
 
       const DAILY_KEY = "sudokuDailyChallenge";
-      const DAILY_DIFFICULTY = "medium";
+      const DAILY_DIFFICULTY = "hard";
       let dailyMode = false;
       let dailyDate = "";
 
@@ -2616,6 +2618,8 @@
       function updateModeBadge() {
         const badge = document.getElementById("mode-badge");
         badge.hidden = !dailyMode;
+        difficultyControl.hidden = dailyMode;
+        difficultyControl.parentElement.classList.toggle("daily-mode", dailyMode);
         if (dailyMode) {
           const [, month, day] = dailyDate.split("-");
           badge.textContent = `🏆 ${t("Thử thách hàng ngày")} - ${t("Ngày")} ${day}/${month}`;
