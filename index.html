@@ -937,7 +937,7 @@
     <header class="lobby-header">
       <div class="lobby-wallet" aria-label="Tài nguyên">
         <span class="wallet-pill"><span class="wallet-icon" aria-hidden="true">🪙</span><span>2.450</span></span>
-        <span class="wallet-pill"><span class="wallet-icon" aria-hidden="true">🔥</span><span>7</span></span>
+        <span class="wallet-pill"><span class="wallet-icon" aria-hidden="true">🔥</span><span id="streak-count">0</span></span>
       </div>
     </header>
     <div class="lobby-content">
@@ -963,7 +963,7 @@
           <p>Hoàn thành để nhận phần thưởng</p>
           <span class="daily-timer"><span aria-hidden="true">◷</span><span id="daily-countdown">08:42:16</span> còn lại</span>
         </div>
-        <button class="daily-cta" type="button" aria-label="Xem thử thách hàng ngày">Chơi</button>
+        <button class="daily-cta" id="daily-play" type="button" aria-label="Xem thử thách hàng ngày">Chơi</button>
       </article>
       <section class="classic-section" aria-labelledby="classic-title">
         <div class="classic-heading"><h2 id="classic-title">Sudoku cổ điển</h2></div>
@@ -1477,6 +1477,9 @@
         ["Bạn đã thua trò chơi vì bạn mắc 3 lỗi.", "You lost the game because you made 3 errors.", "你犯了 3 次错误，游戏失败。", "실수 3번으로 게임에서 졌습니다.", "3回ミスしたため、ゲームに負けました。"],
         ["Khởi động lại", "Restart", "重新开始", "다시 시작", "リスタート"],
         ["Chiến thắng!", "Victory!", "胜利！", "승리!", "勝利！"],
+        ["Đã xong", "Done", "已完成", "완료", "完了"],
+        ["Bạn đã hoàn thành thử thách hôm nay. Chuỗi hiện tại: {n} ngày.", "You already completed today's challenge. Current streak: {n} days.", "你已完成今日挑战。当前连胜：{n} 天。", "오늘의 챌린지를 이미 완료했습니다. 현재 연속: {n}일.", "本日のチャレンジは完了済みです。現在の連続記録：{n}日。"],
+        ["🎁 Chúc mừng! Hoàn thành Thử thách hàng ngày. Bạn nhận thưởng +{p} xu. Chuỗi: {n} ngày liên tiếp!", "🎁 Congratulations! Daily Challenge complete. You earned +{p} coins. Streak: {n} days in a row!", "🎁 恭喜！完成每日挑战，获得 +{p} 金币。连续 {n} 天！", "🎁 축하합니다! 일일 챌린지 완료. +{p} 코인 획득. {n}일 연속!", "🎁 おめでとう！デイリーチャレンジ達成。+{p}コイン獲得。{n}日連続！"],
         ["Tuyệt vời! Bạn đã hoàn thành Sudoku.", "Awesome! You completed the Sudoku.", "太棒了！你已完成数独。", "훌륭해요! 스도쿠를 완성했습니다.", "お見事！数独をクリアしました。"],
         ["✦ Chơi tiếp", "✦ Play again", "✦ 继续玩", "✦ 계속 플레이", "✦ 続けてプレイ"],
         ["↻ Chơi lại", "↻ Replay", "↻ 重玩", "↻ 다시 하기", "↻ もう一度"],
@@ -1677,15 +1680,16 @@
       let gameRecorded = false;
       let toastTimeout;
       let notificationsEnabled = true;
-      let dailyChallengeSeconds = 8 * 60 * 60 + 42 * 60 + 16;
       const toolFeedbackTimeouts = new WeakMap();
 
       function updateDailyCountdown() {
+        const now = new Date();
+        const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        const dailyChallengeSeconds = Math.max(0, Math.floor((midnight - now) / 1000));
         const hours = String(Math.floor(dailyChallengeSeconds / 3600)).padStart(2, "0");
         const minutes = String(Math.floor((dailyChallengeSeconds % 3600) / 60)).padStart(2, "0");
         const seconds = String(dailyChallengeSeconds % 60).padStart(2, "0");
         dailyCountdownElement.textContent = `${hours}:${minutes}:${seconds}`;
-        dailyChallengeSeconds = Math.max(0, dailyChallengeSeconds - 1);
       }
 
       function loadGameHistory() {
@@ -1865,10 +1869,26 @@
         saveGameHistory();
       }
 
+      let rng = Math.random;
+      function seededRandom(seedText) {
+        let h = 1779033703 ^ seedText.length;
+        for (let i = 0; i < seedText.length; i += 1) {
+          h = Math.imul(h ^ seedText.charCodeAt(i), 3432918353);
+          h = (h << 13) | (h >>> 19);
+        }
+        let a = h >>> 0;
+        return () => {
+          a = (a + 0x6D2B79F5) >>> 0;
+          let x = Math.imul(a ^ (a >>> 15), 1 | a);
+          x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
+          return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
       function shuffled(items) {
         const result = items.slice();
         for (let i = result.length - 1; i > 0; i -= 1) {
-          const j = Math.floor(Math.random() * (i + 1));
+          const j = Math.floor(rng() * (i + 1));
           [result[i], result[j]] = [result[j], result[i]];
         }
         return result;
@@ -2205,6 +2225,17 @@
           document.getElementById("victory-time").textContent = `${document.getElementById("timer-minutes").textContent}:${document.getElementById("timer-seconds").textContent}`;
           document.getElementById("victory-score").textContent = String(score);
           document.getElementById("victory-errors").textContent = errorsElement.textContent;
+          const victoryMessage = document.getElementById("victory-message");
+          if (dailyMode) {
+            const alreadyDone = Boolean(loadDailyData().results[dailyDate]);
+            const streak = completeDaily(Math.floor(elapsedMs / 1000));
+            victoryMessage.textContent = alreadyDone
+              ? t("Bạn đã hoàn thành thử thách hôm nay. Chuỗi hiện tại: {n} ngày.", { n: streak })
+              : t("🎁 Chúc mừng! Hoàn thành Thử thách hàng ngày. Bạn nhận thưởng +{p} xu. Chuỗi: {n} ngày liên tiếp!", { p: 100 + 20 * Math.min(streak, 7), n: streak });
+            renderDailyStatus();
+          } else {
+            victoryMessage.textContent = t("Tuyệt vời! Bạn đã hoàn thành Sudoku.");
+          }
           victoryModal.classList.add("show");
           playSound("win");
           document.getElementById("victory-new").focus();
@@ -2510,8 +2541,74 @@
         renderBoard();
       }
 
+      const DAILY_KEY = "sudokuDailyChallenge";
+      const DAILY_DIFFICULTY = "medium";
+      let dailyMode = false;
+      let dailyDate = "";
+
+      function dailyDateString(date = new Date()) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      }
+
+      function loadDailyData() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(DAILY_KEY) || "null");
+          if (saved && typeof saved === "object") {
+            return { streak: Number(saved.streak) || 0, lastCompleted: String(saved.lastCompleted || ""), results: saved.results && typeof saved.results === "object" ? saved.results : {} };
+          }
+        } catch (error) { /* localStorage không khả dụng hoặc dữ liệu lỗi */ }
+        return { streak: 0, lastCompleted: "", results: {} };
+      }
+
+      function currentStreak() {
+        const data = loadDailyData();
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const alive = data.lastCompleted === dailyDateString() || data.lastCompleted === dailyDateString(yesterday);
+        return alive ? data.streak : 0;
+      }
+
+      function renderDailyStatus() {
+        document.getElementById("streak-count").textContent = String(currentStreak());
+        const done = Boolean(loadDailyData().results[dailyDateString()]);
+        document.getElementById("daily-play").textContent = t(done ? "Đã xong" : "Chơi");
+      }
+
+      function completeDaily(seconds) {
+        const data = loadDailyData();
+        const key = dailyDate;
+        if (data.results[key]) return data.streak;
+        const prev = new Date(`${key}T00:00:00`);
+        prev.setDate(prev.getDate() - 1);
+        data.streak = data.lastCompleted === dailyDateString(prev) ? data.streak + 1 : 1;
+        data.lastCompleted = key;
+        data.results[key] = { seconds, completedAt: new Date().toISOString() };
+        try { localStorage.setItem(DAILY_KEY, JSON.stringify(data)); } catch (error) { /* ignore */ }
+        return data.streak;
+      }
+
+      function startDailyChallenge() {
+        recordGame("abandoned");
+        dailyMode = true;
+        dailyDate = dailyDateString();
+        rng = seededRandom(`sudoku-daily-${dailyDate}`);
+        let generated;
+        try { generated = createPuzzle(DAILY_DIFFICULTY); } finally { rng = Math.random; }
+        solution = generated.answer;
+        puzzle = generated.grid;
+        difficultyState.value = DAILY_DIFFICULTY;
+        difficultyLabel.textContent = difficultyText(DAILY_DIFFICULTY);
+        difficultyLabel.dataset.value = DAILY_DIFFICULTY;
+        difficultyOptions.forEach((item) => item.setAttribute("aria-selected", String(item.dataset.value === DAILY_DIFFICULTY)));
+        resetState();
+        currentGameId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        gameRecorded = false;
+        setMessage("Thử thách hàng ngày: bảng chơi giống nhau cho mọi người hôm nay.");
+      }
+
       function startNewGame() {
         recordGame("abandoned");
+        dailyMode = false;
         const generated = createPuzzle(difficultyState.value);
         solution = generated.answer;
         puzzle = generated.grid;
@@ -2590,6 +2687,15 @@
         lobbyElement.classList.remove("show");
         appElement.classList.remove("hidden");
         if (paused && !finished) setPaused(false);
+      });
+      document.getElementById("daily-play").addEventListener("click", () => {
+        lobbyElement.classList.remove("show");
+        appElement.classList.remove("hidden");
+        if (dailyMode && dailyDate === dailyDateString() && !finished) {
+          if (paused) setPaused(false);
+          return;
+        }
+        startDailyChallenge();
       });
       document.getElementById("lobby-new-game").addEventListener("click", () => {
         lobbyElement.classList.remove("show");
@@ -2768,6 +2874,7 @@
       });
 
       updateDailyCountdown();
+      renderDailyStatus();
       window.setInterval(updateStats, 1000);
       window.setInterval(updateDailyCountdown, 1000);
       window.addEventListener("pagehide", () => recordGame("abandoned"));
@@ -2793,6 +2900,7 @@
         numberLockToggle.setAttribute("aria-label", t(numberLock ? "Tắt Giữ số" : "Bật Giữ số"));
         document.getElementById("pause-game").setAttribute("aria-label", t(paused ? "Tiếp tục" : "Tạm dừng"));
         lobbyDifficultyElement.textContent = difficultyText();
+        renderDailyStatus();
         renderGameStatistics();
         renderGameHistory();
         updateStats();
