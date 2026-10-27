@@ -421,7 +421,7 @@
       font-size: 26px;
       line-height: 1;
     }
-    .settings-back:focus-visible, .settings-row:focus-visible, .settings-toggle:focus-visible, .settings-extra summary:focus-visible, .settings-extra .action-button:focus-visible { outline: 2px solid #8da3ff; outline-offset: 2px; }
+    .settings-back:focus-visible, .settings-row:focus-visible, .settings-toggle:focus-visible { outline: 2px solid #8da3ff; outline-offset: 2px; }
     .settings-content { overflow: auto; padding: 16px 18px 20px; overscroll-behavior: contain; }
     .settings-group { margin: 0 0 16px; }
     .settings-group:last-of-type { margin-bottom: 14px; }
@@ -500,10 +500,6 @@
     }
     .settings-toggle[aria-pressed="true"] { background: #34c759; }
     .settings-toggle[aria-pressed="true"]::after { transform: translateX(19px); }
-    .settings-extra { margin-top: 2px; border-radius: 14px; background: #fff; }
-    .settings-extra summary { padding: 13px 14px; color: #68758b; font-size: 13px; font-weight: 650; cursor: pointer; }
-    .settings-extra .modal-actions { padding: 0 12px 12px; }
-    .settings-extra .action-button { min-height: 38px; font-size: 12px; }
     .guide-modal { padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); }
     .guide-card {
       display: flex;
@@ -1009,15 +1005,6 @@
             <button class="settings-row" type="button"><span class="settings-icon community" aria-hidden="true">👥</span><span class="settings-label">Tham gia nhóm Facebook</span><span class="settings-chevron" aria-hidden="true">›</span></button>
           </div>
         </section>
-        <details class="settings-extra">
-          <summary>Tùy chọn ván chơi</summary>
-          <div class="modal-actions">
-            <button class="action-button" id="restart" type="button">↺ Chơi lại</button>
-            <button class="action-button" id="new-game" type="button">✦ Bàn mới</button>
-            <button class="action-button" id="show-game-history" type="button">Lịch sử ván chơi</button>
-            <button class="action-button" id="check-board" type="button">Kiểm tra kết quả</button>
-          </div>
-        </details>
       </div>
     </div>
   </div>
@@ -1303,7 +1290,6 @@
         ["Chia sẻ", "Share", "分享", "공유", "シェア"],
         ["Theo dõi trang Facebook", "Follow our Facebook page", "关注 Facebook 主页", "Facebook 페이지 팔로우", "Facebookページをフォロー"],
         ["Tham gia nhóm Facebook", "Join our Facebook group", "加入 Facebook 群组", "Facebook 그룹 참여", "Facebookグループに参加"],
-        ["Tùy chọn ván chơi", "Game options", "游戏选项", "게임 옵션", "ゲームオプション"],
         ["↺ Chơi lại", "↺ Restart", "↺ 重玩", "↺ 다시 시작", "↺ やり直す"],
         ["✦ Bàn mới", "✦ New board", "✦ 新棋盘", "✦ 새 판", "✦ 新しい盤面"],
         ["Lịch sử ván chơi", "Game history", "游戏记录", "게임 기록", "プレイ履歴"],
@@ -2434,12 +2420,6 @@
           toggle.setAttribute("aria-pressed", String(toggle.getAttribute("aria-pressed") !== "true"));
         });
       });
-      document.getElementById("show-game-history").addEventListener("click", () => {
-        closeSettings();
-        renderGameHistory();
-        gameHistoryModal.classList.add("show");
-        document.getElementById("close-game-history").focus();
-      });
       document.getElementById("open-statistics").addEventListener("click", () => {
         closeSettings();
         renderGameStatistics();
@@ -2455,8 +2435,6 @@
         if (event.target === gameHistoryModal) gameHistoryModal.classList.remove("show");
       });
 
-      document.getElementById("restart").addEventListener("click", () => { closeSettings(); restartGame(); });
-      document.getElementById("new-game").addEventListener("click", () => { closeSettings(); startNewGame(); });
       document.getElementById("game-over-restart").addEventListener("click", restartGame);
       document.getElementById("game-over-new").addEventListener("click", startNewGame);
       document.getElementById("victory-restart").addEventListener("click", restartGame);
@@ -2482,14 +2460,6 @@
         difficultyOptions.forEach((item) => item.setAttribute("aria-selected", String(item === option)));
         startNewGame();
       }));
-      document.getElementById("check-board").addEventListener("click", () => {
-        closeSettings();
-        if (isComplete()) {
-          finishIfComplete();
-        } else {
-          setMessage("Bảng vẫn còn ô trống hoặc số chưa chính xác.", "error");
-        }
-      });
 
       document.addEventListener("keydown", (event) => {
         if (event.target.matches("select, input, textarea, [contenteditable='true']")) return;
