@@ -760,6 +760,9 @@
     .event-card.event .event-tag { color: #694115; background: #fff8e7a8; }
     .event-card h2 { position: relative; z-index: 1; margin: 6px 0 2px; font-size: 15px; font-weight: 850; }
     .event-card p { position: relative; z-index: 1; margin: 0; opacity: .84; font-size: 11px; font-weight: 650; }
+    .mode-badge { width: fit-content; margin: 0 auto 8px; padding: 5px 12px; border-radius: 999px; color: #7a5410; background: #fff1cc; border: 1px solid #f2d47b; font-size: 12px; font-weight: 800; }
+    .mode-badge[hidden] { display: none; }
+    [data-theme="dark"] .mode-badge { color: #ffdc7e; background: var(--surface); border-color: var(--border-color); }
     .daily-card { position: relative; display: flex; min-height: 118px; align-items: center; gap: 12px; padding: 15px; overflow: hidden; border: 1px solid #f0dfb2; border-radius: 22px; background: linear-gradient(115deg, #fffdf6 4%, #fff4d7 100%); box-shadow: 0 8px 20px #9e74151a; }
     .daily-card::after { position: absolute; top: -48px; right: 12px; width: 138px; height: 138px; border: 1px solid #f2d88b55; border-radius: 50%; background: #ffdc7e18; content: ""; }
     .daily-trophy { position: relative; display: grid; width: 58px; height: 58px; flex: 0 0 auto; place-items: center; border: 1px solid #f2d47b; border-radius: 19px; background: linear-gradient(145deg, #fff5c5, #f7cc5d); box-shadow: inset 0 1px 5px #fff9d8, 0 5px 12px #bf861e30; font-size: 34px; }
@@ -1008,6 +1011,8 @@
         <div class="timer-row"><span id="timer" role="timer" aria-label="00:00"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9 2h6m-3 0v3"/></svg><span class="timer-value"><span id="timer-minutes">00</span><span>:</span><span id="timer-seconds">00</span></span></span></div>
       </div>
     </section>
+
+    <div class="mode-badge" id="mode-badge" hidden></div>
 
     <div class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="Bảng Sudoku 9 nhân 9"></div>
@@ -1384,6 +1389,7 @@
         ["So tài cùng người chơi", "Compete with other players", "与其他玩家一较高下", "다른 플레이어와 겨루세요", "他のプレイヤーと競おう"],
         ["Sự kiện", "Event", "活动", "이벤트", "イベント"],
         ["Biến cố Mũi tên", "Arrow Twist", "箭头变奏", "화살표 변수", "アロー・ツイスト"],
+        ["Ngày", "Day", "日期", "날짜", "日"],
         ["Thử thách giới hạn", "Push your limits", "挑战极限", "한계에 도전하세요", "限界に挑戦"],
         ["Sắp tới", "Coming soon", "即将开始", "곧 시작", "まもなく"],
         ["Lễ hội", "Festival", "节日", "페스티벌", "フェスティバル"],
@@ -2603,12 +2609,23 @@
         resetState();
         currentGameId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
         gameRecorded = false;
+        updateModeBadge();
         setMessage("Thử thách hàng ngày: bảng chơi giống nhau cho mọi người hôm nay.");
+      }
+
+      function updateModeBadge() {
+        const badge = document.getElementById("mode-badge");
+        badge.hidden = !dailyMode;
+        if (dailyMode) {
+          const [, month, day] = dailyDate.split("-");
+          badge.textContent = `🏆 ${t("Thử thách hàng ngày")} - ${t("Ngày")} ${day}/${month}`;
+        }
       }
 
       function startNewGame() {
         recordGame("abandoned");
         dailyMode = false;
+        updateModeBadge();
         const generated = createPuzzle(difficultyState.value);
         solution = generated.answer;
         puzzle = generated.grid;
