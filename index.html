@@ -33,13 +33,13 @@
       height: 100vh;
       height: 100dvh;
       margin: 0;
-      padding: max(8px, env(safe-area-inset-top)) 2px calc(max(8px, env(safe-area-inset-bottom)) + 12px);
+      padding: max(8px, env(safe-area-inset-top)) 2px calc(max(12px, env(safe-area-inset-bottom)) + 12px);
       overflow: hidden;
       background: #f4f7fb;
     }
     button, select { font: inherit; }
     button { -webkit-tap-highlight-color: transparent; cursor: pointer; }
-    .app { box-sizing: border-box; width: 100%; max-width: 100vw; height: 100%; min-height: 0; margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
+    .app { box-sizing: border-box; width: 100%; max-width: 100vw; height: 100%; min-height: 0; margin: 0 auto; display: flex; flex-direction: column; gap: clamp(4px, 1.1dvh, 8px); }
 
     .topbar {
       display: flex;
@@ -287,7 +287,7 @@
       position: relative;
       display: flex;
       min-width: 0;
-      height: 56px;
+      height: clamp(48px, 7dvh, 56px);
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -352,7 +352,7 @@
     .number-button {
       display: flex;
       flex-direction: column;
-      min-height: 60px;
+      min-height: clamp(48px, 7.5dvh, 60px);
       align-items: center;
       justify-content: center;
       padding: 0;
@@ -687,23 +687,23 @@
     #lobby [data-ad],
     #lobby [data-ad-slot],
     #lobby ins.adsbygoogle { display: none !important; }
-    .ad-banner { display: flex; flex: 0 0 auto; min-height: 72px; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid #f0dfe1; border-radius: 14px; color: #536078; background: linear-gradient(110deg, #fff 0%, #fff8f8 100%); box-shadow: 0 2px 6px rgba(31, 35, 40, .08); text-decoration: none; }
+    .ad-banner { display: flex; flex: 0 0 auto; min-height: clamp(64px, 9dvh, 76px); align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid #f0dfe1; border-radius: 14px; color: #536078; background: linear-gradient(110deg, #fff 0%, #fff8f8 100%); box-shadow: 0 2px 6px rgba(31, 35, 40, .08); text-decoration: none; }
     .ad-banner:hover { border-color: #e7c8cc; box-shadow: 0 3px 9px rgba(31, 35, 40, .12); }
     .ad-banner:focus-visible { outline: 2px solid #9aafff; outline-offset: 2px; }
     .ad-banner-icon { display: grid; width: 44px; height: 44px; align-self: center; flex: 0 0 auto; place-items: center; border-radius: 12px; background: linear-gradient(145deg, #f26c72, #d94350); box-shadow: inset 0 1px 0 #ffffff55, 0 2px 4px #c8323a30; }
     .ad-banner-icon svg { width: 36px; height: 36px; fill: none; stroke: #fff; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
     .ad-banner-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; justify-content: center; gap: 5px; }
     .ad-banner strong { color: #8f4650; font-size: 11px; font-weight: 750; letter-spacing: .035em; line-height: 1.2; }
-    .ad-banner-text { display: block; overflow: hidden; height: 20px; color: #2b3a67; font-size: 14px; font-weight: 750; line-height: 20px; white-space: nowrap; }
+    .ad-banner-text { display: block; overflow: hidden; height: 22px; color: #2b3a67; font-size: 14px; font-weight: 750; line-height: 22px; white-space: nowrap; }
     .ad-banner-track { display: inline-block; white-space: nowrap; }
-    .ad-banner-track > span { display: block; height: 20px; }
+    .ad-banner-track > span { display: block; height: 22px; }
     /* Effect modes: change the class on .ad-banner to ad-effect-static | ad-effect-scroll-horizontal | ad-effect-scroll-vertical */
     .ad-effect-static .ad-banner-track { overflow: hidden; max-width: 100%; text-overflow: ellipsis; }
     .ad-effect-scroll-horizontal .ad-banner-track { padding-left: 100%; animation: adScrollX 10s linear infinite; }
     .ad-effect-scroll-vertical .ad-banner-track { display: block; animation: adScrollY 6s ease-in-out infinite; }
     .ad-effect-scroll-horizontal:hover .ad-banner-track, .ad-effect-scroll-vertical:hover .ad-banner-track { animation-play-state: paused; }
     @keyframes adScrollX { to { transform: translateX(-100%); } }
-    @keyframes adScrollY { 0%, 40% { transform: translateY(0); } 50%, 90% { transform: translateY(-20px); } 100% { transform: translateY(0); } }
+    @keyframes adScrollY { 0%, 40% { transform: translateY(0); } 50%, 90% { transform: translateY(-22px); } 100% { transform: translateY(0); } }
     @media (prefers-reduced-motion: reduce) { .ad-banner-track { animation: none !important; padding-left: 0 !important; } }
     @media (max-height: 620px) { .ad-banner { min-height: 64px; padding: 6px 10px; } .ad-banner-icon { width: 40px; height: 40px; } }
     .lobby-header { display: flex; min-height: 52px; align-items: center; justify-content: flex-end; }
@@ -765,10 +765,10 @@
       .timer-row svg { width: 16px; height: 16px; }
       .timer-row #timer { gap: 3px; font-size: 12px; }
       .toolbar { gap: 3px; }
-      .tool { height: 52px; gap: 3px; padding: 2px 1px; font-size: 9px; }
+      .tool { height: clamp(46px, 7dvh, 52px); gap: 3px; padding: 2px 1px; font-size: 9px; }
       .tool .tool-icon { width: 18px; height: 18px; }
       .number-pad { gap: 3px; }
-      .number-button { min-height: 56px; font-size: 27px; }
+      .number-button { min-height: clamp(48px, 7.5dvh, 56px); font-size: 27px; }
       .lobby { padding-right: 12px; padding-left: 12px; }
       .lobby-bottom-bar { margin-right: -12px; margin-left: -12px; }
       .lobby-content { gap: 12px; }
@@ -809,9 +809,9 @@
       .app { gap: 4px; }
       .topbar { padding: 4px; }
       .toolbar { gap: 3px; }
-      .tool { height: 48px; font-size: 9px; }
+      .tool { height: clamp(44px, 7dvh, 48px); font-size: 9px; }
       .tool .tool-icon { width: 18px; height: 18px; }
-      .number-button { min-height: 50px; font-size: 26px; }
+      .number-button { min-height: clamp(44px, 8dvh, 50px); font-size: 26px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
