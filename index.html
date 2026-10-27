@@ -598,6 +598,20 @@
     .game-history-heading { color: var(--stat-ink); font-size: 13px; font-weight: 750; }
     .game-history-score { color: var(--blue-dark); font-variant-numeric: tabular-nums; }
     .game-history-empty { margin: 0 0 14px; color: #65738c; font-size: 13px; text-align: center; }
+    .statistics-card { width: min(100%, 560px); max-height: min(90vh, 720px); max-height: min(90dvh, 720px); overflow: auto; padding: 22px; -webkit-overflow-scrolling: touch; }
+    .statistics-subtitle { margin: -6px 0 18px; color: #7c879b; font-size: 13px; }
+    .statistics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 22px; }
+    .statistics-tile { min-width: 0; padding: 14px; border: 1px solid #e8edf5; border-radius: 16px; background: linear-gradient(145deg, #fff, #f7f9ff); box-shadow: 0 3px 10px #24324a0a; }
+    .statistics-tile span { display: block; margin-bottom: 8px; color: #7c879b; font-size: 11px; font-weight: 700; }
+    .statistics-tile strong { display: block; overflow: hidden; color: #26344c; font-size: clamp(20px, 6vw, 27px); font-variant-numeric: tabular-nums; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+    .statistics-section-title { margin: 0 0 10px; color: #26344c; font-size: 14px; font-weight: 750; }
+    .best-times { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 18px; }
+    .best-time { display: flex; min-width: 0; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 12px; border-radius: 12px; color: #65738c; background: #f4f6fb; font-size: 12px; }
+    .best-time strong { color: #26344c; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    @media (min-width: 600px) {
+      .statistics-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .best-times { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
     .game-over-card { text-align: center; }
     .game-over-card p { margin: 0 0 18px; color: #65738c; font-size: 14px; line-height: 1.5; }
     .game-over-card .modal-actions { grid-template-columns: 1fr; }
@@ -966,7 +980,7 @@
         <section class="settings-group" aria-label="Thống kê và hướng dẫn">
           <h3 class="settings-group-title">Thống kê &amp; hướng dẫn</h3>
           <div class="settings-list">
-            <button class="settings-row" type="button"><span class="settings-icon stats" aria-hidden="true">📊</span><span class="settings-label">Thống kê</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" id="open-statistics" type="button"><span class="settings-icon stats" aria-hidden="true">📊</span><span class="settings-label">Thống kê</span><span class="settings-chevron" aria-hidden="true">›</span></button>
             <button class="settings-row" id="open-guide" type="button"><span class="settings-icon guide" aria-hidden="true">📖</span><span class="settings-label">Hướng dẫn trò chơi / Kỹ thuật Sudoku</span><span class="settings-chevron" aria-hidden="true">›</span></button>
           </div>
         </section>
@@ -1094,6 +1108,23 @@
     </div>
   </div>
 
+  <div class="modal" id="statistics-modal" role="dialog" aria-modal="true" aria-labelledby="statistics-title">
+    <div class="modal-card statistics-card">
+      <h2 id="statistics-title">Thống kê</h2>
+      <p class="statistics-subtitle">Thành tích Sudoku của bạn</p>
+      <div class="statistics-grid">
+        <article class="statistics-tile"><span>Ván đã chơi</span><strong id="statistics-played">0</strong></article>
+        <article class="statistics-tile"><span>Ván đã thắng</span><strong id="statistics-won">0</strong></article>
+        <article class="statistics-tile"><span>Tỷ lệ thắng</span><strong id="statistics-win-rate">0%</strong></article>
+        <article class="statistics-tile"><span>Chuỗi hiện tại</span><strong id="statistics-current-streak">0</strong></article>
+        <article class="statistics-tile"><span>Chuỗi dài nhất</span><strong id="statistics-best-streak">0</strong></article>
+      </div>
+      <h3 class="statistics-section-title">Thời gian tốt nhất theo độ khó</h3>
+      <div class="best-times" id="statistics-best-times"></div>
+      <div class="modal-actions"><button class="action-button primary" id="close-statistics" type="button">Đóng</button></div>
+    </div>
+  </div>
+
   <div class="modal" id="change-game-modal" role="dialog" aria-modal="true" aria-labelledby="change-game-title" aria-describedby="change-game-message">
     <div class="modal-card change-game-card">
       <h2 id="change-game-title">Đổi Bài</h2>
@@ -1199,12 +1230,14 @@
       const gameHistoryModal = document.getElementById("game-history-modal");
       const gameHistoryList = document.getElementById("game-history-list");
       const GAME_HISTORY_KEY = "sudokuRecentGames";
+      const GAME_STATISTICS_KEY = "sudokuStatistics";
       const MAX_GAME_HISTORY = 20;
       const clueTargets = { easy: 42, medium: 37, hard: 32, harder: 27, expert: 22 };
       const correctEntryPoints = { easy: 50, medium: 100, hard: 150, harder: 200, expert: 250 };
       const difficultyNames = { easy: "Dễ", medium: "Vừa", hard: "Khó", harder: "Khó hơn", expert: "Chuyên gia" };
       const gameOutcomes = { won: "Chiến thắng", lost: "Thua", restarted: "Chơi lại", abandoned: "Chưa hoàn thành" };
       let gameHistory = loadGameHistory();
+      let gameStatistics = loadGameStatistics();
 
       let solution = [];
       let puzzle = [];
@@ -1262,6 +1295,89 @@
         }
       }
 
+      function emptyGameStatistics() {
+        return { gamesPlayed: 0, gamesWon: 0, currentStreak: 0, bestStreak: 0, bestTimes: {}, lastRecordedGameId: "" };
+      }
+
+      function loadGameStatistics() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(GAME_STATISTICS_KEY) || "null");
+          if (saved && Number.isFinite(saved.gamesPlayed) && Number.isFinite(saved.gamesWon)) {
+            const statistics = {
+              ...emptyGameStatistics(),
+              ...saved,
+              gamesPlayed: Math.max(0, Math.floor(saved.gamesPlayed)),
+              gamesWon: Math.max(0, Math.floor(saved.gamesWon)),
+              currentStreak: Math.max(0, Math.floor(saved.currentStreak || 0)),
+              bestStreak: Math.max(0, Math.floor(saved.bestStreak || 0)),
+              bestTimes: {}
+            };
+            Object.keys(difficultyNames).forEach((difficulty) => {
+              const bestTime = saved.bestTimes && saved.bestTimes[difficulty];
+              if (Number.isFinite(bestTime) && bestTime >= 0) statistics.bestTimes[difficulty] = Math.floor(bestTime);
+            });
+            return statistics;
+          }
+        } catch {
+          // Fall back to the available game history if saved statistics are unreadable.
+        }
+
+        const statistics = emptyGameStatistics();
+        const chronologicalHistory = gameHistory.slice().reverse();
+        chronologicalHistory.forEach((game) => {
+          statistics.gamesPlayed += 1;
+          if (game.outcome === "won") {
+            statistics.gamesWon += 1;
+            statistics.currentStreak += 1;
+            statistics.bestStreak = Math.max(statistics.bestStreak, statistics.currentStreak);
+            const previousBest = statistics.bestTimes[game.difficulty];
+            if (previousBest === undefined || game.duration < previousBest) statistics.bestTimes[game.difficulty] = game.duration;
+          } else {
+            statistics.currentStreak = 0;
+          }
+        });
+        return statistics;
+      }
+
+      function saveGameStatistics() {
+        try {
+          localStorage.setItem(GAME_STATISTICS_KEY, JSON.stringify(gameStatistics));
+        } catch {
+          setMessage("Không thể lưu thống kê trên thiết bị này.", "error");
+        }
+      }
+
+      function formatDuration(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainder = seconds % 60;
+        return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+      }
+
+      function renderGameStatistics() {
+        document.getElementById("statistics-played").textContent = String(gameStatistics.gamesPlayed);
+        document.getElementById("statistics-won").textContent = String(gameStatistics.gamesWon);
+        const winRate = gameStatistics.gamesPlayed
+          ? Math.round((gameStatistics.gamesWon / gameStatistics.gamesPlayed) * 100)
+          : 0;
+        document.getElementById("statistics-win-rate").textContent = `${winRate}%`;
+        document.getElementById("statistics-current-streak").textContent = String(gameStatistics.currentStreak);
+        document.getElementById("statistics-best-streak").textContent = String(gameStatistics.bestStreak);
+
+        const bestTimesElement = document.getElementById("statistics-best-times");
+        bestTimesElement.replaceChildren();
+        Object.entries(difficultyNames).forEach(([difficulty, name]) => {
+          const item = document.createElement("div");
+          item.className = "best-time";
+          const label = document.createElement("span");
+          label.textContent = name;
+          const time = document.createElement("strong");
+          const bestTime = gameStatistics.bestTimes[difficulty];
+          time.textContent = bestTime === undefined ? "—" : formatDuration(bestTime);
+          item.append(label, time);
+          bestTimesElement.appendChild(item);
+        });
+      }
+
       function renderGameHistory() {
         gameHistoryList.replaceChildren();
         if (gameHistory.length === 0) {
@@ -1303,6 +1419,22 @@
         const hasProgress = score > 0 || errors > 0 || history.length > 0 ||
           values.some((value, index) => value !== puzzle.flat()[index]);
         if (!hasProgress) return;
+        if (gameStatistics.lastRecordedGameId !== currentGameId) {
+          gameStatistics.gamesPlayed += 1;
+          if (outcome === "won") {
+            gameStatistics.gamesWon += 1;
+            gameStatistics.currentStreak += 1;
+            gameStatistics.bestStreak = Math.max(gameStatistics.bestStreak, gameStatistics.currentStreak);
+            const previousBest = gameStatistics.bestTimes[difficultyState.value];
+            if (previousBest === undefined || elapsedSeconds < previousBest) {
+              gameStatistics.bestTimes[difficultyState.value] = elapsedSeconds;
+            }
+          } else {
+            gameStatistics.currentStreak = 0;
+          }
+          gameStatistics.lastRecordedGameId = currentGameId;
+          saveGameStatistics();
+        }
         gameHistory = gameHistory.filter((game) => game.gameId !== currentGameId);
         gameHistory.unshift({
           gameId: currentGameId,
@@ -2023,6 +2155,16 @@
         gameHistoryModal.classList.add("show");
         document.getElementById("close-game-history").focus();
       });
+      document.getElementById("open-statistics").addEventListener("click", () => {
+        closeSettings();
+        renderGameStatistics();
+        document.getElementById("statistics-modal").classList.add("show");
+        document.getElementById("close-statistics").focus();
+      });
+      document.getElementById("close-statistics").addEventListener("click", () => document.getElementById("statistics-modal").classList.remove("show"));
+      document.getElementById("statistics-modal").addEventListener("click", (event) => {
+        if (event.target === document.getElementById("statistics-modal")) document.getElementById("statistics-modal").classList.remove("show");
+      });
       document.getElementById("close-game-history").addEventListener("click", () => gameHistoryModal.classList.remove("show"));
       gameHistoryModal.addEventListener("click", (event) => {
         if (event.target === gameHistoryModal) gameHistoryModal.classList.remove("show");
@@ -2069,6 +2211,7 @@
         if (event.key === "Escape" && guideModal.classList.contains("show")) { closeGuide(); return; }
         if (event.key === "Escape" && changeGameModal.classList.contains("show")) { changeGameModal.classList.remove("show"); return; }
         if (event.key === "Escape" && gameHistoryModal.classList.contains("show")) { gameHistoryModal.classList.remove("show"); return; }
+        if (event.key === "Escape" && document.getElementById("statistics-modal").classList.contains("show")) { document.getElementById("statistics-modal").classList.remove("show"); return; }
         if (event.key === "Escape" && difficultyElement.classList.contains("show")) { closeDifficultyPopover(); return; }
         if (event.key === "Escape" && settingsModal.classList.contains("show")) { closeSettings(); return; }
         if (paused) return;
