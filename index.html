@@ -1019,6 +1019,7 @@
 
       const MAX_ERRORS = 3;
       const MAX_HINTS = 3;
+      const MAX_UNDOS = 3;
       const boardElement = document.getElementById("board");
       const appElement = document.querySelector(".app");
       const lobbyElement = document.getElementById("lobby");
@@ -1067,7 +1068,7 @@
       let values = [];
       let notes = [];
       let history = [];
-      let undoUsed = false;
+      let undosLeft = MAX_UNDOS;
       let eraseUsed = false;
       let selectedCell = -1;
       let selectedDigit = 0;
@@ -1393,7 +1394,7 @@
         document.getElementById("pause-difficulty").textContent = difficultyLabel.textContent;
         hintCountElement.textContent = String(hintsLeft);
         document.getElementById("hint").disabled = hintsLeft === 0;
-        document.getElementById("undo").disabled = undoUsed || history.length === 0;
+        document.getElementById("undo").disabled = undosLeft === 0 || history.length === 0;
         document.getElementById("erase").disabled = eraseUsed;
       }
 
@@ -1632,9 +1633,9 @@
       }
 
       function undo() {
-        if (finished || paused || undoUsed || history.length === 0) return;
+        if (finished || paused || undosLeft === 0 || history.length === 0) return;
         const last = history.pop();
-        undoUsed = true;
+        undosLeft -= 1;
         values = last.values;
         notes = last.notes;
         invalidCells = last.invalidCells;
@@ -1736,7 +1737,7 @@
         values = puzzle.flat();
         notes = Array.from({ length: 81 }, () => new Set());
         history = [];
-        undoUsed = false;
+        undosLeft = MAX_UNDOS;
         eraseUsed = false;
         selectedCell = -1;
         invalidCells = new Set();
