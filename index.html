@@ -29,10 +29,11 @@
     * { box-sizing: border-box; }
     body {
       min-height: 100vh;
+      min-height: 100dvh;
       height: 100vh;
       height: 100dvh;
       margin: 0;
-      padding: max(8px, env(safe-area-inset-top)) 2px max(8px, env(safe-area-inset-bottom));
+      padding: max(8px, env(safe-area-inset-top)) 2px calc(max(8px, env(safe-area-inset-bottom)) + 12px);
       overflow: hidden;
       background: #f4f7fb;
     }
