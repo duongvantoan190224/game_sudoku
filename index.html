@@ -376,6 +376,7 @@
     .tool:active { transform: scale(.96); }
     .number-pad.lock-mode .number-button:not(:disabled),
     .number-pad.lock-mode .number-button.note-highlight:not(:disabled) { opacity: .45; }
+    .number-pad.lock-mode .number-button.selected:not(:disabled) { opacity: 1; }
     .number-button:active { transform: scale(1.15); transition-duration: .06s; }
     .number-button:disabled { opacity: .3; cursor: default; }
 
@@ -1689,6 +1690,10 @@
 
       function setNumberLock(on) {
         numberLock = on;
+        if (!on) {
+          selectedDigit = 0;
+          activePadDigit = 0;
+        }
         numberLockToggle.setAttribute("aria-pressed", String(on));
         numberLockState.textContent = on ? "ON" : "OFF";
         numberLockState.classList.toggle("off", !on);
