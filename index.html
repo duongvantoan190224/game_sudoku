@@ -498,6 +498,64 @@
     .settings-extra summary { padding: 13px 14px; color: #68758b; font-size: 13px; font-weight: 650; cursor: pointer; }
     .settings-extra .modal-actions { padding: 0 12px 12px; }
     .settings-extra .action-button { min-height: 38px; font-size: 12px; }
+    .guide-modal { padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); }
+    .guide-card {
+      display: flex;
+      width: min(100%, 720px);
+      max-height: min(94vh, 900px);
+      max-height: min(94dvh, 900px);
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0;
+      border: 1px solid #ffffffc7;
+      border-radius: 26px;
+      background: #f2f3f7;
+      box-shadow: 0 24px 60px #101a2d4d;
+    }
+    .guide-header {
+      display: grid;
+      min-height: 64px;
+      grid-template-columns: 44px 1fr 44px;
+      align-items: center;
+      padding: 8px 14px;
+      border-bottom: 1px solid #e6e7eb;
+      background: #fff;
+    }
+    .guide-header h2 { margin: 0; color: #202b40; font-size: 17px; font-weight: 750; text-align: center; }
+    .guide-close {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 14px;
+      color: #4569e8;
+      background: #f2f5ff;
+      font-size: 26px;
+      line-height: 1;
+    }
+    .guide-close:focus-visible { outline: 2px solid #8da3ff; outline-offset: 2px; }
+    .guide-content {
+      min-height: 0;
+      overflow-y: auto;
+      padding: 20px clamp(18px, 4vw, 32px) max(24px, env(safe-area-inset-bottom));
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    .guide-intro { margin: 0 0 22px; color: #65738c; font-size: 14px; line-height: 1.65; }
+    .guide-section { margin: 0 0 24px; }
+    .guide-section:last-child { margin-bottom: 0; }
+    .guide-section h3 { display: flex; align-items: center; gap: 9px; margin: 0 0 12px; color: #26344c; font-size: 18px; font-weight: 800; line-height: 1.3; }
+    .guide-section h3 span { display: grid; width: 32px; height: 32px; flex: 0 0 32px; place-items: center; border-radius: 11px; color: #4569e8; background: #e6ecff; font-size: 16px; }
+    .guide-card-list { display: grid; gap: 9px; }
+    .guide-item { padding: 13px 15px; border: 1px solid #e9edf4; border-radius: 16px; background: #fff; box-shadow: 0 2px 8px #24324a08; }
+    .guide-item h4 { margin: 0 0 5px; color: #2d3b55; font-size: 14px; font-weight: 750; line-height: 1.4; }
+    .guide-item p { margin: 0; color: #65738c; font-size: 13px; line-height: 1.65; }
+    .guide-example { margin-top: 8px !important; padding: 8px 10px; border-radius: 10px; color: #496180 !important; background: #f2f6ff; font-size: 12px !important; }
+    .guide-callout { padding: 13px 15px; border: 1px solid #dfe8ff; border-radius: 15px; color: #496180; background: #edf3ff; font-size: 13px; line-height: 1.6; }
+    .guide-callout strong { color: #3455ce; }
     @media (max-width: 380px) {
       .settings-modal { padding: 8px; }
       .settings-content { padding: 14px 12px 16px; }
@@ -909,7 +967,7 @@
           <h3 class="settings-group-title">Thống kê &amp; hướng dẫn</h3>
           <div class="settings-list">
             <button class="settings-row" type="button"><span class="settings-icon stats" aria-hidden="true">📊</span><span class="settings-label">Thống kê</span><span class="settings-chevron" aria-hidden="true">›</span></button>
-            <button class="settings-row" type="button"><span class="settings-icon guide" aria-hidden="true">📖</span><span class="settings-label">Hướng dẫn trò chơi / Kỹ thuật Sudoku</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" id="open-guide" type="button"><span class="settings-icon guide" aria-hidden="true">📖</span><span class="settings-label">Hướng dẫn trò chơi / Kỹ thuật Sudoku</span><span class="settings-chevron" aria-hidden="true">›</span></button>
           </div>
         </section>
         <section class="settings-group" aria-label="Tùy chỉnh hệ thống và trải nghiệm">
@@ -942,6 +1000,89 @@
         </details>
       </div>
     </div>
+  </div>
+
+  <div class="modal guide-modal" id="guide-modal" role="dialog" aria-modal="true" aria-labelledby="guide-title" aria-describedby="guide-intro">
+    <article class="modal-card guide-card">
+      <header class="guide-header">
+        <button class="guide-close" id="close-guide" type="button" aria-label="Đóng hướng dẫn">×</button>
+        <h2 id="guide-title">Hướng dẫn Sudoku</h2>
+        <span aria-hidden="true"></span>
+      </header>
+      <div class="guide-content">
+        <p class="guide-intro" id="guide-intro">Sudoku là trò chơi suy luận: hãy dùng các con số đã có để tìm số phù hợp cho từng ô trống. Bạn không cần tính toán — chỉ cần quan sát và loại trừ.</p>
+
+        <section class="guide-section" aria-labelledby="guide-rules-title">
+          <h3 id="guide-rules-title"><span aria-hidden="true">▦</span>Luật chơi cơ bản</h3>
+          <div class="guide-card-list">
+            <div class="guide-item">
+              <h4>Mỗi hàng, cột và khối có đủ số 1–9</h4>
+              <p>Bàn cờ gồm 9 hàng, 9 cột và 9 khối nhỏ 3×3. Mỗi số từ 1 đến 9 chỉ xuất hiện một lần trong từng hàng, từng cột và từng khối.</p>
+            </div>
+            <div class="guide-item">
+              <h4>Tìm số hợp lệ bằng cách loại trừ</h4>
+              <p>Trước khi điền một số, kiểm tra cả hàng, cột và khối của ô đó. Nếu số đã xuất hiện ở một trong ba nơi, ô đó không thể nhận số ấy.</p>
+            </div>
+            <div class="guide-item">
+              <h4>Số có sẵn là manh mối cố định</h4>
+              <p>Hãy giữ nguyên các số đề bài đã cho và dùng chúng làm điểm bắt đầu để suy luận các ô còn trống.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="guide-section" aria-labelledby="guide-tools-title">
+          <h3 id="guide-tools-title"><span aria-hidden="true">✦</span>Mẹo nhập số</h3>
+          <div class="guide-card-list">
+            <div class="guide-item">
+              <h4>Gợi ý</h4>
+              <p>Chọn một ô trống rồi nhấn <strong>Gợi ý</strong> để điền đáp án đúng vào ô đó. Nếu chưa chọn ô phù hợp, trò chơi sẽ chọn một ô còn cần giải. Mỗi ván có 3 lượt gợi ý; mỗi lượt bị trừ 20 điểm.</p>
+            </div>
+            <div class="guide-item">
+              <h4>Giữ số</h4>
+              <p>Bật <strong>Giữ số</strong>, chọn một số trên bàn phím rồi chạm lần lượt các ô muốn điền số đó. Tắt chế độ này khi muốn chọn số khác hoặc nhập theo cách thông thường.</p>
+            </div>
+            <div class="guide-item">
+              <h4>Ghi chú ứng viên</h4>
+              <p>Bật chế độ ghi chú để lưu tạm các số có thể điền vào ô. Khi một số đã được xác định ở hàng, cột hoặc khối, hãy loại số đó khỏi các ghi chú liên quan.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="guide-section" aria-labelledby="guide-techniques-title">
+          <h3 id="guide-techniques-title"><span aria-hidden="true">◎</span>Kỹ thuật giải Sudoku</h3>
+          <div class="guide-card-list">
+            <div class="guide-item">
+              <h4>1. Naked Single — Ô chỉ còn một ứng viên</h4>
+              <p>Liệt kê các số chưa có trong hàng, cột và khối của một ô. Nếu chỉ còn đúng một số hợp lệ, điền số đó ngay.</p>
+              <p class="guide-example"><strong>Ví dụ:</strong> Ô chưa thể là 1, 2, 3, 4, 5, 6, 8 hoặc 9; vậy ứng viên duy nhất là 7.</p>
+            </div>
+            <div class="guide-item">
+              <h4>2. Hidden Single — Số chỉ có một vị trí</h4>
+              <p>Xét từng số còn thiếu trong một hàng, cột hoặc khối. Nếu số đó chỉ có thể đặt ở một ô trong vùng, hãy điền nó — dù ô ấy còn có ứng viên khác.</p>
+              <p class="guide-example"><strong>Ví dụ:</strong> Trong một khối 3×3, chỉ ô này có thể chứa số 5 theo các hàng và cột đang bị chặn, nên ô này phải là 5.</p>
+            </div>
+            <div class="guide-item">
+              <h4>3. Locked Candidates — Ứng viên bị khóa</h4>
+              <p>Nếu mọi vị trí có thể đặt một số trong khối 3×3 đều nằm trên cùng một hàng (hoặc cột), số đó không thể xuất hiện ở phần còn lại của hàng (hoặc cột) bên ngoài khối. Chiều ngược lại cũng áp dụng khi các vị trí của một hàng hoặc cột nằm gọn trong một khối.</p>
+            </div>
+            <div class="guide-item">
+              <h4>4. Naked Pair / Triple — Cặp hoặc bộ ba trần</h4>
+              <p>Nếu hai ô trong cùng một hàng, cột hoặc khối có cùng đúng hai ứng viên — chẳng hạn cả hai chỉ có {2, 8} — hai số ấy phải thuộc về hai ô đó. Hãy loại chúng khỏi các ô khác trong vùng. Với Naked Triple, ba ô có ứng viên thuộc chung một nhóm ba số; loại các số đó khỏi những ô còn lại trong vùng.</p>
+            </div>
+            <div class="guide-item">
+              <h4>5. X-Wing — Mẫu chữ nhật</h4>
+              <p>Tìm hai hàng mà trong mỗi hàng, một số chỉ có thể nằm ở cùng hai cột. Bốn vị trí tạo thành hình chữ nhật; số đó phải nằm trên một trong hai góc ở mỗi hàng, nên có thể loại nó khỏi các ô khác trong hai cột ấy.</p>
+            </div>
+            <div class="guide-item">
+              <h4>6. Swordfish — Mẫu ba hàng, ba cột</h4>
+              <p>Mở rộng ý tưởng X-Wing: nếu ứng viên trong ba hàng chỉ nằm ở cùng ba cột, số đó đã được dành cho ba cột ấy. Loại ứng viên đó khỏi các ô khác trong ba cột. Kỹ thuật này hiếm hơn; hãy ghi chú ứng viên cẩn thận trước khi áp dụng.</p>
+            </div>
+          </div>
+        </section>
+
+        <aside class="guide-callout"><strong>Mẹo nhỏ:</strong> Sau mỗi lần điền số, cập nhật lại các ứng viên và tiếp tục tìm Naked Single, Hidden Single trước. Nếu chưa chắc chắn, đừng đoán — hãy kiểm tra lại hàng, cột và khối.</aside>
+      </div>
+    </article>
   </div>
 
   <div class="modal" id="game-history-modal" role="dialog" aria-modal="true" aria-labelledby="game-history-title" aria-describedby="game-history-note">
@@ -1050,6 +1191,7 @@
       const notesState = document.getElementById("notes-state");
       const pauseOverlay = document.getElementById("pause-overlay");
       const settingsModal = document.getElementById("settings-modal");
+      const guideModal = document.getElementById("guide-modal");
       const pauseModal = document.getElementById("pause-modal");
       const changeGameModal = document.getElementById("change-game-modal");
       const gameOverModal = document.getElementById("game-over-modal");
@@ -1855,9 +1997,21 @@
 
       function openSettings() { settingsModal.classList.add("show"); }
       function closeSettings() { settingsModal.classList.remove("show"); }
+      function openGuide() {
+        closeSettings();
+        guideModal.classList.add("show");
+        document.getElementById("close-guide").focus();
+      }
+      function closeGuide() {
+        guideModal.classList.remove("show");
+        document.getElementById("settings").focus();
+      }
       document.getElementById("settings").addEventListener("click", openSettings);
       document.getElementById("close-settings").addEventListener("click", closeSettings);
       settingsModal.addEventListener("click", (event) => { if (event.target === settingsModal) closeSettings(); });
+      document.getElementById("open-guide").addEventListener("click", openGuide);
+      document.getElementById("close-guide").addEventListener("click", closeGuide);
+      guideModal.addEventListener("click", (event) => { if (event.target === guideModal) closeGuide(); });
       settingsModal.querySelectorAll(".settings-toggle").forEach((toggle) => {
         toggle.addEventListener("click", () => {
           toggle.setAttribute("aria-pressed", String(toggle.getAttribute("aria-pressed") !== "true"));
@@ -1912,6 +2066,7 @@
 
       document.addEventListener("keydown", (event) => {
         if (event.target.matches("select, input, textarea, [contenteditable='true']")) return;
+        if (event.key === "Escape" && guideModal.classList.contains("show")) { closeGuide(); return; }
         if (event.key === "Escape" && changeGameModal.classList.contains("show")) { changeGameModal.classList.remove("show"); return; }
         if (event.key === "Escape" && gameHistoryModal.classList.contains("show")) { gameHistoryModal.classList.remove("show"); return; }
         if (event.key === "Escape" && difficultyElement.classList.contains("show")) { closeDifficultyPopover(); return; }
