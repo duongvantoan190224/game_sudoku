@@ -959,14 +959,26 @@
     .vs-name { font-size: 20px; font-weight: 850; } .vs-meta { font-size: 16px; font-weight: 700; }
     .vs-text { position: absolute; top: 50%; left: 50%; z-index: 2; transform: translate(-50%, -50%); color: #fff; font-size: 64px; font-weight: 950; font-style: italic; text-shadow: 0 4px 18px #000a; animation: battle-pop 0.5s ease-out; }
     @keyframes battle-pop { from { transform: translate(-50%, -50%) scale(2.5); opacity: 0; } }
-    .battle-bar { display: none; align-items: center; gap: 8px; margin: 0 0 8px; }
-    .app.battle .battle-bar { display: flex; }
+    .battle-header { display: none; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; padding: 2px 3px; }
+    .app.battle .battle-header { display: grid; }
+    .battle-player { display: flex; min-width: 0; align-items: center; gap: 8px; }
+    .battle-player-bot { flex-direction: row-reverse; text-align: right; }
+    .battle-avatar-wrap { position: relative; display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center; border: 2px solid #fff; border-radius: 50%; background: #e8efff; box-shadow: 0 2px 6px #26395820; font-size: 21px; }
+    .battle-player-bot .battle-avatar-wrap { background: #fff0f0; }
+    .battle-flag { position: absolute; right: -5px; bottom: -3px; display: grid; width: 19px; height: 19px; place-items: center; border: 2px solid var(--surface); border-radius: 50%; background: var(--surface); font-size: 12px; line-height: 1; }
+    .battle-player-copy { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+    .battle-player-name { overflow: hidden; color: var(--text-primary); font-size: 12px; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
+    .battle-player-caption { color: var(--text-secondary); font-size: 9px; font-weight: 650; }
+    .battle-clock { min-width: 68px; padding: 6px 10px; border: 1px solid #ffffff20; border-radius: 999px; color: #fff; background: #28344d; box-shadow: 0 3px 8px #26395824; font-size: 15px; font-variant-numeric: tabular-nums; font-weight: 850; text-align: center; }
+    .battle-progress { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 0 3px; }
+    .app.battle .battle-progress { display: grid; }
+    .battle-progress-side { display: grid; min-width: 0; gap: 4px; }
+    .battle-progress-heading { display: flex; justify-content: space-between; gap: 6px; color: var(--text-secondary); font-size: 10px; font-weight: 750; }
+    .battle-progress-heading span:last-child { color: var(--text-primary); font-variant-numeric: tabular-nums; }
     .app.battle .info-bar { display: none; }
-    .battle-side { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 3px; font-size: 11px; font-weight: 800; color: var(--text-primary, #28344d); }
-    .battle-track { height: 10px; overflow: hidden; border-radius: 999px; background: #d8dfef; }
+    .battle-track { height: 5px; overflow: hidden; border-radius: 999px; background: #d8dfef; }
     .battle-fill { height: 100%; width: 0; border-radius: 999px; transition: width 0.4s; }
     .battle-fill.me { background: #2f6df0; } .battle-fill.bot { background: #e5484d; }
-    .battle-clock { padding: 6px 10px; border-radius: 12px; color: #fff; background: #28344d; font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 850; }
   </style>
 </head>
 <body>
@@ -1054,10 +1066,16 @@
       </div>
     </header>
 
-    <section class="battle-bar" id="battle-bar" aria-label="Tiến độ trận đấu">
-      <div class="battle-side"><span>Bạn <span id="battle-me-pct">0%</span></span><div class="battle-track"><div class="battle-fill me" id="battle-me-fill"></div></div></div>
+    <section class="battle-header" aria-label="Người chơi trận đấu">
+      <div class="battle-player battle-player-me">
+        <span class="battle-avatar-wrap"><span id="battle-me-avatar" aria-hidden="true">🧑</span><span class="battle-flag" id="battle-me-flag" aria-label="Việt Nam">🇻🇳</span></span>
+        <span class="battle-player-copy"><span class="battle-player-name">Bạn</span><span class="battle-player-caption">Người chơi</span></span>
+      </div>
       <div class="battle-clock" id="battle-clock" role="timer">00:00</div>
-      <div class="battle-side"><span><span id="battle-bot-name">Bot</span> <span id="battle-bot-pct">0%</span></span><div class="battle-track"><div class="battle-fill bot" id="battle-bot-fill"></div></div></div>
+      <div class="battle-player battle-player-bot">
+        <span class="battle-avatar-wrap"><span id="battle-bot-avatar" aria-hidden="true">🤖</span><span class="battle-flag" id="battle-bot-flag" aria-label="Nhật Bản">🇯🇵</span></span>
+        <span class="battle-player-copy"><span class="battle-player-name" id="battle-bot-name">Bot</span><span class="battle-player-caption">Đối thủ</span></span>
+      </div>
     </section>
 
     <section class="info-bar" aria-label="Thông tin ván chơi">
@@ -1069,6 +1087,17 @@
     </section>
 
     <div class="mode-badge" id="mode-badge" hidden></div>
+
+    <section class="battle-progress" aria-label="Tiến độ trận đấu">
+      <div class="battle-progress-side">
+        <div class="battle-progress-heading"><span>Bạn</span><span id="battle-me-pct">0%</span></div>
+        <div class="battle-track" id="battle-me-progress" role="progressbar" aria-label="Tiến độ của bạn" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="battle-fill me" id="battle-me-fill"></div></div>
+      </div>
+      <div class="battle-progress-side">
+        <div class="battle-progress-heading"><span>Đối thủ</span><span id="battle-bot-pct">0%</span></div>
+        <div class="battle-track" id="battle-bot-progress" role="progressbar" aria-label="Tiến độ của đối thủ" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="battle-fill bot" id="battle-bot-fill"></div></div>
+      </div>
+    </section>
 
     <div class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="Bảng Sudoku 9 nhân 9"></div>
@@ -2825,8 +2854,10 @@
         const me = Math.round(battleProgress() * 100), bot = Math.round(battleBotFilled / battleBotTotal * 100);
         document.getElementById("battle-me-pct").textContent = `${me}%`;
         document.getElementById("battle-me-fill").style.width = `${me}%`;
+        document.getElementById("battle-me-progress").setAttribute("aria-valuenow", me);
         document.getElementById("battle-bot-pct").textContent = `${bot}%`;
         document.getElementById("battle-bot-fill").style.width = `${bot}%`;
+        document.getElementById("battle-bot-progress").setAttribute("aria-valuenow", bot);
         const sec = Math.floor((Date.now() - battleStart) / 1000);
         document.getElementById("battle-clock").textContent = `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
       }
@@ -2892,9 +2923,13 @@
         setTimeout(() => {
           battleEls.searching.classList.remove("show");
           const bot = randomBotName();
+          const botAvatar = pick(BOT_AVATARS), botFlag = pick(BOT_FLAGS);
           document.getElementById("vs-bot-name").textContent = bot;
-          document.getElementById("vs-bot-avatar").textContent = pick(BOT_AVATARS);
-          document.getElementById("vs-bot-flag").textContent = pick(BOT_FLAGS);
+          document.getElementById("vs-bot-avatar").textContent = botAvatar;
+          document.getElementById("vs-bot-flag").textContent = botFlag;
+          document.getElementById("battle-bot-name").textContent = bot;
+          document.getElementById("battle-bot-avatar").textContent = botAvatar;
+          document.getElementById("battle-bot-flag").textContent = botFlag;
           battleEls.vs.classList.add("show");
           setTimeout(() => beginBattleGame(bot), 2500);
         }, 2000);
