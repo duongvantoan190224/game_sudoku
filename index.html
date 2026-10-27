@@ -986,6 +986,11 @@
     .battle-progress-heading span:last-child { color: var(--text-primary); font-variant-numeric: tabular-nums; }
     .app.battle .info-bar { display: none; }
     .app.battle { gap: 3px; }
+    .app.battle .toolbar { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(5px, 1.5vw, 8px); }
+    .app.battle .tool { height: clamp(52px, 8dvh, 62px); gap: 5px; font-size: clamp(10px, 2.8vw, 12px); }
+    .app.battle .tool .tool-icon { width: 22px; height: 22px; }
+    .app.battle .number-pad { gap: clamp(5px, 1.5vw, 7px); }
+    .app.battle .number-button { min-height: clamp(54px, 8.5dvh, 68px); font-size: clamp(30px, 9vw, 38px); }
     .battle-header { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 6px; padding: 0 3px; }
     .battle-avatar-wrap { width: 28px; height: 28px; flex-basis: 28px; font-size: 16px; }
     .battle-flag { width: 15px; height: 15px; font-size: 9px; }
