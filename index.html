@@ -508,6 +508,41 @@
     .settings-toggle[aria-pressed="true"] { background: #34c759; }
     .settings-toggle[aria-pressed="true"]::after { transform: translateX(19px); }
     .guide-modal { padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); }
+    .about-screen {
+      position: fixed;
+      z-index: 30;
+      inset: 0;
+      display: none;
+      min-height: 100vh;
+      min-height: 100dvh;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: max(16px, env(safe-area-inset-top)) 24px max(18px, env(safe-area-inset-bottom));
+      color: #202b40;
+      background-color: #f7f9ff;
+      background-image: linear-gradient(rgba(69, 105, 232, .045) 1px, transparent 1px), linear-gradient(90deg, rgba(69, 105, 232, .045) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .about-screen.show { display: flex; }
+    .about-back {
+      align-self: flex-start;
+      min-height: 44px;
+      padding: 0 4px;
+      border: 0;
+      color: #4569e8;
+      background: transparent;
+      font-size: 16px;
+      font-weight: 650;
+    }
+    .about-back:focus-visible, .about-footer a:focus-visible { outline: 2px solid #8da3ff; outline-offset: 4px; }
+    .about-main { display: flex; flex: 1 0 auto; flex-direction: column; align-items: center; justify-content: center; padding: 28px 0; text-align: center; }
+    .about-logo { width: 104px; height: 104px; margin-bottom: 22px; filter: drop-shadow(0 10px 18px rgba(48, 77, 165, .2)); }
+    .about-title { margin: 0; color: #202b40; font-size: 30px; font-weight: 760; letter-spacing: -.04em; }
+    .about-description { margin: 8px 0 0; color: #65738c; font-size: 15px; }
+    .about-version { margin: 12px 0 0; color: #8a94a8; font-size: 13px; }
+    .about-footer { display: flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 12px; padding-top: 16px; color: #8791a4; font-size: 12px; text-align: center; }
+    .about-footer a { color: #65738c; text-decoration: none; }
+    .about-footer a:hover { color: #4569e8; text-decoration: underline; }
     .guide-card {
       display: flex;
       width: min(100%, 720px);
@@ -873,6 +908,11 @@
     [data-theme="dark"] .guide-callout strong { color: #b6c6ff; }
     [data-theme="dark"] .guide-item, [data-theme="dark"] .statistics-tile, [data-theme="dark"] .game-history-item { border-color: var(--border-color); }
     [data-theme="dark"] .settings-back, [data-theme="dark"] .guide-close { color: #b6c6ff; background: var(--surface-raised); }
+    [data-theme="dark"] .about-screen { color: var(--text-primary); background-color: #101827; background-image: linear-gradient(rgba(182, 198, 255, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(182, 198, 255, .055) 1px, transparent 1px); }
+    [data-theme="dark"] .about-title { color: var(--text-primary); }
+    [data-theme="dark"] .about-description, [data-theme="dark"] .about-footer a { color: var(--text-secondary); }
+    [data-theme="dark"] .about-version, [data-theme="dark"] .about-footer { color: #929db2; }
+    [data-theme="dark"] .about-back, [data-theme="dark"] .about-footer a:hover { color: #b6c6ff; }
     [data-theme="dark"] .modal-card > p, [data-theme="dark"] .victory-card p, [data-theme="dark"] .game-history-item, [data-theme="dark"] .pause-summary div { border-color: var(--border-color); }
     [data-theme="dark"] .toast, [data-theme="dark"] .ad-banner, [data-theme="dark"] .event-card, [data-theme="dark"] .daily-card { color: var(--text-primary); background: var(--surface); border-color: var(--border-color); }
     [data-theme="dark"] .ad-banner-text, [data-theme="dark"] .settings-group-title { color: var(--text-secondary); }
@@ -1077,7 +1117,7 @@
           <h3 class="settings-group-title">Hỗ trợ &amp; cộng đồng</h3>
           <div class="settings-list">
             <button class="settings-row" type="button"><span class="settings-icon help" aria-hidden="true">?</span><span class="settings-label">Trung tâm trợ giúp</span><span class="settings-chevron" aria-hidden="true">›</span></button>
-            <button class="settings-row" type="button"><span class="settings-icon about" aria-hidden="true">ⓘ</span><span class="settings-label">Giới thiệu về game</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+            <button class="settings-row" id="open-about" type="button"><span class="settings-icon about" aria-hidden="true">ⓘ</span><span class="settings-label">Giới thiệu về game</span><span class="settings-chevron" aria-hidden="true">›</span></button>
             <button class="settings-row" type="button"><span class="settings-icon share" aria-hidden="true">↗</span><span class="settings-label">Chia sẻ</span><span class="settings-chevron" aria-hidden="true">›</span></button>
             <button class="settings-row" type="button"><span class="settings-icon facebook" aria-hidden="true">f</span><span class="settings-label">Theo dõi trang Facebook</span><span class="settings-chevron" aria-hidden="true">›</span></button>
             <button class="settings-row" type="button"><span class="settings-icon community" aria-hidden="true">👥</span><span class="settings-label">Tham gia nhóm Facebook</span><span class="settings-chevron" aria-hidden="true">›</span></button>
@@ -1085,6 +1125,29 @@
         </section>
       </div>
     </div>
+  </div>
+
+  <div class="about-screen" id="about-screen" role="dialog" aria-modal="true" aria-labelledby="about-title" aria-describedby="about-description">
+    <button class="about-back" id="close-about" type="button">← Giới thiệu</button>
+    <main class="about-main">
+      <svg class="about-logo" aria-hidden="true" viewBox="0 0 104 104">
+        <defs><linearGradient id="about-logo-gradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6688f4"/><stop offset="1" stop-color="#3d5ed2"/></linearGradient></defs>
+        <rect width="104" height="104" rx="27" fill="url(#about-logo-gradient)"/>
+        <rect x="22" y="19" width="60" height="60" rx="8" fill="none" stroke="#fff" stroke-opacity=".92" stroke-width="3"/>
+        <path d="M42 20v58M62 20v58M23 39h58M23 59h58" stroke="#fff" stroke-opacity=".58" stroke-width="2"/>
+        <path d="M31 33h5m15 0h5m15 0h5M31 53h5m15 0h5m15 0h5M31 70h5m15 0h5" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
+        <path d="m55 75 28-28 8 8-28 28-11 3 3-11Z" fill="#ffd66b" stroke="#fff" stroke-linejoin="round" stroke-width="2.5"/>
+        <path d="m55 75 8 8" stroke="#c88725" stroke-width="2"/>
+      </svg>
+      <h1 class="about-title" id="about-title">Sudoku</h1>
+      <p class="about-description" id="about-description">Câu đố Sudoku cổ điển miễn phí</p>
+      <p class="about-version">phiên bản: <span id="about-version"></span></p>
+    </main>
+    <footer class="about-footer">
+      <a href="#terms-of-service">Điều khoản Dịch vụ</a>
+      <span aria-hidden="true">|</span>
+      <a href="#privacy-policy">Chính sách Quyền riêng tư</a>
+    </footer>
   </div>
 
   <div class="modal" id="language-modal" role="dialog" aria-modal="true" aria-labelledby="language-title">
@@ -1568,6 +1631,7 @@
       const notesState = document.getElementById("notes-state");
       const pauseOverlay = document.getElementById("pause-overlay");
       const settingsModal = document.getElementById("settings-modal");
+      const aboutScreen = document.getElementById("about-screen");
       const guideModal = document.getElementById("guide-modal");
       const pauseModal = document.getElementById("pause-modal");
       const changeGameModal = document.getElementById("change-game-modal");
@@ -1577,6 +1641,7 @@
       const gameHistoryList = document.getElementById("game-history-list");
       const GAME_HISTORY_KEY = "sudokuRecentGames";
       const GAME_STATISTICS_KEY = "sudokuStatistics";
+      const APP_VERSION = "1.0.0";
       const MAX_GAME_HISTORY = 20;
       const clueTargets = { easy: 42, medium: 37, hard: 32, harder: 27, expert: 22 };
       const correctEntryPoints = { easy: 50, medium: 100, hard: 150, harder: 200, expert: 250 };
@@ -2546,6 +2611,15 @@
 
       function openSettings() { settingsModal.classList.add("show"); }
       function closeSettings() { settingsModal.classList.remove("show"); }
+      function openAbout() {
+        document.getElementById("about-version").textContent = APP_VERSION;
+        aboutScreen.classList.add("show");
+        document.getElementById("close-about").focus();
+      }
+      function closeAbout() {
+        aboutScreen.classList.remove("show");
+        document.getElementById("open-about").focus();
+      }
       function openGuide() {
         closeSettings();
         guideModal.classList.add("show");
@@ -2558,6 +2632,8 @@
       document.getElementById("settings").addEventListener("click", openSettings);
       document.getElementById("close-settings").addEventListener("click", closeSettings);
       settingsModal.addEventListener("click", (event) => { if (event.target === settingsModal) closeSettings(); });
+      document.getElementById("open-about").addEventListener("click", openAbout);
+      document.getElementById("close-about").addEventListener("click", closeAbout);
       document.getElementById("open-guide").addEventListener("click", openGuide);
       document.getElementById("close-guide").addEventListener("click", closeGuide);
       guideModal.addEventListener("click", (event) => { if (event.target === guideModal) closeGuide(); });
@@ -2639,6 +2715,7 @@
 
       document.addEventListener("keydown", (event) => {
         if (event.target.matches("select, input, textarea, [contenteditable='true']")) return;
+        if (event.key === "Escape" && aboutScreen.classList.contains("show")) { closeAbout(); return; }
         if (event.key === "Escape" && guideModal.classList.contains("show")) { closeGuide(); return; }
         if (event.key === "Escape" && changeGameModal.classList.contains("show")) { changeGameModal.classList.remove("show"); return; }
         if (event.key === "Escape" && gameHistoryModal.classList.contains("show")) { gameHistoryModal.classList.remove("show"); return; }
