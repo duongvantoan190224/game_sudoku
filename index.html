@@ -1019,6 +1019,8 @@
 
       const MAX_ERRORS = 3;
       const MAX_HINTS = 3;
+      const MAX_UNDO_USES = 3;
+      const MAX_ERASE_USES = 3;
       const boardElement = document.getElementById("board");
       const appElement = document.querySelector(".app");
       const lobbyElement = document.getElementById("lobby");
@@ -1067,8 +1069,8 @@
       let values = [];
       let notes = [];
       let history = [];
-      let undoUsed = false;
-      let eraseUsed = false;
+      let undoUses = 0;
+      let eraseUses = 0;
       let selectedCell = -1;
       let selectedDigit = 0;
       let activePadDigit = 0;
@@ -1393,8 +1395,8 @@
         document.getElementById("pause-difficulty").textContent = difficultyLabel.textContent;
         hintCountElement.textContent = String(hintsLeft);
         document.getElementById("hint").disabled = hintsLeft === 0;
-        document.getElementById("undo").disabled = undoUsed || history.length === 0;
-        document.getElementById("erase").disabled = eraseUsed;
+        document.getElementById("undo").disabled = undoUses >= MAX_UNDO_USES || history.length === 0;
+        document.getElementById("erase").disabled = eraseUses >= MAX_ERASE_USES;
       }
 
       function isComplete() {
@@ -1604,12 +1606,12 @@
         }
 
         if (!value && !values[selectedCell] && notes[selectedCell].size === 0) return;
-        if (!value && eraseUsed) {
+        if (!value && eraseUses >= MAX_ERASE_USES) {
           setMessage("Bạn đã dùng hết lượt xóa trong bàn chơi này.", "error");
           return;
         }
         pushHistory();
-        if (!value) eraseUsed = true;
+        if (!value) eraseUses += 1;
         invalidCells.delete(selectedCell);
         const previousValues = values.slice();
         values[selectedCell] = value;
@@ -1632,9 +1634,9 @@
       }
 
       function undo() {
-        if (finished || paused || undoUsed || history.length === 0) return;
+        if (finished || paused || undoUses >= MAX_UNDO_USES || history.length === 0) return;
         const last = history.pop();
-        undoUsed = true;
+        undoUses += 1;
         values = last.values;
         notes = last.notes;
         invalidCells = last.invalidCells;
@@ -1736,8 +1738,8 @@
         values = puzzle.flat();
         notes = Array.from({ length: 81 }, () => new Set());
         history = [];
-        undoUsed = false;
-        eraseUsed = false;
+        undoUses = 0;
+        eraseUses = 0;
         selectedCell = -1;
         invalidCells = new Set();
         elapsedMs = 0;
