@@ -935,6 +935,38 @@
     [data-theme="dark"] .change-game-card .action-button.primary { color: #fff; }
     [data-theme="dark"] #victory-restart { border-color: var(--border-color); color: #b6c6ff; background: var(--surface-raised); }
     [data-theme="dark"] .game-history-score { color: #b6c6ff; }
+
+    .battle-lobby { display: none; flex: 1; flex-direction: column; gap: 14px; padding: 8px 3px; }
+    .lobby.battle-view .battle-lobby { display: flex; }
+    .lobby.battle-view .lobby-content > :not(.battle-lobby) { display: none; }
+    .battle-rank { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 18px; border-radius: 20px; color: #fff; background: linear-gradient(135deg, #4c70e9, #7a4de0); box-shadow: 0 8px 18px #4569e83d; }
+    .battle-badge { display: grid; width: 74px; height: 74px; place-items: center; border: 3px solid #ffe08a; border-radius: 50%; background: #ffffff26; font-size: 38px; }
+    .battle-rank-name { font-size: 18px; font-weight: 850; }
+    .battle-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .battle-stat { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 6px; border: 1px solid #e1e7f5; border-radius: 16px; background: #fff; color: #28344d; }
+    .battle-stat b { font-size: 22px; } .battle-stat span { color: #6b7589; font-size: 11px; font-weight: 700; }
+    .battle-start { min-height: 60px; border: 0; border-radius: 17px; color: #fff; background: linear-gradient(110deg, #e5484d, #c92a3a); box-shadow: 0 7px 16px #c92a3a45; font-size: 17px; font-weight: 850; }
+    .battle-overlay { position: fixed; z-index: 90; inset: 0; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 14px; color: #fff; background: #0f1523ee; font-weight: 800; }
+    .battle-overlay.show { display: flex; }
+    .battle-spinner { width: 54px; height: 54px; border: 5px solid #ffffff40; border-top-color: #fff; border-radius: 50%; animation: battle-spin 0.9s linear infinite; }
+    @keyframes battle-spin { to { transform: rotate(360deg); } }
+    .vs-screen { position: fixed; z-index: 91; inset: 0; display: none; overflow: hidden; color: #fff; }
+    .vs-screen.show { display: block; }
+    .vs-side { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .vs-me { background: linear-gradient(135deg, #2f6df0, #1c47b8); clip-path: polygon(0 0, 100% 0, 0 100%); justify-content: flex-start; padding-top: 14vh; }
+    .vs-bot { background: linear-gradient(135deg, #e5484d, #a81d2b); clip-path: polygon(100% 0, 100% 100%, 0 100%); justify-content: flex-end; padding-bottom: 14vh; }
+    .vs-avatar { display: grid; width: 92px; height: 92px; place-items: center; border: 4px solid #fff; border-radius: 50%; background: #ffffff30; font-size: 52px; }
+    .vs-name { font-size: 20px; font-weight: 850; } .vs-meta { font-size: 16px; font-weight: 700; }
+    .vs-text { position: absolute; top: 50%; left: 50%; z-index: 2; transform: translate(-50%, -50%); color: #fff; font-size: 64px; font-weight: 950; font-style: italic; text-shadow: 0 4px 18px #000a; animation: battle-pop 0.5s ease-out; }
+    @keyframes battle-pop { from { transform: translate(-50%, -50%) scale(2.5); opacity: 0; } }
+    .battle-bar { display: none; align-items: center; gap: 8px; margin: 0 0 8px; }
+    .app.battle .battle-bar { display: flex; }
+    .app.battle .info-bar { display: none; }
+    .battle-side { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 3px; font-size: 11px; font-weight: 800; color: var(--text-primary, #28344d); }
+    .battle-track { height: 10px; overflow: hidden; border-radius: 999px; background: #d8dfef; }
+    .battle-fill { height: 100%; width: 0; border-radius: 999px; transition: width 0.4s; }
+    .battle-fill.me { background: #2f6df0; } .battle-fill.bot { background: #e5484d; }
+    .battle-clock { padding: 6px 10px; border-radius: 12px; color: #fff; background: #28344d; font-size: 16px; font-variant-numeric: tabular-nums; font-weight: 850; }
   </style>
 </head>
 <body>
@@ -978,14 +1010,30 @@
         </button>
         <button class="new-game-button" id="lobby-new-game" type="button">Trò chơi mới</button>
       </section>
+      <section class="battle-lobby" id="battle-lobby" aria-label="Sảnh Trận chiến">
+        <div class="battle-rank"><div class="battle-badge" id="battle-badge" aria-hidden="true">🥉</div><div class="battle-rank-name" id="battle-rank">Đồng</div><div>🎫 <span id="battle-tickets">5</span> vé</div></div>
+        <div class="battle-stats">
+          <div class="battle-stat"><b id="battle-wins">0</b><span>Thắng</span></div>
+          <div class="battle-stat"><b id="battle-losses">0</b><span>Thua</span></div>
+          <div class="battle-stat"><b id="battle-rate">0%</b><span>Tỉ lệ thắng</span></div>
+        </div>
+        <button class="battle-start" id="battle-start" type="button">⚔ Bắt đầu trận đấu</button>
+      </section>
     </div>
     <nav class="lobby-bottom-bar" aria-label="Điều hướng chính">
-      <button class="lobby-tab active" type="button" aria-current="page"><span class="lobby-tab-icon" aria-hidden="true">⌂</span><span>Trang chủ</span></button>
-      <button class="lobby-tab" type="button"><span class="lobby-tab-icon" aria-hidden="true">⚔</span><span>Trận chiến</span></button>
+      <button class="lobby-tab active" id="tab-home" type="button" aria-current="page"><span class="lobby-tab-icon" aria-hidden="true">⌂</span><span>Trang chủ</span></button>
+      <button class="lobby-tab" id="tab-battle" type="button"><span class="lobby-tab-icon" aria-hidden="true">⚔</span><span>Trận chiến</span></button>
       <button class="lobby-tab" type="button"><span class="lobby-tab-icon" aria-hidden="true">◈</span><span>Khám phá</span></button>
       <button class="lobby-tab" type="button"><span class="lobby-tab-icon" aria-hidden="true">●</span><span>Cá nhân</span></button>
     </nav>
   </section>
+  <div class="battle-overlay" id="battle-searching" role="status"><div class="battle-spinner"></div><div>Đang tìm đối thủ...</div></div>
+  <div class="vs-screen" id="vs-screen" aria-label="Màn hình VS">
+    <div class="vs-side vs-me"><div class="vs-avatar" id="vs-me-avatar">🧑</div><div class="vs-name">Bạn</div><div class="vs-meta">🇻🇳 Lv.1</div></div>
+    <div class="vs-side vs-bot"><div class="vs-avatar" id="vs-bot-avatar">🤖</div><div class="vs-name" id="vs-bot-name">BOT</div><div class="vs-meta"><span id="vs-bot-flag">🇯🇵</span> Lv.1</div></div>
+    <div class="vs-text">VS</div>
+  </div>
+  <div class="battle-overlay" id="battle-result"><div id="battle-result-title" style="font-size:32px"></div><div id="battle-result-text"></div><button class="battle-start" id="battle-result-ok" type="button" style="padding:0 28px">Về sảnh</button></div>
   <main class="app hidden">
     <header class="topbar">
       <div class="topbar-leading">
@@ -1005,6 +1053,12 @@
         </button>
       </div>
     </header>
+
+    <section class="battle-bar" id="battle-bar" aria-label="Tiến độ trận đấu">
+      <div class="battle-side"><span>Bạn <span id="battle-me-pct">0%</span></span><div class="battle-track"><div class="battle-fill me" id="battle-me-fill"></div></div></div>
+      <div class="battle-clock" id="battle-clock" role="timer">00:00</div>
+      <div class="battle-side"><span><span id="battle-bot-name">Bot</span> <span id="battle-bot-pct">0%</span></span><div class="battle-track"><div class="battle-fill bot" id="battle-bot-fill"></div></div></div>
+    </section>
 
     <section class="info-bar" aria-label="Thông tin ván chơi">
       <div class="stat"><span class="stat-label">Lỗi</span><span class="stat-value" id="errors">0/3</span></div>
@@ -2115,6 +2169,7 @@
         document.getElementById("hint").disabled = hintsLeft === 0;
         document.getElementById("undo").disabled = undoUses >= MAX_UNDO_USES || history.length === 0;
         document.getElementById("erase").disabled = eraseUses >= MAX_ERASE_USES;
+        if (typeof updateBattleBar === "function") updateBattleBar();
       }
 
       function isComplete() {
@@ -2224,7 +2279,8 @@
       }
 
       function finishIfComplete() {
-        if (isComplete()) {
+        if (battleMode && !battleOver && isComplete()) { endBattle(true); return; }
+        if (!battleMode && isComplete()) {
           elapsedMs = currentElapsed();
           finished = true;
           recordGame("won");
@@ -2627,6 +2683,8 @@
       }
 
       function startNewGame() {
+        if (battleMode && !battleOver) endBattle(false);
+        if (battleMode) leaveBattleMode();
         recordGame("abandoned");
         dailyMode = false;
         updateModeBadge();
@@ -2722,6 +2780,134 @@
         lobbyElement.classList.remove("show");
         appElement.classList.remove("hidden");
         startNewGame();
+      });
+
+      /* ===== Battle mode ===== */
+      const BATTLE_KEY = "sudokuBattleStats";
+      const BOT_AVATARS = ["🦊", "🐼", "🐯", "🦁", "🐸", "🐵", "🐙", "🦄", "🐧", "🤖"];
+      const BOT_FLAGS = ["🇯🇵", "🇰🇷", "🇺🇸", "🇬🇧", "🇫🇷", "🇩🇪", "🇧🇷", "🇹🇭", "🇸🇬", "🇨🇦"];
+      var battleMode = false, battleBotTimer = null, battleBotFilled = 0, battleBotTotal = 0, battleOver = false, battleStart = 0, battleClockTimer = null;
+      const battleEls = {
+        searching: document.getElementById("battle-searching"), vs: document.getElementById("vs-screen"),
+        result: document.getElementById("battle-result")
+      };
+      function loadBattleStats() {
+        try { const d = JSON.parse(localStorage.getItem(BATTLE_KEY)); if (d) return { wins: d.wins | 0, losses: d.losses | 0, tickets: d.tickets | 0 }; } catch (e) {}
+        return { wins: 0, losses: 0, tickets: 5 };
+      }
+      function saveBattleStats(d) { try { localStorage.setItem(BATTLE_KEY, JSON.stringify(d)); } catch (e) {} }
+      function renderBattleLobby() {
+        const d = loadBattleStats(), total = d.wins + d.losses;
+        const tiers = [["🥉", "Đồng"], ["🥈", "Bạc"], ["🥇", "Vàng"], ["💎", "Kim cương"]];
+        const tier = tiers[Math.min(3, Math.floor(d.wins / 5))];
+        document.getElementById("battle-wins").textContent = d.wins;
+        document.getElementById("battle-losses").textContent = d.losses;
+        document.getElementById("battle-rate").textContent = `${total ? Math.round(d.wins / total * 100) : 0}%`;
+        document.getElementById("battle-tickets").textContent = d.tickets;
+        document.getElementById("battle-badge").textContent = tier[0];
+        document.getElementById("battle-rank").textContent = tier[1];
+      }
+      function setLobbyTab(battle) {
+        lobbyElement.classList.toggle("battle-view", battle);
+        const home = document.getElementById("tab-home"), tab = document.getElementById("tab-battle");
+        home.classList.toggle("active", !battle); tab.classList.toggle("active", battle);
+        home.toggleAttribute("aria-current", !battle); tab.toggleAttribute("aria-current", battle);
+        if (battle) renderBattleLobby();
+      }
+      function battleProgress() {
+        const given = puzzle.flat();
+        let done = 0, total = 0;
+        values.forEach((v, i) => { if (given[i] === 0) { total += 1; if (v === solution[Math.floor(i / 9)][i % 9]) done += 1; } });
+        return total ? done / total : 0;
+      }
+      function updateBattleBar() {
+        if (!battleMode) return;
+        const me = Math.round(battleProgress() * 100), bot = Math.round(battleBotFilled / battleBotTotal * 100);
+        document.getElementById("battle-me-pct").textContent = `${me}%`;
+        document.getElementById("battle-me-fill").style.width = `${me}%`;
+        document.getElementById("battle-bot-pct").textContent = `${bot}%`;
+        document.getElementById("battle-bot-fill").style.width = `${bot}%`;
+        const sec = Math.floor((Date.now() - battleStart) / 1000);
+        document.getElementById("battle-clock").textContent = `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
+      }
+      function stopBattleTimers() { clearTimeout(battleBotTimer); clearInterval(battleClockTimer); }
+      function leaveBattleMode() {
+        stopBattleTimers();
+        battleMode = false;
+        appElement.classList.remove("battle");
+        difficultyControl.hidden = dailyMode;
+      }
+      function endBattle(won) {
+        if (battleOver) return;
+        battleOver = true;
+        stopBattleTimers();
+        finished = true;
+        elapsedMs = currentElapsed();
+        const d = loadBattleStats();
+        if (won) d.wins += 1; else d.losses += 1;
+        saveBattleStats(d);
+        document.getElementById("battle-result-title").textContent = won ? "🏆 Bạn thắng!" : "😢 Bạn thua!";
+        document.getElementById("battle-result-text").textContent = won ? "Bạn đã hoàn thành trước đối thủ." : "Đối thủ đã hoàn thành trước.";
+        battleEls.result.classList.add("show");
+      }
+      function botStep(interval) {
+        battleBotTimer = setTimeout(() => {
+          if (!battleMode || battleOver) return;
+          if (!paused) {
+            battleBotFilled += 1;
+            updateBattleBar();
+            if (battleBotFilled >= battleBotTotal) { endBattle(false); return; }
+          }
+          botStep(interval);
+        }, interval * (0.6 + Math.random() * 0.8));
+      }
+      function beginBattleGame(bot) {
+        battleEls.vs.classList.remove("show");
+        lobbyElement.classList.remove("show");
+        appElement.classList.remove("hidden");
+        startNewGame();
+        gameRecorded = true;
+        battleMode = true; battleOver = false;
+        appElement.classList.add("battle");
+        difficultyControl.hidden = true;
+        document.getElementById("battle-bot-name").textContent = bot;
+        battleBotTotal = puzzle.flat().filter((v) => v === 0).length;
+        battleBotFilled = 0;
+        battleStart = Date.now();
+        setMessage("Trận đấu bắt đầu! Hoàn thành trước đối thủ.");
+        updateBattleBar();
+        battleClockTimer = setInterval(updateBattleBar, 1000);
+        botStep(Math.max(4000, 600000 / battleBotTotal));
+      }
+      function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+      function randomBotName() {
+        const L = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        return pick(L) + pick(L) + (10 + Math.floor(Math.random() * 90)) + pick(L) + pick(L);
+      }
+      function startMatchmaking() {
+        const d = loadBattleStats();
+        if (d.tickets <= 0) { d.tickets = 5; }
+        d.tickets -= 1; saveBattleStats(d);
+        battleEls.searching.classList.add("show");
+        setTimeout(() => {
+          battleEls.searching.classList.remove("show");
+          const bot = randomBotName();
+          document.getElementById("vs-bot-name").textContent = bot;
+          document.getElementById("vs-bot-avatar").textContent = pick(BOT_AVATARS);
+          document.getElementById("vs-bot-flag").textContent = pick(BOT_FLAGS);
+          battleEls.vs.classList.add("show");
+          setTimeout(() => beginBattleGame(bot), 2500);
+        }, 2000);
+      }
+      document.getElementById("tab-home").addEventListener("click", () => setLobbyTab(false));
+      document.getElementById("tab-battle").addEventListener("click", () => setLobbyTab(true));
+      document.getElementById("battle-start").addEventListener("click", startMatchmaking);
+      document.getElementById("battle-result-ok").addEventListener("click", () => {
+        battleEls.result.classList.remove("show");
+        leaveBattleMode();
+        appElement.classList.add("hidden");
+        lobbyElement.classList.add("show");
+        renderBattleLobby();
       });
       document.getElementById("change-game").addEventListener("click", () => changeGameModal.classList.add("show"));
       document.getElementById("cancel-change-game").addEventListener("click", () => changeGameModal.classList.remove("show"));
