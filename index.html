@@ -3115,13 +3115,15 @@
           if (d) return {
             wins: d.wins | 0,
             losses: d.losses | 0,
+            pvpWins: d.pvpWins | 0,
+            pvpLosses: d.pvpLosses | 0,
             tickets: d.tickets | 0,
             history: Array.isArray(d.history) ? d.history.filter((entry) =>
               entry && typeof entry.won === "boolean" && Number.isFinite(entry.playedAt)
             ).slice(0, 10) : []
           };
         } catch (e) {}
-        return { wins: 0, losses: 0, tickets: 5, history: [] };
+        return { wins: 0, losses: 0, pvpWins: 0, pvpLosses: 0, tickets: 5, history: [] };
       }
       function saveBattleStats(d) { try { localStorage.setItem(BATTLE_KEY, JSON.stringify(d)); } catch (e) {} }
       function renderBattleOverview() {
@@ -3198,11 +3200,11 @@
         getFirebaseSession().then(() => showUser(firebase.auth().currentUser)).catch(() => {});
       }
       function renderRoomStats() {
-        const d = loadBattleStats(), total = d.wins + d.losses;
+        const d = loadBattleStats(), total = d.pvpWins + d.pvpLosses;
         document.getElementById("room-stats-total").textContent = total;
-        document.getElementById("room-stats-wins").textContent = d.wins;
-        document.getElementById("room-stats-losses").textContent = d.losses;
-        document.getElementById("room-stats-rate").textContent = `${total ? Math.round(d.wins / total * 100) : 0}%`;
+        document.getElementById("room-stats-wins").textContent = d.pvpWins;
+        document.getElementById("room-stats-losses").textContent = d.pvpLosses;
+        document.getElementById("room-stats-rate").textContent = `${total ? Math.round(d.pvpWins / total * 100) : 0}%`;
       }
       function setLobbyTab(tabName) {
         lobbyElement.classList.toggle("room-view", tabName === "room");
@@ -3547,6 +3549,9 @@
         elapsedMs = currentElapsed();
         const d = loadBattleStats();
         if (won) d.wins += 1; else d.losses += 1;
+        if (battleRealtime) {
+          if (won) d.pvpWins += 1; else d.pvpLosses += 1;
+        }
         d.history.unshift({ won, opponent: battleRealtime ? document.getElementById("battle-bot-name").textContent : "Bot", playedAt: Date.now() });
         d.history = d.history.slice(0, 10);
         saveBattleStats(d);
