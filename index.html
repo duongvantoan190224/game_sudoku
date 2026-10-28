@@ -1626,6 +1626,11 @@
         ["Mã phòng không hợp lệ hoặc phòng không tồn tại.", "Invalid code or room does not exist.", "房间代码无效或房间不存在。", "잘못된 코드이거나 방이 없습니다.", "コードが無効か、部屋がありません。"],
         ["Phòng đã có người chơi hoặc trận đấu đã bắt đầu.", "The room is full or the match has started.", "房间已满或比赛已开始。", "방이 가득 찼거나 경기가 시작되었습니다.", "部屋が満員か、試合が始まっています。"],
         ["Không thể kết nối Firebase. Kiểm tra cấu hình và kết nối mạng.", "Could not connect to Firebase. Check the configuration and network.", "无法连接 Firebase，请检查配置和网络。", "Firebase에 연결할 수 없습니다. 설정과 네트워크를 확인하세요.", "Firebaseに接続できません。設定とネットワークを確認してください。"],
+        ["Firebase chưa bật đăng nhập ẩn danh. Hãy bật Anonymous trong Firebase Authentication.", "Firebase Anonymous Authentication is disabled. Enable Anonymous in Firebase Authentication.", "Firebase 未启用匿名登录。请在 Firebase Authentication 中启用 Anonymous。", "Firebase 익명 인증이 비활성화되어 있습니다. Firebase Authentication에서 Anonymous를 활성화하세요.", "Firebase の匿名認証が無効です。Firebase Authentication で Anonymous を有効にしてください。"],
+        ["Tên miền hiện tại chưa được cho phép trong Firebase Authentication. Hãy thêm tên miền vào Authorized domains.", "This site is not authorized in Firebase Authentication. Add its hostname to Authorized domains.", "当前网站域名未获 Firebase Authentication 授权。请将其添加到 Authorized domains。", "현재 사이트가 Firebase Authentication에서 허용되지 않았습니다. 호스트 이름을 Authorized domains에 추가하세요.", "このサイトは Firebase Authentication で許可されていません。ホスト名を Authorized domains に追加してください。"],
+        ["Firebase Realtime Database từ chối truy cập. Hãy kiểm tra và xuất bản Rules.", "Firebase Realtime Database denied access. Check and publish the database Rules.", "Firebase Realtime Database 拒绝访问。请检查并发布数据库 Rules。", "Firebase Realtime Database 액세스가 거부되었습니다. Rules를 확인하고 게시하세요.", "Firebase Realtime Database がアクセスを拒否しました。Rules を確認して公開してください。"],
+        ["Cấu hình Firebase không hợp lệ. Hãy kiểm tra API key và URL Realtime Database.", "Firebase configuration is invalid. Check the API key and Realtime Database URL.", "Firebase 配置无效。请检查 API key 和 Realtime Database URL。", "Firebase 구성이 올바르지 않습니다. API 키와 Realtime Database URL을 확인하세요.", "Firebase の設定が無効です。API キーと Realtime Database URL を確認してください。"],
+        ["Không thể gửi yêu cầu đến Firebase. Hãy kiểm tra Internet hoặc mạng có chặn Firebase không.", "Could not reach Firebase. Check your internet connection or whether your network blocks Firebase.", "无法连接 Firebase。请检查网络连接或网络是否屏蔽 Firebase。", "Firebase에 연결할 수 없습니다. 인터넷 연결 또는 네트워크의 Firebase 차단 여부를 확인하세요.", "Firebase に接続できません。インターネット接続またはネットワークによる Firebase のブロックを確認してください。"],
         ["Hủy phòng", "Cancel room", "取消房间", "방 취소", "部屋をキャンセル"],
         ["Bạn đã hoàn thành trước đối thủ.", "You finished before your opponent.", "你先于对手完成。", "상대보다 먼저 완료했습니다.", "対戦相手より先に完了しました。"],
         ["Đối thủ đã hoàn thành trước.", "Your opponent finished first.", "对手先完成了。", "상대가 먼저 완료했습니다.", "対戦相手が先に完了しました。"],
@@ -3032,9 +3037,10 @@
         if (!battleRealtime || !roomRef || !roomUid || progress === lastPublishedProgress) return;
         lastPublishedProgress = progress;
         roomRef.child(`players/${roomUid}`).update({ progress, completed: progress >= 1 })
-          .catch(() => {
+          .catch((error) => {
             lastPublishedProgress = -1;
-            setRoomMessage("Không thể kết nối Firebase. Kiểm tra cấu hình và kết nối mạng.");
+            console.error(error);
+            setRoomMessage(firebaseErrorMessage(error));
           });
       }
       function updateBattleBar() {
@@ -3065,6 +3071,15 @@
       }
       function setRoomMessage(message) {
         document.getElementById("battle-room-message").textContent = message ? t(message) : "";
+      }
+      function firebaseErrorMessage(error) {
+        const code = String(error && error.code || "").toLowerCase();
+        if (code.includes("operation-not-allowed")) return t("Firebase chưa bật đăng nhập ẩn danh. Hãy bật Anonymous trong Firebase Authentication.");
+        if (code.includes("unauthorized-domain")) return t("Tên miền hiện tại chưa được cho phép trong Firebase Authentication. Hãy thêm tên miền vào Authorized domains.");
+        if (code.includes("permission-denied") || code.includes("permission_denied")) return t("Firebase Realtime Database từ chối truy cập. Hãy kiểm tra và xuất bản Rules.");
+        if (code.includes("invalid-api-key") || code.includes("invalid-url") || code.includes("project-not-found")) return t("Cấu hình Firebase không hợp lệ. Hãy kiểm tra API key và URL Realtime Database.");
+        if (code.includes("network-request-failed")) return t("Không thể gửi yêu cầu đến Firebase. Hãy kiểm tra Internet hoặc mạng có chặn Firebase không.");
+        return t("Không thể kết nối Firebase. Kiểm tra cấu hình và kết nối mạng.");
       }
       function setRoomBusy(busy) {
         document.getElementById("create-room").disabled = busy;
@@ -3125,7 +3140,10 @@
             return;
           }
           handleRoomUpdate(room);
-        }, () => setRoomMessage("Không thể kết nối Firebase. Kiểm tra cấu hình và kết nối mạng."));
+        }, (error) => {
+          console.error(error);
+          setRoomMessage(firebaseErrorMessage(error));
+        });
       }
       function handleRoomUpdate(room) {
         if (room.status === "waiting") {
@@ -3194,7 +3212,7 @@
           watchRoom(roomRef);
         } catch (error) {
           console.error(error);
-          setRoomMessage("Không thể kết nối Firebase. Kiểm tra cấu hình và kết nối mạng.");
+          setRoomMessage(firebaseErrorMessage(error));
         } finally {
           setRoomBusy(false);
         }
@@ -3231,7 +3249,7 @@
           console.error(error);
           setRoomMessage(error.message === "Room is unavailable"
             ? "Phòng đã có người chơi hoặc trận đấu đã bắt đầu."
-            : "Không thể kết nối Firebase. Kiểm tra cấu hình và kết nối mạng.");
+            : firebaseErrorMessage(error));
         } finally {
           setRoomBusy(false);
         }
@@ -3257,7 +3275,7 @@
             }
           } catch (error) {
             console.error(error);
-            setRoomMessage("Không thể kết nối Firebase. Kiểm tra cấu hình và kết nối mạng.");
+            setRoomMessage(firebaseErrorMessage(error));
             return;
           }
         }
@@ -3311,7 +3329,7 @@
           if (result.committed) handleRoomUpdate(result.snapshot.val());
         } catch (error) {
           console.error(error);
-          setRoomMessage("Không thể kết nối Firebase. Kiểm tra cấu hình và kết nối mạng.");
+          setRoomMessage(firebaseErrorMessage(error));
         }
       }
       function beginRealtimeBattle(room) {
