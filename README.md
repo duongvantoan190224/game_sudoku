@@ -7,8 +7,9 @@ Game Sudoku truyền thống.
 Trận đấu trực tuyến dùng Firebase Realtime Database và Firebase Anonymous Authentication. Mỗi người chơi cần kết nối Internet.
 
 1. Tạo một dự án Firebase, thêm ứng dụng web, bật **Authentication → Sign-in method → Anonymous**, rồi tạo **Realtime Database**.
-2. Trong `/home/runner/work/game_sudoku/game_sudoku/index.html`, thay các giá trị `YOUR_API_KEY`, `YOUR_PROJECT_ID` và `YOUR_APP_ID` trong `FIREBASE_CONFIG` bằng thông tin ứng dụng web trên Firebase. Dùng đúng URL database trong trường `databaseURL`.
-3. Dán các quy tắc sau vào trang **Realtime Database → Rules**:
+2. Trong `index.html`, dùng cấu hình ứng dụng web đúng với dự án Firebase, đặc biệt là `apiKey`, `projectId`, `appId` và URL `databaseURL` được hiển thị trong trang Realtime Database. Thêm tên miền đang chạy trò chơi vào **Authentication → Settings → Authorized domains**.
+3. Trong **Authentication → Sign-in method**, bật **Anonymous**.
+4. Dán các quy tắc sau vào trang **Realtime Database → Rules**, rồi bấm **Publish**:
 
 ```json
 {
@@ -30,7 +31,7 @@ Trận đấu trực tuyến dùng Firebase Realtime Database và Firebase Anony
 }
 ```
 
-4. Serve the page over HTTPS (or localhost during development) and open it in two browser sessions. On the **Phòng đấu** tab, one player creates a room and shares its four-digit code; the other enters that code to join.
+5. Serve the page over HTTPS (or localhost during development) and open it in two browser sessions. On the **Phòng đấu** tab, one player creates a room and shares its four-digit code; the other enters that code to join.
 
 Both clients generate the same puzzle from the room seed and difficulty. Player progress is written to the room in Realtime Database; the first client to claim a completed board atomically sets the winner.
 
