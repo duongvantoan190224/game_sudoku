@@ -941,6 +941,25 @@
     .lobby.battle-view .lobby-content > :not(.battle-lobby) { display: none; }
     .lobby.room-view .room-lobby { display: flex; }
     .lobby.room-view .lobby-content > :not(.room-lobby) { display: none; }
+    .profile-lobby { display: none; flex: 1; flex-direction: column; gap: 14px; padding: 8px 3px; }
+    .lobby.profile-view .profile-lobby { display: flex; }
+    .lobby.profile-view .lobby-content > :not(.profile-lobby) { display: none; }
+    .profile-header { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid #e1e7f5; border-radius: 20px; background: var(--surface); box-shadow: 0 4px 14px #26395812; }
+    .profile-avatar { display: grid; width: 64px; height: 64px; flex: 0 0 64px; place-items: center; border-radius: 50%; color: #fff; background: linear-gradient(135deg, #6f8cff, #4569e8); font-size: 28px; font-weight: 800; }
+    .profile-info { display: grid; min-width: 0; gap: 4px; }
+    .profile-name { overflow: hidden; color: var(--text-primary); font-size: 17px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+    .profile-rank { display: inline-flex; width: fit-content; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; color: #986817; background: #fff0c2; font-size: 12px; font-weight: 800; }
+    .profile-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .profile-stat { display: grid; gap: 2px; padding: 12px 4px; border: 1px solid #e1e7f5; border-radius: 16px; background: var(--surface); text-align: center; }
+    .profile-stat b { color: var(--text-primary); font-size: 20px; font-variant-numeric: tabular-nums; }
+    .profile-stat span { color: var(--text-secondary); font-size: 11px; }
+    .profile-options { overflow: hidden; border: 1px solid #e1e7f5; border-radius: 20px; background: var(--surface); }
+    .profile-option { display: flex; width: 100%; min-height: 54px; align-items: center; gap: 12px; padding: 0 14px; border: 0; border-bottom: 1px solid #eef1f7; color: var(--text-primary); background: transparent; font-size: 14px; font-weight: 700; text-align: left; }
+    .profile-option:last-child { border-bottom: 0; }
+    .profile-option .settings-label { flex: 1; }
+    .profile-option-value { color: var(--text-secondary); font-size: 13px; font-weight: 600; }
+    [data-theme="dark"] .profile-header, [data-theme="dark"] .profile-stat, [data-theme="dark"] .profile-options, [data-theme="dark"] .profile-option { border-color: var(--border-color); }
+    [data-theme="dark"] .profile-rank { color: #f0d788; background: #3a3219; }
     .battle-overview-title { margin: 0 0 10px; color: var(--text-primary); font-size: 15px; font-weight: 800; }
     .battle-achievements { display: grid; gap: 8px; }
     .battle-achievement { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #e1e7f5; border-radius: 14px; color: var(--text-secondary); background: var(--surface); font-size: 12px; }
@@ -1172,6 +1191,23 @@
         </button>
         <button class="new-game-button" id="lobby-new-game" type="button">Trò chơi mới</button>
       </section>
+      <section class="profile-lobby" id="profile-lobby" aria-label="Cá nhân">
+        <div class="profile-header">
+          <div class="profile-avatar" id="profile-avatar" aria-hidden="true">?</div>
+          <div class="profile-info"><div class="profile-name" id="profile-name">Người chơi</div><div class="profile-rank"><span id="profile-badge" aria-hidden="true">🥉</span><span id="profile-rank">Đồng</span></div></div>
+        </div>
+        <div class="profile-stats">
+          <div class="profile-stat"><b id="profile-total">0</b><span>Tổng trận</span></div>
+          <div class="profile-stat"><b id="profile-wins">0</b><span>Thắng</span></div>
+          <div class="profile-stat"><b id="profile-losses">0</b><span>Thua</span></div>
+          <div class="profile-stat"><b id="profile-rate">0%</b><span>Tỉ lệ thắng</span></div>
+        </div>
+        <div class="profile-options">
+          <div class="profile-option"><span class="settings-icon sound" aria-hidden="true">🔊</span><span class="settings-label">Âm thanh</span><button class="settings-toggle" id="profile-sound-toggle" type="button" aria-label="Âm thanh" aria-pressed="true"></button></div>
+          <button class="profile-option" id="profile-history" type="button"><span class="settings-icon history" aria-hidden="true">🕘</span><span class="settings-label">Lịch sử đấu chi tiết</span><span class="settings-chevron" aria-hidden="true">›</span></button>
+          <div class="profile-option"><span class="settings-icon" aria-hidden="true">ℹ️</span><span class="settings-label">Phiên bản ứng dụng</span><span class="profile-option-value" id="profile-version"></span></div>
+        </div>
+      </section>
       <section class="battle-lobby" id="battle-lobby" aria-label="Thống kê trận chiến">
         <div class="battle-rank"><div class="battle-badge" id="battle-badge" aria-hidden="true">🥉</div><div class="battle-rank-name" id="battle-rank">Đồng</div><div>🎫 <span id="battle-tickets">5</span> vé</div></div>
         <div class="battle-stats">
@@ -1207,7 +1243,7 @@
       <button class="lobby-tab active" id="tab-home" type="button" aria-current="page"><span class="lobby-tab-icon" aria-hidden="true">⌂</span><span>Trang chủ</span></button>
       <button class="lobby-tab" id="tab-battle" type="button"><span class="lobby-tab-icon" aria-hidden="true">⚔</span><span>Trận chiến</span></button>
       <button class="lobby-tab" id="tab-room" type="button"><span class="lobby-tab-icon" aria-hidden="true">◈</span><span>Phòng đấu</span></button>
-      <button class="lobby-tab" type="button"><span class="lobby-tab-icon" aria-hidden="true">●</span><span>Cá nhân</span></button>
+      <button class="lobby-tab" id="tab-profile" type="button"><span class="lobby-tab-icon" aria-hidden="true">●</span><span>Cá nhân</span></button>
     </nav>
   </section>
   <div class="battle-overlay" id="battle-searching" role="status"><div class="battle-spinner"></div><div>Đang tìm đối thủ...</div></div>
@@ -3119,13 +3155,40 @@
           return item;
         }));
       }
+      function renderProfile() {
+        const d = loadBattleStats(), total = d.wins + d.losses;
+        const tiers = [["🥉", "Đồng"], ["🥈", "Bạc"], ["🥇", "Vàng"], ["💎", "Kim cương"]];
+        const tier = tiers[Math.min(3, Math.floor(d.wins / 5))];
+        document.getElementById("profile-total").textContent = total;
+        document.getElementById("profile-wins").textContent = d.wins;
+        document.getElementById("profile-losses").textContent = d.losses;
+        document.getElementById("profile-rate").textContent = `${total ? Math.round(d.wins / total * 100) : 0}%`;
+        document.getElementById("profile-badge").textContent = tier[0];
+        document.getElementById("profile-rank").textContent = tier[1];
+        document.getElementById("profile-version").textContent = APP_VERSION;
+        document.getElementById("profile-sound-toggle").setAttribute("aria-pressed", soundToggle.getAttribute("aria-pressed"));
+        const showUser = (user) => {
+          const name = user ? (user.displayName || roomPlayerName(user.uid)) : "Người chơi";
+          document.getElementById("profile-name").textContent = name;
+          document.getElementById("profile-avatar").textContent = user && user.photoURL ? "" : (name.replace(/^#/, "").charAt(0).toUpperCase() || "?");
+          if (user && user.photoURL) {
+            const img = document.createElement("img");
+            img.src = user.photoURL; img.alt = ""; img.style.cssText = "width:100%;height:100%;border-radius:50%;object-fit:cover";
+            document.getElementById("profile-avatar").replaceChildren(img);
+          }
+        };
+        showUser(window.firebase && firebase.apps && firebase.apps.length ? firebase.auth().currentUser : null);
+        getFirebaseSession().then(() => showUser(firebase.auth().currentUser)).catch(() => {});
+      }
       function setLobbyTab(tabName) {
         lobbyElement.classList.toggle("room-view", tabName === "room");
         lobbyElement.classList.toggle("battle-view", tabName === "battle");
+        lobbyElement.classList.toggle("profile-view", tabName === "profile");
         const tabs = {
           home: document.getElementById("tab-home"),
           battle: document.getElementById("tab-battle"),
-          room: document.getElementById("tab-room")
+          room: document.getElementById("tab-room"),
+          profile: document.getElementById("tab-profile")
         };
         Object.entries(tabs).forEach(([name, tab]) => {
           const active = name === tabName;
@@ -3133,6 +3196,7 @@
           tab.toggleAttribute("aria-current", active);
         });
         if (tabName === "battle") renderBattleOverview();
+        if (tabName === "profile") renderProfile();
       }
       function battleProgress() {
         const given = puzzle.flat();
@@ -3560,6 +3624,16 @@
       document.getElementById("tab-home").addEventListener("click", () => setLobbyTab("home"));
       document.getElementById("tab-battle").addEventListener("click", () => setLobbyTab("battle"));
       document.getElementById("tab-room").addEventListener("click", () => setLobbyTab("room"));
+      document.getElementById("tab-profile").addEventListener("click", () => setLobbyTab("profile"));
+      document.getElementById("profile-sound-toggle").addEventListener("click", (event) => {
+        soundToggle.click();
+        event.currentTarget.setAttribute("aria-pressed", soundToggle.getAttribute("aria-pressed"));
+      });
+      document.getElementById("profile-history").addEventListener("click", () => {
+        renderGameHistory();
+        gameHistoryModal.classList.add("show");
+        document.getElementById("close-game-history").focus();
+      });
       document.getElementById("find-opponent").addEventListener("click", startBotBattle);
       document.getElementById("create-room").addEventListener("click", createRoom);
       document.getElementById("join-room").addEventListener("click", joinRoom);
