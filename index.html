@@ -1089,6 +1089,21 @@
       .tool-row, .number-pad { flex: 0 0 auto; width: 100%; }
     }
   </style>
+  <style>
+    .chat-widget{position:fixed;right:12px;bottom:84px;z-index:40;display:none;flex-direction:column;align-items:flex-end;gap:8px;font-family:inherit}
+    .chat-widget.show{display:flex}
+    .chat-toggle{width:48px;height:48px;border-radius:50%;border:0;background:#2563eb;color:#fff;font-size:22px;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;position:relative}
+    .chat-toggle .chat-dot{position:absolute;top:4px;right:4px;width:12px;height:12px;border-radius:50%;background:#ef4444;display:none}
+    .chat-toggle.unread .chat-dot{display:block}
+    .chat-panel{display:none;width:min(280px,calc(100vw - 24px));background:#fff;color:#111;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.3);overflow:hidden}
+    .chat-widget.open .chat-panel{display:flex;flex-direction:column}
+    .chat-log{height:160px;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;background:#f3f4f6}
+    .chat-msg{max-width:80%;padding:6px 10px;border-radius:14px;font-size:14px;word-break:break-word;background:#e5e7eb;align-self:flex-start}
+    .chat-msg.me{background:#2563eb;color:#fff;align-self:flex-end}
+    .chat-form{display:flex;gap:6px;padding:6px;border-top:1px solid #e5e7eb}
+    .chat-form input{flex:1;min-width:0;padding:6px 8px;border:1px solid #d1d5db;border-radius:8px;font-size:14px}
+    .chat-form button{border:0;background:#2563eb;color:#fff;border-radius:8px;padding:0 12px;cursor:pointer}
+  </style>
 </head>
 <body>
   <section class="lobby show" id="lobby" aria-label="Sảnh chính">
@@ -1286,6 +1301,12 @@
       <span class="ad-banner-copy"><strong>Đồ chơi trí tuệ</strong><span class="ad-banner-text"><span class="ad-banner-track"><span>Sách Sudoku giảm giá</span><span>Xem ngay trên Tiki</span></span></span></span>
     </a>
   </main>
+
+  <div class="chat-widget" id="chat-widget">
+    <div class="chat-panel" id="chat-panel"><div class="chat-log" id="chat-log" aria-live="polite"></div>
+      <form class="chat-form" id="chat-form"><input id="chat-input" maxlength="200" autocomplete="off" placeholder="Nhắn tin..." aria-label="Tin nhắn"><button type="submit">Gửi</button></form></div>
+    <button class="chat-toggle" id="chat-toggle" type="button" aria-label="Chat" aria-expanded="false">💬<span class="chat-dot"></span></button>
+  </div>
 
   <div class="toast" id="toast" role="alert" aria-live="assertive">
     <span class="toast-icon-wrap" aria-hidden="true"><svg class="toast-icon" viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4m0 3h.01"/></svg></span>
@@ -3114,7 +3135,51 @@
         });
         return firebaseInitPromise;
       }
+      var chatRef = null;
+      function chatEls() { return { w: document.getElementById("chat-widget"), log: document.getElementById("chat-log"), toggle: document.getElementById("chat-toggle") }; }
+      function addChatMessage(msg) {
+        const { w, log, toggle } = chatEls();
+        const el = document.createElement("div");
+        const mine = msg.uid === roomUid;
+        el.className = "chat-msg" + (mine ? " me" : "");
+        el.textContent = String(msg.text || "");
+        log.appendChild(el);
+        while (log.children.length > 50) log.removeChild(log.firstChild);
+        log.scrollTop = log.scrollHeight;
+        if (!mine && !w.classList.contains("open")) toggle.classList.add("unread");
+      }
+      function startChat() {
+        if (!roomRef || chatRef) return;
+        chatRef = roomRef.child("chat");
+        chatEls().log.textContent = "";
+        chatEls().w.classList.add("show");
+        chatRef.limitToLast(50).on("child_added", (snap) => { const m = snap.val(); if (m) addChatMessage(m); }, (e) => console.error(e));
+      }
+      function stopChat() {
+        if (chatRef) chatRef.off();
+        chatRef = null;
+        const { w, toggle } = chatEls();
+        w.classList.remove("show", "open");
+        toggle.classList.remove("unread");
+        toggle.setAttribute("aria-expanded", "false");
+      }
+      document.getElementById("chat-toggle").addEventListener("click", () => {
+        const { w, toggle, log } = chatEls();
+        const open = w.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", String(open));
+        toggle.classList.remove("unread");
+        if (open) { log.scrollTop = log.scrollHeight; document.getElementById("chat-input").focus(); }
+      });
+      document.getElementById("chat-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const input = document.getElementById("chat-input");
+        const text = input.value.trim().slice(0, 200);
+        if (!text || !chatRef) return;
+        input.value = "";
+        chatRef.push({ uid: roomUid, name: roomPlayerName(roomUid), text, time: firebase.database.ServerValue.TIMESTAMP }).catch((err) => console.error(err));
+      });
       function resetRoomStatus() {
+        stopChat();
         roomRef = null;
         roomCode = "";
         roomUid = "";
@@ -3302,6 +3367,7 @@
         if (battleOver) return;
         battleOver = true;
         stopBattleTimers();
+        stopChat();
         finished = true;
         elapsedMs = currentElapsed();
         const d = loadBattleStats();
@@ -3334,6 +3400,7 @@
       }
       function beginRealtimeBattle(room) {
         if (!roomRef || battleOver) return;
+        startChat();
         recordGame("abandoned");
         dailyMode = false;
         updateModeBadge();
