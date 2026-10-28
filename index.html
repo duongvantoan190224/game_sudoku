@@ -959,7 +959,6 @@
     .profile-option .settings-label { flex: 1; }
     .profile-option-value { color: var(--text-secondary); font-size: 13px; font-weight: 600; }
     [data-theme="dark"] .profile-header, [data-theme="dark"] .profile-stat, [data-theme="dark"] .profile-options, [data-theme="dark"] .profile-option { border-color: var(--border-color); }
-    [data-theme="dark"] .room-stats-card { border-color: var(--border-color); background: var(--surface); }
     [data-theme="dark"] .profile-rank { color: #f0d788; background: #3a3219; }
     .battle-overview-title { margin: 0 0 10px; color: var(--text-primary); font-size: 15px; font-weight: 800; }
     .battle-achievements { display: grid; gap: 8px; }
@@ -993,9 +992,12 @@
     .battle-stat b { font-size: 22px; } .battle-stat span { color: #6b7589; font-size: 11px; font-weight: 700; }
     .battle-start { min-height: 60px; border: 0; border-radius: 17px; color: #fff; background: linear-gradient(110deg, #e5484d, #c92a3a); box-shadow: 0 7px 16px #c92a3a45; font-size: 17px; font-weight: 850; }
     .battle-room-actions { display: grid; gap: 10px; }
-    .room-stats-card { padding: 14px; border: 1px solid #e1e7f5; border-radius: 20px; background: var(--surface); box-shadow: 0 4px 14px #26395812; }
-    .room-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .room-stats .profile-stat { padding: 10px 6px; }
+    .room-stats-card { padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 18px; background: var(--surface-raised); box-shadow: 0 4px 14px #26395812; }
+    .room-stats-card .battle-overview-title { margin-bottom: 6px; font-size: 13px; }
+    .room-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; }
+    .room-stats .profile-stat { gap: 3px; padding: 5px 1px; border: 0; border-radius: 12px; background: transparent; }
+    .room-stats .profile-stat b { font-size: clamp(15px, 4vw, 18px); line-height: 1.15; }
+    .room-stats .profile-stat span { font-size: clamp(9px, 2.7vw, 10px); line-height: 1.2; }
     .battle-room-join { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
     .battle-room-code { min-width: 0; padding: 11px 12px; border: 1px solid #dce3ef; border-radius: 12px; color: var(--text-primary); background: var(--surface); font-size: 16px; font-weight: 800; letter-spacing: .12em; }
     .battle-room-join .battle-start { min-height: 48px; padding: 0 14px; font-size: 14px; }
@@ -1232,7 +1234,7 @@
       </section>
       <section class="room-lobby" id="room-lobby" aria-label="Sảnh Phòng đấu">
         <section class="room-stats-card" aria-labelledby="room-stats-title">
-          <h2 class="battle-overview-title" id="room-stats-title">Thống kê PvP</h2>
+          <h2 class="battle-overview-title" id="room-stats-title">Thống kê phòng đấu</h2>
           <div class="profile-stats room-stats">
             <div class="profile-stat"><b id="room-stats-total">0</b><span>Tổng trận</span></div>
             <div class="profile-stat"><b id="room-stats-wins">0</b><span>Thắng</span></div>
