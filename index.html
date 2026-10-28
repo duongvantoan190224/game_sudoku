@@ -789,7 +789,7 @@
     .continue-arrow { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%; color: #4163df; background: #fff; font-size: 23px; font-weight: 700; }
     .new-game-button { width: 100%; min-height: 62px; margin-top: 10px; border: 1.5px solid #cbd5f3; border-radius: 17px; color: #4562ce; background: #ffffffb8; font-size: 15px; font-weight: 800; }
     .new-game-button:hover { background: #fff; }
-    .lobby-bottom-bar { display: grid; min-height: calc(67px + env(safe-area-inset-bottom)); grid-template-columns: repeat(4, 1fr); align-items: center; margin: 0 -16px; padding: 4px 8px calc(6px + env(safe-area-inset-bottom)); border: 1px solid #e9edf5; border-radius: 24px 24px 0 0; background: #fff; box-shadow: 0 8px 24px #25324b1a; }
+    .lobby-bottom-bar { display: grid; min-height: calc(67px + env(safe-area-inset-bottom)); grid-template-columns: repeat(5, 1fr); align-items: center; margin: 0 -16px; padding: 4px 8px calc(6px + env(safe-area-inset-bottom)); border: 1px solid #e9edf5; border-radius: 24px 24px 0 0; background: #fff; box-shadow: 0 8px 24px #25324b1a; }
     .lobby-tab { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 3px; border: 0; color: #98a1b2; background: transparent; font-size: 10px; font-weight: 700; }
     .lobby-tab:first-child { border-top-left-radius: 18px; }
     .lobby-tab:last-child { border-top-right-radius: 18px; }
@@ -941,6 +941,16 @@
     .lobby.battle-view .lobby-content > :not(.battle-lobby) { display: none; }
     .lobby.room-view .room-lobby { display: flex; }
     .lobby.room-view .lobby-content > :not(.room-lobby) { display: none; }
+    .tournament-lobby { display: none; flex: 1; flex-direction: column; gap: 14px; padding: 8px 3px; }
+    .lobby.tournament-view .tournament-lobby { display: flex; }
+    .lobby.tournament-view .lobby-content > :not(.tournament-lobby) { display: none; }
+    .tournament-list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .tournament-item { display: flex; align-items: center; gap: 10px; padding: 11px 13px; border: 1px solid #e3e8f4; border-radius: 14px; background: #fff; font-size: 14px; font-weight: 700; }
+    .tournament-item .t-rank { min-width: 28px; text-align: center; }
+    .tournament-item .t-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tournament-item .t-score { color: #4569e8; }
+    .tournament-empty { margin: 0; color: #98a1b2; font-size: 13px; text-align: center; }
+    [data-theme="dark"] .tournament-item { background: var(--surface, #1f2430); border-color: #ffffff22; }
     .profile-lobby { display: none; flex: 1; flex-direction: column; gap: 14px; padding: 8px 3px; }
     .lobby.profile-view .profile-lobby { display: flex; }
     .lobby.profile-view .lobby-content > :not(.profile-lobby) { display: none; }
@@ -1197,6 +1207,19 @@
         </button>
         <button class="new-game-button" id="lobby-new-game" type="button">Trò chơi mới</button>
       </section>
+      <section class="tournament-lobby" id="tournament-lobby" aria-label="Giải đấu">
+        <section aria-labelledby="tournament-list-title">
+          <h2 class="battle-overview-title" id="tournament-list-title">Danh sách giải đấu</h2>
+          <ol class="tournament-list" id="tournament-list"></ol>
+          <p class="tournament-empty" id="tournament-list-empty">Chưa có giải đấu nào.</p>
+        </section>
+        <section aria-labelledby="tournament-board-title">
+          <h2 class="battle-overview-title" id="tournament-board-title">Bảng xếp hạng</h2>
+          <ol class="tournament-list" id="tournament-board"></ol>
+          <p class="tournament-empty" id="tournament-board-empty">Chưa có dữ liệu xếp hạng.</p>
+        </section>
+        <p class="battle-room-message" id="tournament-message" role="status" aria-live="polite"></p>
+      </section>
       <section class="profile-lobby" id="profile-lobby" aria-label="Cá nhân">
         <div class="profile-header">
           <div class="profile-avatar" id="profile-avatar" aria-hidden="true">?</div>
@@ -1258,6 +1281,7 @@
       <button class="lobby-tab active" id="tab-home" type="button" aria-current="page"><span class="lobby-tab-icon" aria-hidden="true">⌂</span><span>Trang chủ</span></button>
       <button class="lobby-tab" id="tab-battle" type="button"><span class="lobby-tab-icon" aria-hidden="true">⚔</span><span>Trận chiến</span></button>
       <button class="lobby-tab" id="tab-room" type="button"><span class="lobby-tab-icon" aria-hidden="true">◈</span><span>Phòng đấu</span></button>
+      <button class="lobby-tab" id="tab-tournament" type="button"><span class="lobby-tab-icon" aria-hidden="true">🏆</span><span>Giải đấu</span></button>
       <button class="lobby-tab" id="tab-profile" type="button"><span class="lobby-tab-icon" aria-hidden="true">●</span><span>Cá nhân</span></button>
     </nav>
   </section>
@@ -1722,6 +1746,11 @@
         ["Trò chơi mới", "New game", "新游戏", "새 게임", "新しいゲーム"],
         ["Trang chủ", "Home", "首页", "홈", "ホーム"],
         ["Trận chiến", "Battle", "对战", "대전", "バトル"],
+        ["Giải đấu", "Tournament", "锦标赛", "토너먼트", "トーナメント"],
+        ["Danh sách giải đấu", "Tournaments", "锦标赛列表", "토너먼트 목록", "トーナメント一覧"],
+        ["Bảng xếp hạng", "Leaderboard", "排行榜", "리더보드", "ランキング"],
+        ["Chưa có giải đấu nào.", "No tournaments yet.", "暂无锦标赛。", "토너먼트가 없습니다.", "トーナメントはまだありません。"],
+        ["Chưa có dữ liệu xếp hạng.", "No leaderboard data yet.", "暂无排名数据。", "순위 데이터가 없습니다.", "ランキングデータはまだありません。"],
         ["Phòng đấu", "Arena", "对战房间", "대전방", "対戦ルーム"],
         ["Thống kê PvP", "PvP stats", "PvP 统计", "PvP 통계", "PvP 統計"],
         ["Tổng trận", "Total matches", "总场次", "총 경기", "合計試合数"],
@@ -3212,10 +3241,12 @@
         lobbyElement.classList.toggle("room-view", tabName === "room");
         lobbyElement.classList.toggle("battle-view", tabName === "battle");
         lobbyElement.classList.toggle("profile-view", tabName === "profile");
+        lobbyElement.classList.toggle("tournament-view", tabName === "tournament");
         const tabs = {
           home: document.getElementById("tab-home"),
           battle: document.getElementById("tab-battle"),
           room: document.getElementById("tab-room"),
+          tournament: document.getElementById("tab-tournament"),
           profile: document.getElementById("tab-profile")
         };
         Object.entries(tabs).forEach(([name, tab]) => {
@@ -3226,6 +3257,56 @@
         if (tabName === "battle") renderBattleOverview();
         if (tabName === "room") renderRoomStats();
         if (tabName === "profile") renderProfile();
+        if (tabName === "tournament") startTournamentListeners(); else stopTournamentListeners();
+      }
+      var tournamentRefs = [];
+      function stopTournamentListeners() {
+        tournamentRefs.forEach((ref) => ref.off());
+        tournamentRefs = [];
+      }
+      function renderTournamentRows(listId, emptyId, rows, build) {
+        const list = document.getElementById(listId);
+        list.replaceChildren(...rows.map(build));
+        document.getElementById(emptyId).style.display = rows.length ? "none" : "";
+      }
+      function tournamentRow(icon, name, extra) {
+        const li = document.createElement("li");
+        li.className = "tournament-item";
+        [["t-rank", icon], ["t-name", name], ["t-score", extra]].forEach(([cls, text]) => {
+          const span = document.createElement("span");
+          span.className = cls; span.textContent = text; li.appendChild(span);
+        });
+        return li;
+      }
+      async function startTournamentListeners() {
+        stopTournamentListeners();
+        const message = document.getElementById("tournament-message");
+        message.textContent = "";
+        try {
+          const { database } = await getFirebaseSession();
+          if (!lobbyElement.classList.contains("tournament-view")) return;
+          stopTournamentListeners();
+          const onError = (error) => { console.error(error); message.textContent = t(firebaseErrorMessage(error)); };
+          const listRef = database.ref("sudokuTournaments").limitToLast(20);
+          const boardRef = database.ref("sudokuLeaderboard").orderByChild("score").limitToLast(20);
+          listRef.on("value", (snap) => {
+            const rows = [];
+            snap.forEach((child) => { rows.push(child.val() || {}); });
+            renderTournamentRows("tournament-list", "tournament-list-empty", rows.reverse(),
+              (item) => tournamentRow("🏆", String(item.name || ""), String(item.status || "")));
+          }, onError);
+          boardRef.on("value", (snap) => {
+            const rows = [];
+            snap.forEach((child) => { rows.push(child.val() || {}); });
+            rows.sort((a, b) => (Number(b.score) || 0) - (Number(a.score) || 0));
+            renderTournamentRows("tournament-board", "tournament-board-empty", rows,
+              (item, i) => tournamentRow(["🥇", "🥈", "🥉"][i] || String(i + 1), String(item.name || ""), String(Number(item.score) || 0)));
+          }, onError);
+          tournamentRefs = [listRef, boardRef];
+        } catch (error) {
+          console.error(error);
+          message.textContent = t(firebaseErrorMessage(error));
+        }
       }
       function battleProgress() {
         const given = puzzle.flat();
@@ -3657,6 +3738,7 @@
       document.getElementById("tab-home").addEventListener("click", () => setLobbyTab("home"));
       document.getElementById("tab-battle").addEventListener("click", () => setLobbyTab("battle"));
       document.getElementById("tab-room").addEventListener("click", () => setLobbyTab("room"));
+      document.getElementById("tab-tournament").addEventListener("click", () => setLobbyTab("tournament"));
       document.getElementById("tab-profile").addEventListener("click", () => setLobbyTab("profile"));
       document.getElementById("profile-sound-toggle").addEventListener("click", (event) => {
         soundToggle.click();
