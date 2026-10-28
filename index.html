@@ -3197,6 +3197,13 @@
         showUser(window.firebase && firebase.apps && firebase.apps.length ? firebase.auth().currentUser : null);
         getFirebaseSession().then(() => showUser(firebase.auth().currentUser)).catch(() => {});
       }
+      function renderRoomStats() {
+        const d = loadBattleStats(), total = d.wins + d.losses;
+        document.getElementById("room-stats-total").textContent = total;
+        document.getElementById("room-stats-wins").textContent = d.wins;
+        document.getElementById("room-stats-losses").textContent = d.losses;
+        document.getElementById("room-stats-rate").textContent = `${total ? Math.round(d.wins / total * 100) : 0}%`;
+      }
       function setLobbyTab(tabName) {
         lobbyElement.classList.toggle("room-view", tabName === "room");
         lobbyElement.classList.toggle("battle-view", tabName === "battle");
@@ -3213,6 +3220,7 @@
           tab.toggleAttribute("aria-current", active);
         });
         if (tabName === "battle") renderBattleOverview();
+        if (tabName === "room") renderRoomStats();
         if (tabName === "profile") renderProfile();
       }
       function battleProgress() {
@@ -3542,6 +3550,7 @@
         d.history.unshift({ won, opponent: battleRealtime ? document.getElementById("battle-bot-name").textContent : "Bot", playedAt: Date.now() });
         d.history = d.history.slice(0, 10);
         saveBattleStats(d);
+        renderRoomStats();
         document.getElementById("battle-result-title").textContent = won ? "🏆 Bạn thắng!" : "😢 Bạn thua!";
         document.getElementById("battle-result-text").textContent = t(won ? "Bạn đã hoàn thành trước đối thủ." : "Đối thủ đã hoàn thành trước.");
         battleEls.result.classList.add("show");
