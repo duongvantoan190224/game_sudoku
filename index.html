@@ -3350,6 +3350,17 @@
           return;
         }
         setLobbyTab("battle");
+        stopBattleTimers();
+        battleEls.vs.classList.remove("show");
+        battleEls.searching.classList.add("show");
+        battleStartTimer = setTimeout(() => {
+          battleEls.searching.classList.remove("show");
+          battleEls.vs.classList.add("show");
+          battleStartTimer = setTimeout(beginBotBattle, 1600);
+        }, 900);
+      }
+      function beginBotBattle() {
+        battleEls.vs.classList.remove("show");
         startNewGame();
         battleMode = true;
         battleRealtime = false;
