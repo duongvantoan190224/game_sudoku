@@ -959,6 +959,7 @@
     .profile-option .settings-label { flex: 1; }
     .profile-option-value { color: var(--text-secondary); font-size: 13px; font-weight: 600; }
     [data-theme="dark"] .profile-header, [data-theme="dark"] .profile-stat, [data-theme="dark"] .profile-options, [data-theme="dark"] .profile-option { border-color: var(--border-color); }
+    [data-theme="dark"] .room-stats-card { border-color: var(--border-color); background: var(--surface); }
     [data-theme="dark"] .profile-rank { color: #f0d788; background: #3a3219; }
     .battle-overview-title { margin: 0 0 10px; color: var(--text-primary); font-size: 15px; font-weight: 800; }
     .battle-achievements { display: grid; gap: 8px; }
@@ -992,6 +993,9 @@
     .battle-stat b { font-size: 22px; } .battle-stat span { color: #6b7589; font-size: 11px; font-weight: 700; }
     .battle-start { min-height: 60px; border: 0; border-radius: 17px; color: #fff; background: linear-gradient(110deg, #e5484d, #c92a3a); box-shadow: 0 7px 16px #c92a3a45; font-size: 17px; font-weight: 850; }
     .battle-room-actions { display: grid; gap: 10px; }
+    .room-stats-card { padding: 14px; border: 1px solid #e1e7f5; border-radius: 20px; background: var(--surface); box-shadow: 0 4px 14px #26395812; }
+    .room-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .room-stats .profile-stat { padding: 10px 6px; }
     .battle-room-join { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
     .battle-room-code { min-width: 0; padding: 11px 12px; border: 1px solid #dce3ef; border-radius: 12px; color: var(--text-primary); background: var(--surface); font-size: 16px; font-weight: 800; letter-spacing: .12em; }
     .battle-room-join .battle-start { min-height: 48px; padding: 0 14px; font-size: 14px; }
@@ -1227,6 +1231,15 @@
         </section>
       </section>
       <section class="room-lobby" id="room-lobby" aria-label="Sảnh Phòng đấu">
+        <section class="room-stats-card" aria-labelledby="room-stats-title">
+          <h2 class="battle-overview-title" id="room-stats-title">Thống kê PvP</h2>
+          <div class="profile-stats room-stats">
+            <div class="profile-stat"><b id="room-stats-total">0</b><span>Tổng trận</span></div>
+            <div class="profile-stat"><b id="room-stats-wins">0</b><span>Thắng</span></div>
+            <div class="profile-stat"><b id="room-stats-losses">0</b><span>Thua</span></div>
+            <div class="profile-stat"><b id="room-stats-rate">0%</b><span>Tỉ lệ thắng</span></div>
+          </div>
+        </section>
         <div class="battle-room-actions">
           <button class="battle-start" id="create-room" type="button">Tạo phòng</button>
           <div class="battle-room-join">
@@ -1708,6 +1721,10 @@
         ["Trang chủ", "Home", "首页", "홈", "ホーム"],
         ["Trận chiến", "Battle", "对战", "대전", "バトル"],
         ["Phòng đấu", "Arena", "对战房间", "대전방", "対戦ルーム"],
+        ["Thống kê PvP", "PvP stats", "PvP 统计", "PvP 통계", "PvP 統計"],
+        ["Tổng trận", "Total matches", "总场次", "총 경기", "合計試合数"],
+        ["Thắng", "Wins", "胜场", "승리", "勝利"],
+        ["Tỉ lệ thắng", "Win rate", "胜率", "승률", "勝率"],
         ["Cá nhân", "Profile", "个人", "내 정보", "プロフィール"],
         ["Tạo phòng", "Create room", "创建房间", "방 만들기", "部屋を作成"],
         ["Tham gia phòng", "Join room", "加入房间", "방 참가", "部屋に参加"],
@@ -3098,13 +3115,15 @@
           if (d) return {
             wins: d.wins | 0,
             losses: d.losses | 0,
+            pvpWins: d.pvpWins | 0,
+            pvpLosses: d.pvpLosses | 0,
             tickets: d.tickets | 0,
             history: Array.isArray(d.history) ? d.history.filter((entry) =>
               entry && typeof entry.won === "boolean" && Number.isFinite(entry.playedAt)
             ).slice(0, 10) : []
           };
         } catch (e) {}
-        return { wins: 0, losses: 0, tickets: 5, history: [] };
+        return { wins: 0, losses: 0, pvpWins: 0, pvpLosses: 0, tickets: 5, history: [] };
       }
       function saveBattleStats(d) { try { localStorage.setItem(BATTLE_KEY, JSON.stringify(d)); } catch (e) {} }
       function renderBattleOverview() {
@@ -3180,6 +3199,13 @@
         showUser(window.firebase && firebase.apps && firebase.apps.length ? firebase.auth().currentUser : null);
         getFirebaseSession().then(() => showUser(firebase.auth().currentUser)).catch(() => {});
       }
+      function renderRoomStats() {
+        const d = loadBattleStats(), total = d.pvpWins + d.pvpLosses;
+        document.getElementById("room-stats-total").textContent = total;
+        document.getElementById("room-stats-wins").textContent = d.pvpWins;
+        document.getElementById("room-stats-losses").textContent = d.pvpLosses;
+        document.getElementById("room-stats-rate").textContent = `${total ? Math.round(d.pvpWins / total * 100) : 0}%`;
+      }
       function setLobbyTab(tabName) {
         lobbyElement.classList.toggle("room-view", tabName === "room");
         lobbyElement.classList.toggle("battle-view", tabName === "battle");
@@ -3196,6 +3222,7 @@
           tab.toggleAttribute("aria-current", active);
         });
         if (tabName === "battle") renderBattleOverview();
+        if (tabName === "room") renderRoomStats();
         if (tabName === "profile") renderProfile();
       }
       function battleProgress() {
@@ -3522,9 +3549,13 @@
         elapsedMs = currentElapsed();
         const d = loadBattleStats();
         if (won) d.wins += 1; else d.losses += 1;
+        if (battleRealtime) {
+          if (won) d.pvpWins += 1; else d.pvpLosses += 1;
+        }
         d.history.unshift({ won, opponent: battleRealtime ? document.getElementById("battle-bot-name").textContent : "Bot", playedAt: Date.now() });
         d.history = d.history.slice(0, 10);
         saveBattleStats(d);
+        renderRoomStats();
         document.getElementById("battle-result-title").textContent = won ? "🏆 Bạn thắng!" : "😢 Bạn thua!";
         document.getElementById("battle-result-text").textContent = t(won ? "Bạn đã hoàn thành trước đối thủ." : "Đối thủ đã hoàn thành trước.");
         battleEls.result.classList.add("show");
