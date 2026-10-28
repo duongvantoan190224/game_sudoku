@@ -936,9 +936,9 @@
     [data-theme="dark"] #victory-restart { border-color: var(--border-color); color: #b6c6ff; background: var(--surface-raised); }
     [data-theme="dark"] .game-history-score { color: #b6c6ff; }
 
-    .battle-lobby { display: none; flex: 1; flex-direction: column; gap: 14px; padding: 8px 3px; }
-    .lobby.battle-view .battle-lobby { display: flex; }
-    .lobby.battle-view .lobby-content > :not(.battle-lobby) { display: none; }
+    .room-lobby { display: none; flex: 1; flex-direction: column; gap: 14px; padding: 8px 3px; }
+    .lobby.room-view .room-lobby { display: flex; }
+    .lobby.room-view .lobby-content > :not(.room-lobby) { display: none; }
     .battle-rank { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 18px; border-radius: 20px; color: #fff; background: linear-gradient(135deg, #4c70e9, #7a4de0); box-shadow: 0 8px 18px #4569e83d; }
     .battle-badge { display: grid; width: 74px; height: 74px; place-items: center; border: 3px solid #ffe08a; border-radius: 50%; background: #ffffff26; font-size: 38px; }
     .battle-rank-name { font-size: 18px; font-weight: 850; }
@@ -994,7 +994,6 @@
     .battle-progress-side { display: grid; min-width: 0; gap: 4px; }
     .battle-progress-heading { display: flex; justify-content: space-between; gap: 6px; color: var(--text-secondary); font-size: 10px; font-weight: 750; }
     .battle-progress-heading span:last-child { color: var(--text-primary); font-variant-numeric: tabular-nums; }
-    .app.battle .info-bar { display: none; }
     .app.battle { gap: 3px; }
     .app.battle .toolbar { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(5px, 1.5vw, 8px); }
     .app.battle .tool { height: clamp(52px, 8dvh, 62px); gap: 5px; font-size: clamp(10px, 2.8vw, 12px); }
@@ -1132,7 +1131,7 @@
         </button>
         <button class="new-game-button" id="lobby-new-game" type="button">Trò chơi mới</button>
       </section>
-      <section class="battle-lobby" id="battle-lobby" aria-label="Sảnh Trận chiến">
+      <section class="room-lobby" id="room-lobby" aria-label="Sảnh Phòng đấu">
         <div class="battle-rank"><div class="battle-badge" id="battle-badge" aria-hidden="true">🥉</div><div class="battle-rank-name" id="battle-rank">Đồng</div><div>🎫 <span id="battle-tickets">5</span> vé</div></div>
         <div class="battle-stats">
           <div class="battle-stat"><b id="battle-wins">0</b><span>Thắng</span></div>
@@ -1154,7 +1153,7 @@
     <nav class="lobby-bottom-bar" aria-label="Điều hướng chính">
       <button class="lobby-tab active" id="tab-home" type="button" aria-current="page"><span class="lobby-tab-icon" aria-hidden="true">⌂</span><span>Trang chủ</span></button>
       <button class="lobby-tab" id="tab-battle" type="button"><span class="lobby-tab-icon" aria-hidden="true">⚔</span><span>Trận chiến</span></button>
-      <button class="lobby-tab" type="button"><span class="lobby-tab-icon" aria-hidden="true">◈</span><span>Phòng đấu</span></button>
+      <button class="lobby-tab" id="tab-room" type="button"><span class="lobby-tab-icon" aria-hidden="true">◈</span><span>Phòng đấu</span></button>
       <button class="lobby-tab" type="button"><span class="lobby-tab-icon" aria-hidden="true">●</span><span>Cá nhân</span></button>
     </nav>
   </section>
@@ -1215,7 +1214,7 @@
       </div>
       <div class="battle-clock" id="battle-clock" role="timer">00:00</div>
       <div class="battle-progress-side">
-        <div class="battle-progress-heading"><span>Đối thủ</span><span id="battle-bot-pct">0%</span></div>
+        <div class="battle-progress-heading"><span id="battle-opponent-label">Đối thủ</span><span id="battle-bot-pct">0%</span></div>
         <div class="battle-track" id="battle-bot-progress" role="progressbar" aria-label="Tiến độ của đối thủ" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="battle-fill bot" id="battle-bot-fill"></div></div>
       </div>
     </section>
@@ -2939,6 +2938,11 @@
           claimBattleResult(battleOpponentUid);
           return;
         }
+        if (battleMode) {
+          stopBattleTimers();
+          leaveBattleMode();
+          setLobbyTab("home");
+        }
         if (!paused && !finished) {
           elapsedMs = currentElapsed();
           paused = true;
@@ -2979,7 +2983,7 @@
         appId: "YOUR_APP_ID"
       };
       var battleMode = false, battleRealtime = false, battleOver = false, battleStart = 0, battleClockTimer = null;
-      var battleStartTimer = null, roomRef = null, roomCode = "", roomUid = "", roomRole = "", battleOpponentUid = "";
+      var battleStartTimer = null, battleBotTimer = null, roomRef = null, roomCode = "", roomUid = "", roomRole = "", battleOpponentUid = "";
       var battleOpponentProgress = 0, lastPublishedProgress = -1, scheduledRoomStart = 0, firebaseInitPromise = null;
       const battleEls = {
         searching: document.getElementById("battle-searching"), vs: document.getElementById("vs-screen"),
@@ -2990,7 +2994,7 @@
         return { wins: 0, losses: 0, tickets: 5 };
       }
       function saveBattleStats(d) { try { localStorage.setItem(BATTLE_KEY, JSON.stringify(d)); } catch (e) {} }
-      function renderBattleLobby() {
+      function renderRoomLobby() {
         const d = loadBattleStats(), total = d.wins + d.losses;
         const tiers = [["🥉", "Đồng"], ["🥈", "Bạc"], ["🥇", "Vàng"], ["💎", "Kim cương"]];
         const tier = tiers[Math.min(3, Math.floor(d.wins / 5))];
@@ -3001,12 +3005,19 @@
         document.getElementById("battle-badge").textContent = tier[0];
         document.getElementById("battle-rank").textContent = tier[1];
       }
-      function setLobbyTab(battle) {
-        lobbyElement.classList.toggle("battle-view", battle);
-        const home = document.getElementById("tab-home"), tab = document.getElementById("tab-battle");
-        home.classList.toggle("active", !battle); tab.classList.toggle("active", battle);
-        home.toggleAttribute("aria-current", !battle); tab.toggleAttribute("aria-current", battle);
-        if (battle) renderBattleLobby();
+      function setLobbyTab(tabName) {
+        lobbyElement.classList.toggle("room-view", tabName === "room");
+        const tabs = {
+          home: document.getElementById("tab-home"),
+          battle: document.getElementById("tab-battle"),
+          room: document.getElementById("tab-room")
+        };
+        Object.entries(tabs).forEach(([name, tab]) => {
+          const active = name === tabName;
+          tab.classList.toggle("active", active);
+          tab.toggleAttribute("aria-current", active);
+        });
+        if (tabName === "room") renderRoomLobby();
       }
       function battleProgress() {
         const given = puzzle.flat();
@@ -3037,9 +3048,16 @@
         document.getElementById("battle-clock").textContent = `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
         publishBattleProgress(progress);
       }
+      function updateBotProgress() {
+        if (!battleMode || battleRealtime || battleOver) return;
+        battleOpponentProgress = Math.min(1, (Date.now() - battleStart) / battleBotDuration);
+        updateBattleBar();
+        if (battleOpponentProgress >= 1) endBattle(false);
+      }
       function stopBattleTimers() {
         clearTimeout(battleStartTimer);
         clearInterval(battleClockTimer);
+        clearInterval(battleBotTimer);
         scheduledRoomStart = 0;
       }
       function setRoomMessage(message) {
@@ -3119,6 +3137,7 @@
           const opponent = players[battleOpponentUid] || {};
           battleOpponentProgress = Math.min(1, Math.max(0, Number(opponent.progress) || 0));
           const opponentName = opponent.name || roomPlayerName(battleOpponentUid);
+          document.getElementById("battle-opponent-label").textContent = "Đối thủ";
           document.getElementById("battle-bot-name").textContent = opponentName;
           document.getElementById("battle-bot-avatar").textContent = "🧑";
           document.getElementById("battle-bot-flag").textContent = "🌐";
@@ -3323,8 +3342,37 @@
         updateBattleBar();
         battleClockTimer = setInterval(updateBattleBar, 1000);
       }
-      document.getElementById("tab-home").addEventListener("click", () => setLobbyTab(false));
-      document.getElementById("tab-battle").addEventListener("click", () => setLobbyTab(true));
+      var battleBotDuration = 90000;
+      function startBotBattle() {
+        if (roomRef) {
+          setLobbyTab("room");
+          setRoomMessage("Hãy hủy phòng đang mở trước khi bắt đầu trận đấu với Bot.");
+          return;
+        }
+        setLobbyTab("battle");
+        startNewGame();
+        battleMode = true;
+        battleRealtime = false;
+        battleOver = false;
+        battleOpponentProgress = 0;
+        battleBotDuration = 90000 + Math.random() * 45000;
+        battleStart = Date.now();
+        document.getElementById("battle-bot-name").textContent = "Bot";
+        document.getElementById("battle-bot-avatar").textContent = "🤖";
+        document.getElementById("battle-bot-flag").textContent = "🇯🇵";
+        document.getElementById("battle-opponent-label").textContent = "Bot";
+        appElement.classList.add("battle");
+        difficultyControl.hidden = true;
+        lobbyElement.classList.remove("show");
+        appElement.classList.remove("hidden");
+        setMessage("Trận đấu bắt đầu! Hoàn thành trước Bot.");
+        updateBattleBar();
+        battleClockTimer = setInterval(updateBattleBar, 1000);
+        battleBotTimer = setInterval(updateBotProgress, 1000);
+      }
+      document.getElementById("tab-home").addEventListener("click", () => setLobbyTab("home"));
+      document.getElementById("tab-battle").addEventListener("click", startBotBattle);
+      document.getElementById("tab-room").addEventListener("click", () => setLobbyTab("room"));
       document.getElementById("create-room").addEventListener("click", createRoom);
       document.getElementById("join-room").addEventListener("click", joinRoom);
       document.getElementById("join-room-code").addEventListener("input", (event) => {
@@ -3337,7 +3385,7 @@
         closeRoomSession();
         appElement.classList.add("hidden");
         lobbyElement.classList.add("show");
-        renderBattleLobby();
+        setLobbyTab("home");
       });
       document.getElementById("change-game").addEventListener("click", () => changeGameModal.classList.add("show"));
       document.getElementById("cancel-change-game").addEventListener("click", () => changeGameModal.classList.remove("show"));
