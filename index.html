@@ -936,9 +936,35 @@
     [data-theme="dark"] #victory-restart { border-color: var(--border-color); color: #b6c6ff; background: var(--surface-raised); }
     [data-theme="dark"] .game-history-score { color: #b6c6ff; }
 
-    .room-lobby { display: none; flex: 1; flex-direction: column; gap: 14px; padding: 8px 3px; }
+    .battle-lobby, .room-lobby { display: none; flex: 1; flex-direction: column; gap: 14px; padding: 8px 3px; }
+    .lobby.battle-view .battle-lobby { display: flex; }
+    .lobby.battle-view .lobby-content > :not(.battle-lobby) { display: none; }
     .lobby.room-view .room-lobby { display: flex; }
     .lobby.room-view .lobby-content > :not(.room-lobby) { display: none; }
+    .battle-overview-title { margin: 0 0 10px; color: var(--text-primary); font-size: 15px; font-weight: 800; }
+    .battle-achievements { display: grid; gap: 8px; }
+    .battle-achievement { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #e1e7f5; border-radius: 14px; color: var(--text-secondary); background: var(--surface); font-size: 12px; }
+    .battle-achievement-icon { display: grid; width: 34px; height: 34px; flex: 0 0 34px; place-items: center; border-radius: 11px; background: #f0f3fa; font-size: 18px; }
+    .battle-achievement-copy { display: grid; gap: 2px; }
+    .battle-achievement-copy strong { color: var(--text-primary); font-size: 12px; }
+    .battle-achievement.unlocked { border-color: #f0d788; background: #fffaf0; }
+    .battle-achievement.unlocked .battle-achievement-icon { background: #fff0c2; }
+    .battle-history-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .battle-history-item, .battle-history-empty { padding: 11px 12px; border: 1px solid #e1e7f5; border-radius: 14px; color: var(--text-secondary); background: var(--surface); font-size: 12px; }
+    .battle-history-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .battle-history-result { font-weight: 800; }
+    .battle-history-result.won { color: #24845e; }
+    .battle-history-result.lost { color: #c14953; }
+    .battle-history-empty { margin: 0; text-align: center; }
+    .battle-find-opponent { width: 100%; min-height: 56px; }
+    [data-theme="dark"] .battle-achievement, [data-theme="dark"] .battle-history-item, [data-theme="dark"] .battle-history-empty { border-color: var(--border-color); color: var(--text-secondary); background: var(--surface); }
+    [data-theme="dark"] .battle-achievement-copy strong { color: var(--text-primary); }
+    [data-theme="dark"] .battle-achievement-icon { background: var(--surface-raised); }
+    [data-theme="dark"] .battle-achievement.unlocked { border-color: #806b37; background: #352d1a; }
+    [data-theme="dark"] .battle-achievement.unlocked .battle-achievement-icon { background: #51421f; }
+    [data-theme="dark"] .battle-stat { border-color: var(--border-color); color: var(--text-primary); background: var(--surface); }
+    [data-theme="dark"] .battle-stat b { color: var(--text-primary); }
+    [data-theme="dark"] .battle-stat span { color: var(--text-secondary); }
     .battle-rank { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 18px; border-radius: 20px; color: #fff; background: linear-gradient(135deg, #4c70e9, #7a4de0); box-shadow: 0 8px 18px #4569e83d; }
     .battle-badge { display: grid; width: 74px; height: 74px; place-items: center; border: 3px solid #ffe08a; border-radius: 50%; background: #ffffff26; font-size: 38px; }
     .battle-rank-name { font-size: 18px; font-weight: 850; }
@@ -1146,13 +1172,25 @@
         </button>
         <button class="new-game-button" id="lobby-new-game" type="button">Trò chơi mới</button>
       </section>
-      <section class="room-lobby" id="room-lobby" aria-label="Sảnh Phòng đấu">
+      <section class="battle-lobby" id="battle-lobby" aria-label="Thống kê trận chiến">
         <div class="battle-rank"><div class="battle-badge" id="battle-badge" aria-hidden="true">🥉</div><div class="battle-rank-name" id="battle-rank">Đồng</div><div>🎫 <span id="battle-tickets">5</span> vé</div></div>
         <div class="battle-stats">
           <div class="battle-stat"><b id="battle-wins">0</b><span>Thắng</span></div>
           <div class="battle-stat"><b id="battle-losses">0</b><span>Thua</span></div>
           <div class="battle-stat"><b id="battle-rate">0%</b><span>Tỉ lệ thắng</span></div>
         </div>
+        <button class="battle-start battle-find-opponent" id="find-opponent" type="button">Tìm đối thủ</button>
+        <section aria-labelledby="battle-achievements-title">
+          <h2 class="battle-overview-title" id="battle-achievements-title">Thành tích</h2>
+          <div class="battle-achievements" id="battle-achievements"></div>
+        </section>
+        <section aria-labelledby="battle-history-title">
+          <h2 class="battle-overview-title" id="battle-history-title">Lịch sử trận đấu</h2>
+          <ol class="battle-history-list" id="battle-history"></ol>
+          <p class="battle-history-empty" id="battle-history-empty">Bạn chưa tham gia trận đấu nào.</p>
+        </section>
+      </section>
+      <section class="room-lobby" id="room-lobby" aria-label="Sảnh Phòng đấu">
         <div class="battle-room-actions">
           <button class="battle-start" id="create-room" type="button">Tạo phòng</button>
           <div class="battle-room-join">
@@ -3019,11 +3057,21 @@
         result: document.getElementById("battle-result")
       };
       function loadBattleStats() {
-        try { const d = JSON.parse(localStorage.getItem(BATTLE_KEY)); if (d) return { wins: d.wins | 0, losses: d.losses | 0, tickets: d.tickets | 0 }; } catch (e) {}
-        return { wins: 0, losses: 0, tickets: 5 };
+        try {
+          const d = JSON.parse(localStorage.getItem(BATTLE_KEY));
+          if (d) return {
+            wins: d.wins | 0,
+            losses: d.losses | 0,
+            tickets: d.tickets | 0,
+            history: Array.isArray(d.history) ? d.history.filter((entry) =>
+              entry && typeof entry.won === "boolean" && Number.isFinite(entry.playedAt)
+            ).slice(0, 10) : []
+          };
+        } catch (e) {}
+        return { wins: 0, losses: 0, tickets: 5, history: [] };
       }
       function saveBattleStats(d) { try { localStorage.setItem(BATTLE_KEY, JSON.stringify(d)); } catch (e) {} }
-      function renderRoomLobby() {
+      function renderBattleOverview() {
         const d = loadBattleStats(), total = d.wins + d.losses;
         const tiers = [["🥉", "Đồng"], ["🥈", "Bạc"], ["🥇", "Vàng"], ["💎", "Kim cương"]];
         const tier = tiers[Math.min(3, Math.floor(d.wins / 5))];
@@ -3033,9 +3081,47 @@
         document.getElementById("battle-tickets").textContent = d.tickets;
         document.getElementById("battle-badge").textContent = tier[0];
         document.getElementById("battle-rank").textContent = tier[1];
+        const achievements = [
+          { icon: "🎮", title: "Tân binh", detail: `${Math.min(total, 1)}/1 trận`, unlocked: total >= 1 },
+          { icon: "🏆", title: "Chiến thắng đầu tiên", detail: `${Math.min(d.wins, 1)}/1 trận thắng`, unlocked: d.wins >= 1 },
+          { icon: "⚔️", title: "Chiến binh bền bỉ", detail: `${Math.min(total, 10)}/10 trận`, unlocked: total >= 10 }
+        ];
+        const achievementList = document.getElementById("battle-achievements");
+        achievementList.replaceChildren(...achievements.map((achievement) => {
+          const item = document.createElement("div");
+          item.className = `battle-achievement${achievement.unlocked ? " unlocked" : ""}`;
+          const icon = document.createElement("span");
+          icon.className = "battle-achievement-icon";
+          icon.setAttribute("aria-hidden", "true");
+          icon.textContent = achievement.icon;
+          const copy = document.createElement("span");
+          copy.className = "battle-achievement-copy";
+          const title = document.createElement("strong");
+          title.textContent = achievement.title;
+          const detail = document.createElement("span");
+          detail.textContent = achievement.unlocked ? "Đã mở khóa" : achievement.detail;
+          copy.append(title, detail);
+          item.append(icon, copy);
+          return item;
+        }));
+        const historyList = document.getElementById("battle-history");
+        const recentHistory = d.history.slice(0, 5);
+        document.getElementById("battle-history-empty").hidden = recentHistory.length > 0;
+        historyList.replaceChildren(...recentHistory.map((match) => {
+          const item = document.createElement("li");
+          item.className = "battle-history-item";
+          const result = document.createElement("span");
+          result.className = `battle-history-result ${match.won ? "won" : "lost"}`;
+          result.textContent = match.won ? "Thắng" : "Thua";
+          const details = document.createElement("span");
+          details.textContent = `${match.opponent || "Bot"} · ${new Date(match.playedAt).toLocaleDateString("vi-VN")}`;
+          item.append(result, details);
+          return item;
+        }));
       }
       function setLobbyTab(tabName) {
         lobbyElement.classList.toggle("room-view", tabName === "room");
+        lobbyElement.classList.toggle("battle-view", tabName === "battle");
         const tabs = {
           home: document.getElementById("tab-home"),
           battle: document.getElementById("tab-battle"),
@@ -3046,7 +3132,7 @@
           tab.classList.toggle("active", active);
           tab.toggleAttribute("aria-current", active);
         });
-        if (tabName === "room") renderRoomLobby();
+        if (tabName === "battle") renderBattleOverview();
       }
       function battleProgress() {
         const given = puzzle.flat();
@@ -3372,6 +3458,8 @@
         elapsedMs = currentElapsed();
         const d = loadBattleStats();
         if (won) d.wins += 1; else d.losses += 1;
+        d.history.unshift({ won, opponent: battleRealtime ? document.getElementById("battle-bot-name").textContent : "Bot", playedAt: Date.now() });
+        d.history = d.history.slice(0, 10);
         saveBattleStats(d);
         document.getElementById("battle-result-title").textContent = won ? "🏆 Bạn thắng!" : "😢 Bạn thua!";
         document.getElementById("battle-result-text").textContent = t(won ? "Bạn đã hoàn thành trước đối thủ." : "Đối thủ đã hoàn thành trước.");
@@ -3470,8 +3558,9 @@
         battleBotTimer = setInterval(updateBotProgress, 1000);
       }
       document.getElementById("tab-home").addEventListener("click", () => setLobbyTab("home"));
-      document.getElementById("tab-battle").addEventListener("click", startBotBattle);
+      document.getElementById("tab-battle").addEventListener("click", () => setLobbyTab("battle"));
       document.getElementById("tab-room").addEventListener("click", () => setLobbyTab("room"));
+      document.getElementById("find-opponent").addEventListener("click", startBotBattle);
       document.getElementById("create-room").addEventListener("click", createRoom);
       document.getElementById("join-room").addEventListener("click", joinRoom);
       document.getElementById("join-room-code").addEventListener("input", (event) => {
@@ -3484,7 +3573,7 @@
         closeRoomSession();
         appElement.classList.add("hidden");
         lobbyElement.classList.add("show");
-        setLobbyTab("home");
+        setLobbyTab("battle");
       });
       document.getElementById("change-game").addEventListener("click", () => changeGameModal.classList.add("show"));
       document.getElementById("cancel-change-game").addEventListener("click", () => changeGameModal.classList.remove("show"));
