@@ -22,7 +22,7 @@ Trận đấu trực tuyến dùng Firebase Realtime Database và Firebase Anony
 
    Các quy tắc này cho phép bất kỳ ai đọc và ghi toàn bộ database, không yêu cầu đăng nhập và có thể bị lạm dụng. Chỉ sử dụng trong dự án thử nghiệm; sau khi kiểm tra, thay bằng các quy tắc giới hạn người chơi bên dưới.
 
-   **Khuyến nghị:** Dùng các quy tắc giới hạn người chơi sau cho PvP:
+   **Khuyến nghị:** Dùng các quy tắc giới hạn người chơi trong [`database.rules.json`](database.rules.json) cho PvP. Thay thế toàn bộ nội dung trong **Realtime Database → Rules** bằng nội dung tệp này rồi bấm **Publish**. Quy tắc cho phép người chơi thứ hai nhận phòng đang chờ khi `guestUid` chưa tồn tại:
 
 ```json
 {
@@ -30,7 +30,7 @@ Trận đấu trực tuyến dùng Firebase Realtime Database và Firebase Anony
     "sudokuRooms": {
       "$roomCode": {
         ".read": "auth != null",
-        ".write": "auth != null && ((!data.exists() && newData.child('hostUid').val() === auth.uid) || (data.child('hostUid').val() === auth.uid && (!newData.exists() || newData.child('hostUid').val() === auth.uid)) || (data.child('status').val() === 'waiting' && data.child('guestUid').val() === null && newData.child('guestUid').val() === auth.uid && newData.child('status').val() === 'active' && newData.child('hostUid').val() === data.child('hostUid').val()) || (data.child('status').val() === 'active' && data.child('guestUid').val() === auth.uid && newData.child('status').val() === 'finished' && newData.child('winnerUid').val() === auth.uid) || (((data.child('lastActive').exists() && data.child('lastActive').val() < now - 600000) || (!data.child('lastActive').exists() && data.child('createdAt').val() < now - 600000)) && (!newData.exists() || newData.child('hostUid').val() === auth.uid)))",
+        ".write": "auth != null && ((!data.exists() && newData.child('hostUid').val() === auth.uid) || (data.child('hostUid').val() === auth.uid && (!newData.exists() || newData.child('hostUid').val() === auth.uid)) || (data.child('status').val() === 'waiting' && !data.child('guestUid').exists() && newData.child('guestUid').val() === auth.uid && newData.child('status').val() === 'active' && newData.child('hostUid').val() === data.child('hostUid').val()) || (data.child('status').val() === 'active' && data.child('guestUid').val() === auth.uid && newData.child('status').val() === 'finished' && newData.child('winnerUid').val() === auth.uid) || (((data.child('lastActive').exists() && data.child('lastActive').val() < now - 600000) || (!data.child('lastActive').exists() && data.child('createdAt').val() < now - 600000)) && (!newData.exists() || newData.child('hostUid').val() === auth.uid)))",
         ".validate": "!newData.exists() || !data.exists() || data.child('hostUid').val() === auth.uid || ((data.child('lastActive').exists() && data.child('lastActive').val() < now - 600000) || (!data.child('lastActive').exists() && data.child('createdAt').val() < now - 600000)) || (newData.child('hostUid').val() === data.child('hostUid').val() && newData.child('seed').val() === data.child('seed').val() && newData.child('difficulty').val() === data.child('difficulty').val())",
         "players": {
           "$playerUid": {
