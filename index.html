@@ -3592,7 +3592,12 @@
             }, undefined, false);
             if (result.committed) created = { code, reference, room };
           }
-          if (!created) throw new Error("Could not allocate a room code");
+          if (!created) {
+            // Giao dịch bị Rules từ chối sẽ trả về committed=false thay vì ném lỗi
+            const denied = new Error("Could not allocate a room code");
+            denied.code = "permission-denied";
+            throw denied;
+          }
           roomRef = created.reference;
           roomCode = created.code;
           roomUid = uid;
