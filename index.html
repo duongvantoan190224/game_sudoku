@@ -1273,6 +1273,7 @@
           </div>
           <div class="battle-room-code-display" id="battle-room-code-display" aria-live="polite">Mã phòng<strong id="battle-room-code-value"></strong></div>
           <p class="battle-room-message" id="battle-room-message" role="status" aria-live="polite"></p>
+          <button class="battle-room-cancel" id="reset-room" type="button">Làm mới / Đặt lại phòng</button>
           <button class="battle-room-cancel" id="cancel-room" type="button">Hủy phòng</button>
         </div>
       </section>
@@ -3360,7 +3361,8 @@
         if (code.includes("permission-denied") || code.includes("permission_denied")) return t("Firebase Realtime Database từ chối truy cập. Hãy kiểm tra và xuất bản Rules.");
         if (code.includes("invalid-api-key") || code.includes("invalid-url") || code.includes("project-not-found")) return t("Cấu hình Firebase không hợp lệ. Hãy kiểm tra API key và URL Realtime Database.");
         if (code.includes("network-request-failed")) return t("Không thể gửi yêu cầu đến Firebase. Hãy kiểm tra Internet hoặc mạng có chặn Firebase không.");
-        return t("Không thể kết nối Firebase. Kiểm tra cấu hình và kết nối mạng.");
+        const detail = error ? ` [${error.code || error.message || error}]` : "";
+        return t("Không thể kết nối Firebase. Kiểm tra cấu hình và kết nối mạng.") + detail;
       }
       function setRoomBusy(busy) {
         document.getElementById("create-room").disabled = busy;
@@ -3440,6 +3442,7 @@
       });
       function resetRoomStatus() {
         stopChat();
+        stopRoomHeartbeat();
         roomRef = null;
         roomCode = "";
         roomUid = "";
@@ -3450,6 +3453,64 @@
         scheduledRoomStart = 0;
         document.getElementById("battle-room-code-display").classList.remove("show");
         document.getElementById("cancel-room").classList.remove("show");
+        document.getElementById("reset-room").classList.remove("show");
+      }
+      var ROOM_STALE_MS = 10 * 60 * 1000, ROOM_FINISHED_STALE_MS = 60 * 1000, ROOM_HEARTBEAT_MS = 60 * 1000;
+      var roomHeartbeatTimer = null;
+      function isRoomStale(room) {
+        if (!room) return true;
+        const now = Date.now();
+        if (room.status === "finished" && now - (room.finishedAt || 0) > ROOM_FINISHED_STALE_MS) return true;
+        return now - (room.lastActive || room.createdAt || 0) > ROOM_STALE_MS;
+      }
+      function newWaitingRoom(uid) {
+        return {
+          hostUid: uid,
+          guestUid: null,
+          seed: makeRoomSeed(),
+          status: "waiting",
+          difficulty: "medium",
+          createdAt: Date.now(),
+          lastActive: Date.now(),
+          players: { [uid]: { name: roomPlayerName(uid), progress: 0, completed: false } }
+        };
+      }
+      function armRoomCleanup(reference) {
+        if (roomRole !== "host") return;
+        reference.onDisconnect().remove().catch((error) => console.error(error));
+      }
+      function startRoomHeartbeat() {
+        stopRoomHeartbeat();
+        roomHeartbeatTimer = setInterval(() => {
+          if (!roomRef || roomRole !== "host") return;
+          roomRef.transaction((room) => {
+            if (!room) return;
+            room.lastActive = Date.now();
+            return room;
+          }, undefined, false).catch((error) => console.error(error));
+        }, ROOM_HEARTBEAT_MS);
+      }
+      function stopRoomHeartbeat() {
+        clearInterval(roomHeartbeatTimer);
+        roomHeartbeatTimer = null;
+      }
+      async function resetRoom() {
+        if (!roomRef || roomRole !== "host") return;
+        try {
+          const uid = roomUid;
+          await roomRef.transaction((room) => {
+            if (!room || room.hostUid !== uid) return;
+            return newWaitingRoom(uid);
+          }, undefined, false);
+          scheduledRoomStart = 0;
+          clearTimeout(battleStartTimer);
+          battleEls.vs.classList.remove("show");
+          armRoomCleanup(roomRef);
+          setRoomMessage("Đã đặt lại phòng. Gửi mã phòng này cho đối thủ để bắt đầu.");
+        } catch (error) {
+          console.error(error);
+          setRoomMessage(firebaseErrorMessage(error));
+        }
       }
       function showRoomCode(code) {
         document.getElementById("battle-room-code-value").textContent = code;
@@ -3472,12 +3533,21 @@
       }
       function handleRoomUpdate(room) {
         if (room.status === "waiting") {
+          if (roomRole !== "host") {
+            closeRoomSession();
+            setRoomMessage("Chủ phòng đã đặt lại phòng.");
+            return;
+          }
           setRoomMessage("Gửi mã phòng này cho đối thủ để bắt đầu.");
           document.getElementById("cancel-room").classList.add("show");
+          document.getElementById("reset-room").classList.add("show");
+          armRoomCleanup(roomRef);
           return;
         }
         document.getElementById("cancel-room").classList.remove("show");
+        document.getElementById("reset-room").classList.remove("show");
         if (room.status === "active") {
+          if (roomRole === "host") roomRef.onDisconnect().cancel().catch(() => {});
           const players = room.players || {};
           battleOpponentUid = Object.keys(players).find((uid) => uid !== roomUid) || "";
           const opponent = players[battleOpponentUid] || {};
@@ -3515,16 +3585,11 @@
           for (let attempt = 0; attempt < 10 && !created; attempt += 1) {
             const code = String(1000 + Math.floor(Math.random() * 9000));
             const reference = rooms.child(code);
-            const room = {
-              hostUid: uid,
-              guestUid: null,
-              seed: makeRoomSeed(),
-              status: "waiting",
-              difficulty: "medium",
-              createdAt: Date.now(),
-              players: { [uid]: { name: roomPlayerName(uid), progress: 0, completed: false } }
-            };
-            const result = await reference.transaction((current) => current === null ? room : undefined, undefined, false);
+            const room = newWaitingRoom(uid);
+            const result = await reference.transaction((current) => {
+              // Ghi đè phòng cũ bị bỏ quên hoặc phòng cũ của chính chủ phòng
+              return current === null || isRoomStale(current) || current.hostUid === uid ? room : undefined;
+            }, undefined, false);
             if (result.committed) created = { code, reference, room };
           }
           if (!created) throw new Error("Could not allocate a room code");
@@ -3534,6 +3599,9 @@
           roomRole = "host";
           showRoomCode(roomCode);
           document.getElementById("cancel-room").classList.add("show");
+          document.getElementById("reset-room").classList.add("show");
+          armRoomCleanup(roomRef);
+          startRoomHeartbeat();
           watchRoom(roomRef);
         } catch (error) {
           console.error(error);
@@ -3554,27 +3622,49 @@
         try {
           const { database, uid } = await getFirebaseSession();
           const reference = database.ref(`sudokuRooms/${code}`);
+          // Đọc trước để transaction không chạy với dữ liệu cache rỗng (gây hủy giao dịch sai)
+          const existing = (await reference.once("value")).val();
+          if (!existing || isRoomStale(existing)) {
+            setRoomMessage("Mã phòng không hợp lệ hoặc phòng không tồn tại.");
+            return;
+          }
           const startedAt = Date.now() + 3000;
+          let rejoinedAsHost = false;
           const result = await reference.transaction((room) => {
-            if (!room || room.status !== "waiting" || room.guestUid || room.hostUid === uid) return;
+            if (!room || isRoomStale(room)) return;
+            rejoinedAsHost = room.hostUid === uid;
+            // Chủ phòng quay lại: đặt lại phòng về trạng thái chờ
+            if (rejoinedAsHost) return newWaitingRoom(uid);
+            if (room.status !== "waiting" || room.guestUid) return;
             room.guestUid = uid;
             room.status = "active";
             room.startedAt = startedAt;
+            room.lastActive = Date.now();
             room.players = room.players || {};
             room.players[uid] = { name: roomPlayerName(uid), progress: 0, completed: false };
             return room;
           }, undefined, false);
-          if (!result.committed) throw new Error("Room is unavailable");
+          if (!result.committed) {
+            const latest = (await reference.once("value")).val();
+            throw new Error(latest && latest.status === "waiting" && !latest.guestUid ? "Join rejected" : "Room is unavailable");
+          }
           roomRef = reference;
           roomCode = code;
           roomUid = uid;
-          roomRole = "guest";
+          roomRole = rejoinedAsHost ? "host" : "guest";
+          if (rejoinedAsHost) {
+            showRoomCode(roomCode);
+            armRoomCleanup(roomRef);
+          }
+          startRoomHeartbeat();
           watchRoom(roomRef);
         } catch (error) {
           console.error(error);
           setRoomMessage(error.message === "Room is unavailable"
-            ? "Phòng đã có người chơi hoặc trận đấu đã bắt đầu."
-            : firebaseErrorMessage(error));
+            ? "Phòng đã có người chơi hoặc trận đấu đã bắt đầu. Nhờ chủ phòng bấm “Làm mới / Đặt lại phòng” hoặc tạo phòng mới."
+            : error.message === "Join rejected"
+              ? "Phòng đang chờ nhưng Firebase Rules từ chối ghi. Hãy cập nhật Rules theo README."
+              : firebaseErrorMessage(error));
         } finally {
           setRoomBusy(false);
         }
@@ -3756,6 +3846,7 @@
         event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 4);
       });
       document.getElementById("cancel-room").addEventListener("click", cancelRoom);
+      document.getElementById("reset-room").addEventListener("click", resetRoom);
       document.getElementById("battle-result-ok").addEventListener("click", () => {
         battleEls.result.classList.remove("show");
         leaveBattleMode();
