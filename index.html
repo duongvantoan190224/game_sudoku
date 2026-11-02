@@ -3355,10 +3355,10 @@
         document.getElementById("battle-room-message").textContent = message ? t(message) : "";
       }
       function firebaseErrorMessage(error) {
-        const code = String(error && error.code || "").toLowerCase();
+        const code = String(error && (error.code || error.message) || error || "").toLowerCase();
         if (code.includes("operation-not-allowed")) return t("Firebase chưa bật đăng nhập ẩn danh. Hãy bật Anonymous trong Firebase Authentication.");
         if (code.includes("unauthorized-domain")) return t("Tên miền hiện tại chưa được cho phép trong Firebase Authentication. Hãy thêm tên miền vào Authorized domains.");
-        if (code.includes("permission-denied") || code.includes("permission_denied")) return t("Firebase Realtime Database từ chối truy cập. Hãy kiểm tra và xuất bản Rules.");
+        if (code.includes("permission-denied") || code.includes("permission_denied") || code.includes("permission denied")) return t("Firebase Realtime Database từ chối truy cập. Hãy kiểm tra và xuất bản Rules.");
         if (code.includes("invalid-api-key") || code.includes("invalid-url") || code.includes("project-not-found")) return t("Cấu hình Firebase không hợp lệ. Hãy kiểm tra API key và URL Realtime Database.");
         if (code.includes("network-request-failed")) return t("Không thể gửi yêu cầu đến Firebase. Hãy kiểm tra Internet hoặc mạng có chặn Firebase không.");
         const detail = error ? ` [${error.code || error.message || error}]` : "";
