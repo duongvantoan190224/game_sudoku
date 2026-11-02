@@ -1769,6 +1769,7 @@
         ["Đã kết nối với đối thủ. Chuẩn bị...", "Opponent connected. Get ready...", "对手已连接，准备开始...", "상대가 연결되었습니다. 준비하세요...", "対戦相手が接続しました。準備してください..."],
         ["Mã phòng không hợp lệ hoặc phòng không tồn tại.", "Invalid code or room does not exist.", "房间代码无效或房间不存在。", "잘못된 코드이거나 방이 없습니다.", "コードが無効か、部屋がありません。"],
         ["Phòng đã có người chơi hoặc trận đấu đã bắt đầu.", "The room is full or the match has started.", "房间已满或比赛已开始。", "방이 가득 찼거나 경기가 시작되었습니다.", "部屋が満員か、試合が始まっています。"],
+        ["Phòng đã hết hạn. Hãy nhờ chủ phòng tạo phòng mới.", "This room has expired. Ask the host to create a new room.", "房间已过期。请让房主创建新房间。", "방이 만료되었습니다. 방장에게 새 방을 만들어 달라고 하세요.", "部屋の有効期限が切れました。ホストに新しい部屋を作成してもらってください。"],
         ["Không thể kết nối Firebase. Kiểm tra cấu hình và kết nối mạng.", "Could not connect to Firebase. Check the configuration and network.", "无法连接 Firebase，请检查配置和网络。", "Firebase에 연결할 수 없습니다. 설정과 네트워크를 확인하세요.", "Firebaseに接続できません。設定とネットワークを確認してください。"],
         ["Firebase chưa bật đăng nhập ẩn danh. Hãy bật Anonymous trong Firebase Authentication.", "Firebase Anonymous Authentication is disabled. Enable Anonymous in Firebase Authentication.", "Firebase 未启用匿名登录。请在 Firebase Authentication 中启用 Anonymous。", "Firebase 익명 인증이 비활성화되어 있습니다. Firebase Authentication에서 Anonymous를 활성화하세요.", "Firebase の匿名認証が無効です。Firebase Authentication で Anonymous を有効にしてください。"],
         ["Tên miền hiện tại chưa được cho phép trong Firebase Authentication. Hãy thêm tên miền vào Authorized domains.", "This site is not authorized in Firebase Authentication. Add its hostname to Authorized domains.", "当前网站域名未获 Firebase Authentication 授权。请将其添加到 Authorized domains。", "현재 사이트가 Firebase Authentication에서 허용되지 않았습니다. 호스트 이름을 Authorized domains에 추가하세요.", "このサイトは Firebase Authentication で許可されていません。ホスト名を Authorized domains に追加してください。"],
@@ -3651,7 +3652,11 @@
           }, undefined, false);
           if (!result.committed) {
             const latest = (await reference.once("value")).val();
-            throw new Error(latest && latest.status === "waiting" && !latest.guestUid ? "Join rejected" : "Room is unavailable");
+            throw new Error(latest && isRoomStale(latest)
+              ? "Room is stale"
+              : latest && latest.status === "waiting" && !latest.guestUid
+                ? "Join rejected"
+                : "Room is unavailable");
           }
           roomRef = reference;
           roomCode = code;
@@ -3667,6 +3672,8 @@
           console.error(error);
           setRoomMessage(error.message === "Room is unavailable"
             ? "Phòng đã có người chơi hoặc trận đấu đã bắt đầu. Nhờ chủ phòng bấm “Làm mới / Đặt lại phòng” hoặc tạo phòng mới."
+            : error.message === "Room is stale"
+              ? "Phòng đã hết hạn. Hãy nhờ chủ phòng tạo phòng mới."
             : error.message === "Join rejected"
               ? "Phòng đang chờ nhưng Firebase Rules từ chối ghi. Hãy cập nhật Rules theo README."
               : firebaseErrorMessage(error));
