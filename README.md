@@ -22,27 +22,7 @@ Trận đấu trực tuyến dùng Firebase Realtime Database và Firebase Anony
 
    Các quy tắc này cho phép bất kỳ ai đọc và ghi toàn bộ database, không yêu cầu đăng nhập và có thể bị lạm dụng. Chỉ sử dụng trong dự án thử nghiệm; sau khi kiểm tra, thay bằng các quy tắc giới hạn người chơi bên dưới.
 
-   **Khuyến nghị:** Dùng các quy tắc giới hạn người chơi trong [`database.rules.json`](database.rules.json) cho PvP. Thay thế toàn bộ nội dung trong **Realtime Database → Rules** bằng nội dung tệp này rồi bấm **Publish**. Quy tắc cho phép người chơi thứ hai nhận phòng đang chờ khi `guestUid` chưa tồn tại:
-
-```json
-{
-  "rules": {
-    "sudokuRooms": {
-      "$roomCode": {
-        ".read": "auth != null",
-        ".write": "auth != null && ((!data.exists() && newData.child('hostUid').val() === auth.uid) || (data.child('hostUid').val() === auth.uid && (!newData.exists() || newData.child('hostUid').val() === auth.uid)) || (data.child('status').val() === 'waiting' && !data.child('guestUid').exists() && newData.child('guestUid').val() === auth.uid && newData.child('status').val() === 'active' && newData.child('hostUid').val() === data.child('hostUid').val()) || (data.child('status').val() === 'active' && data.child('guestUid').val() === auth.uid && newData.child('status').val() === 'finished' && newData.child('winnerUid').val() === auth.uid) || (((data.child('lastActive').exists() && data.child('lastActive').val() < now - 600000) || (!data.child('lastActive').exists() && data.child('createdAt').val() < now - 600000)) && (!newData.exists() || newData.child('hostUid').val() === auth.uid)))",
-        ".validate": "!newData.exists() || !data.exists() || data.child('hostUid').val() === auth.uid || ((data.child('lastActive').exists() && data.child('lastActive').val() < now - 600000) || (!data.child('lastActive').exists() && data.child('createdAt').val() < now - 600000)) || (newData.child('hostUid').val() === data.child('hostUid').val() && newData.child('seed').val() === data.child('seed').val() && newData.child('difficulty').val() === data.child('difficulty').val())",
-        "players": {
-          "$playerUid": {
-            ".write": "auth != null && auth.uid === $playerUid && (auth.uid === root.child('sudokuRooms').child($roomCode).child('hostUid').val() || auth.uid === root.child('sudokuRooms').child($roomCode).child('guestUid').val())",
-            ".validate": "newData.hasChildren(['name', 'progress', 'completed']) && newData.child('progress').isNumber() && newData.child('progress').val() >= 0 && newData.child('progress').val() <= 1 && newData.child('completed').isBoolean()"
-          }
-        }
-      }
-    }
-  }
-}
-```
+   **Khuyến nghị:** Dùng các quy tắc giới hạn người chơi trong [`database.rules.json`](database.rules.json) cho PvP. Sao chép toàn bộ nội dung tệp đó vào **Realtime Database → Rules** rồi bấm **Publish**. Quy tắc cho phép tạo phòng mới và chỉ cho người chơi khác nhận phòng đang chờ bằng cách đặt `guestUid` của chính họ và chuyển trạng thái sang `active` trong cùng giao dịch. Nếu ứng dụng báo phòng đang chờ nhưng từ chối tham gia, hãy xuất bản lại chính xác tệp quy tắc này.
 
 5. Serve the page over HTTPS (or localhost during development) and open it in two browser sessions. On the **Phòng đấu** tab, one player creates a room and shares its four-digit code; the other enters that code to join.
 
