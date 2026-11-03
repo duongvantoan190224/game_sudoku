@@ -3,11 +3,11 @@
     "sudokuRooms": {
       "$roomCode": {
         ".read": "auth != null",
-        ".write": "auth != null && ((data.exists() && newData.child('hostUid').val() === auth.uid) || (data.child('hostUid').val() === auth.uid && (!newData.exists() || newData.child('hostUid').val() === auth.uid)) || (data.child('status').val() === 'waiting' && !data.child('guestUid').exists() && (data.child('hostUid').val() !== auth.uid) && newData.child('hostUid').val() === data.child('hostUid').val()) || (data.child('status').val() === 'active' && data.child('guestUid').val() === auth.uid && newData.child('hostUid').val() === data.child('hostUid').val()) || (data.child('status').val() === 'active' && data.child('hostUid').val() === auth.uid && newData.child('guestUid').val() === data.child('guestUid').val()) || (data.child('status').val() === 'finished' && newData.child('winnerUid').val() === auth.uid) || (((data.child('lastActive').exists() && data.child('lastActive').val() < now - 600000) || (!data.child('lastActive').exists() && data.child('createdAt').val() < now - 600000)) && (!newData.exists() || newData.child('hostUid').val() === auth.uid)))",
-        ".validate": "!newData.exists() || !data.exists() || data.child('hostUid').val() === auth.uid || ((data.child('lastActive').exists() && data.child('lastActive').val() < now - 600000) || (!data.child('lastActive').exists() && data.child('createdAt').val() < now - 600000)) || (newData.child('hostUid').val() === data.child('hostUid').val() && newData.child('seed').val() === data.child('seed').val() && newData.child('difficulty').val() === data.child('difficulty').val())",
+        ".write": "auth != null && (!data.exists() || data.child('hostUid').val() === auth.uid || data.child('guestUid').val() === auth.uid)",
+        ".validate": "!newData.exists() || !data.exists() || newData.child('hostUid').val() === data.child('hostUid').val()",
         "players": {
           "$playerUid": {
-            ".write": "auth != null && auth.uid === $playerUid && (auth.uid === root.child('sudokuRooms').child($roomCode).child('hostUid').val() || auth.uid === root.child('sudokuRooms').child($roomCode).child('guestUid').val())",
+            ".write": "auth != null && auth.uid === $playerUid",
             ".validate": "newData.hasChildren(['name', 'progress', 'completed']) && newData.child('progress').isNumber() && newData.child('progress').val() >= 0 && newData.child('progress').val() <= 1 && newData.child('completed').isBoolean()"
           }
         }
@@ -15,3 +15,4 @@
     }
   }
 }
+
